@@ -16,5 +16,10 @@ User::~User() {
 }
 
 bool User::onEvent(std::shared_ptr<IEvent> event) {
+	UUID type = event->getEventUuid();
+	if (type == EventQuit::uuid) {
+		return false;
+	}
+	return true;
 }
 

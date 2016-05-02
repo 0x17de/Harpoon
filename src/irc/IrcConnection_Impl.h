@@ -6,7 +6,14 @@
 
 
 class IrcConnection_Impl {
-	std::list<irc_session_t*> ircSession; // TODO: fixme
+public:
+	irc_session_t* ircSession;
+
+	void onConnect(irc_session_t* session,
+		const char* event,
+		const char* origin,
+		const char** params,
+		unsigned int count);
 };
 #warning STUB IrcConnection_Impl
 
