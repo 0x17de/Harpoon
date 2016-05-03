@@ -11,7 +11,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.h
 	src/db/ChatDatabaseDummy.cpp src/db/ChatDatabaseDummy.h
 	src/event/IEvent.h src/ini/IniReader.cpp src/ini/IniReader.h
 	src/irc/IrcConnection.cpp src/irc/IrcConnection.h
-	src/irc/IrcConnection_Impl.h
+	src/irc/IrcConnection_Impl.h src/irc/IrcEvents.cpp
 	src/main.cpp src/queue/EventQueue.cpp src/queue/EventQueue.h
 	src/queue/EventQueue_Impl.h src/tcp/TcpClient.cpp
 	src/tcp/TcpClient.h src/tcp/TcpServer.cpp src/tcp/TcpServer.h

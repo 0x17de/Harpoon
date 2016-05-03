@@ -9,7 +9,6 @@ using namespace std;
 
 static map<irc_session_t*, IrcConnection_Impl*> activeIrcConnections;
 
-
 template <void (IrcConnection_Impl::*F)(irc_session_t*, const char*, const char*, const char**, unsigned int)>
 void onIrcEvent(irc_session_t* session,
 	const char* event,
@@ -20,44 +19,6 @@ void onIrcEvent(irc_session_t* session,
 	IrcConnection_Impl* cxn = activeIrcConnections.at(session);
 	(cxn->*F)(session, event, origin, params, count);
 }
-
-
-void IrcConnection_Impl::onConnect(irc_session_t* session,
-	const char* event,
-	const char* origin,
-	const char** params,
-	unsigned int count)
-{
-}
-void IrcConnection_Impl::onNick(irc_session_t* session,
-	const char* event,
-	const char* origin,
-	const char** params,
-	unsigned int count)
-{
-}
-void IrcConnection_Impl::onQuit(irc_session_t* session,
-	const char* event,
-	const char* origin,
-	const char** params,
-	unsigned int count)
-{
-}
-void IrcConnection_Impl::onJoin(irc_session_t* session,
-	const char* event,
-	const char* origin,
-	const char** params,
-	unsigned int count)
-{
-}
-void IrcConnection_Impl::onPart(irc_session_t* session,
-	const char* event,
-	const char* origin,
-	const char** params,
-	unsigned int count)
-{
-}
-
 
 IrcConnection::IrcConnection(EventQueue* appQueue)
 :
@@ -74,7 +35,6 @@ IrcConnection::IrcConnection(EventQueue* appQueue)
 	callbacks.event_quit = &onIrcEvent<&IrcConnection_Impl::onQuit>;
 	callbacks.event_join = &onIrcEvent<&IrcConnection_Impl::onJoin>;
 	callbacks.event_part = &onIrcEvent<&IrcConnection_Impl::onPart>;
-	/*
 	callbacks.event_mode = &onIrcEvent<&IrcConnection_Impl::onMode>;
 	callbacks.event_umode = &onIrcEvent<&IrcConnection_Impl::onUmode>;
 	callbacks.event_topic = &onIrcEvent<&IrcConnection_Impl::onTopic>;
@@ -88,7 +48,7 @@ IrcConnection::IrcConnection(EventQueue* appQueue)
 	callbacks.event_ctcp_rep = &onIrcEvent<&IrcConnection_Impl::onRep>;
 	callbacks.event_ctcp_action = &onIrcEvent<&IrcConnection_Impl::onAction>;
 	callbacks.event_unknown = &onIrcEvent<&IrcConnection_Impl::onUnknown>;
-	*/
+
 	// callbacks.irc_eventcode_callback_t event_numeric = &onIrcEvent<&IrcConnection_Impl::onNumeric>
 	// callbacks.irc_event_dcc_chat_t event_dcc_chat_req = &onIrcEvent<&IrcConnection_Impl::onReq>
 	// callbacks.irc_event_dcc_send_t event_dcc_send_req = &onIrcEvent<&IrcConnection_Impl::onReq>
