@@ -29,6 +29,34 @@ void IrcConnection_Impl::onConnect(irc_session_t* session,
 	unsigned int count)
 {
 }
+void IrcConnection_Impl::onNick(irc_session_t* session,
+	const char* event,
+	const char* origin,
+	const char** params,
+	unsigned int count)
+{
+}
+void IrcConnection_Impl::onQuit(irc_session_t* session,
+	const char* event,
+	const char* origin,
+	const char** params,
+	unsigned int count)
+{
+}
+void IrcConnection_Impl::onJoin(irc_session_t* session,
+	const char* event,
+	const char* origin,
+	const char** params,
+	unsigned int count)
+{
+}
+void IrcConnection_Impl::onPart(irc_session_t* session,
+	const char* event,
+	const char* origin,
+	const char** params,
+	unsigned int count)
+{
+}
 
 
 IrcConnection::IrcConnection(EventQueue* appQueue)
@@ -42,6 +70,29 @@ IrcConnection::IrcConnection(EventQueue* appQueue)
 {
 	irc_callbacks_t callbacks;
 	callbacks.event_connect = &onIrcEvent<&IrcConnection_Impl::onConnect>;
+	callbacks.event_nick = &onIrcEvent<&IrcConnection_Impl::onNick>;
+	callbacks.event_quit = &onIrcEvent<&IrcConnection_Impl::onQuit>;
+	callbacks.event_join = &onIrcEvent<&IrcConnection_Impl::onJoin>;
+	callbacks.event_part = &onIrcEvent<&IrcConnection_Impl::onPart>;
+	/*
+	callbacks.event_mode = &onIrcEvent<&IrcConnection_Impl::onMode>;
+	callbacks.event_umode = &onIrcEvent<&IrcConnection_Impl::onUmode>;
+	callbacks.event_topic = &onIrcEvent<&IrcConnection_Impl::onTopic>;
+	callbacks.event_kick = &onIrcEvent<&IrcConnection_Impl::onKick>;
+	callbacks.event_channel = &onIrcEvent<&IrcConnection_Impl::onChannel>;
+	callbacks.event_privmsg = &onIrcEvent<&IrcConnection_Impl::onPrivmsg>;
+	callbacks.event_notice = &onIrcEvent<&IrcConnection_Impl::onNotice>;
+	callbacks.event_channel_notice = &onIrcEvent<&IrcConnection_Impl::onNotice>;
+	callbacks.event_invite = &onIrcEvent<&IrcConnection_Impl::onInvite>;
+	callbacks.event_ctcp_req = &onIrcEvent<&IrcConnection_Impl::onReq>;
+	callbacks.event_ctcp_rep = &onIrcEvent<&IrcConnection_Impl::onRep>;
+	callbacks.event_ctcp_action = &onIrcEvent<&IrcConnection_Impl::onAction>;
+	callbacks.event_unknown = &onIrcEvent<&IrcConnection_Impl::onUnknown>;
+	*/
+	// callbacks.irc_eventcode_callback_t event_numeric = &onIrcEvent<&IrcConnection_Impl::onNumeric>
+	// callbacks.irc_event_dcc_chat_t event_dcc_chat_req = &onIrcEvent<&IrcConnection_Impl::onReq>
+	// callbacks.irc_event_dcc_send_t event_dcc_send_req = &onIrcEvent<&IrcConnection_Impl::onReq>
+
 	impl->ircSession = irc_create_session(&callbacks);
 	if (impl->ircSession != 0) {
 		activeIrcConnections.emplace(impl->ircSession, impl.get());
