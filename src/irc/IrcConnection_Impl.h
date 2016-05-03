@@ -19,6 +19,18 @@ public:
 	ircEventCallback_t onQuit;
 	ircEventCallback_t onJoin;
 	ircEventCallback_t onPart;
+	ircEventCallback_t onMode;
+	ircEventCallback_t onUmode;
+	ircEventCallback_t onTopic;
+	ircEventCallback_t onKick;
+	ircEventCallback_t onChannel;
+	ircEventCallback_t onPrivmsg;
+	ircEventCallback_t onNotice;
+	ircEventCallback_t onInvite;
+	ircEventCallback_t onReq;
+	ircEventCallback_t onRep;
+	ircEventCallback_t onAction;
+	ircEventCallback_t onUnknown;
 };
 #warning STUB IrcConnection_Impl
 
