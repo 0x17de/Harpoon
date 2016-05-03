@@ -17,9 +17,10 @@ void EventLoop::go(EventLoop* loop) {
 }
 
 void EventLoop::run() {
-	std::shared_ptr<IEvent> event;
+	std::shared_ptr<IEvent> event; // will be filled by getEvent
 
 	int eventResult;
+	// loop and wait for events with a timeout of 1000
 	while ((eventResult = queue.getEvent(1000, event)) >= 0) {
 		if (eventResult < 0) break; // error
 		if (eventResult == 0) continue; // timeout
