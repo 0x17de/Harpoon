@@ -44,8 +44,8 @@ IrcConnection::IrcConnection(EventQueue* appQueue)
 	callbacks.event_notice = &onIrcEvent<&IrcConnection_Impl::onNotice>;
 	callbacks.event_channel_notice = &onIrcEvent<&IrcConnection_Impl::onNotice>;
 	callbacks.event_invite = &onIrcEvent<&IrcConnection_Impl::onInvite>;
-	callbacks.event_ctcp_req = &onIrcEvent<&IrcConnection_Impl::onReq>;
-	callbacks.event_ctcp_rep = &onIrcEvent<&IrcConnection_Impl::onRep>;
+	callbacks.event_ctcp_req = &onIrcEvent<&IrcConnection_Impl::onCtcpReq>;
+	callbacks.event_ctcp_rep = &onIrcEvent<&IrcConnection_Impl::onCtcpRep>;
 	callbacks.event_ctcp_action = &onIrcEvent<&IrcConnection_Impl::onAction>;
 	callbacks.event_unknown = &onIrcEvent<&IrcConnection_Impl::onUnknown>;
 

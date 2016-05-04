@@ -39,8 +39,8 @@ public:
 	ircEventCallback_t onInvite;
 
 	// client2client
-	ircEventCallback_t onReq;
-	ircEventCallback_t onRep;
+	ircEventCallback_t onCtcpReq;
+	ircEventCallback_t onCtcpRep;
 
 	ircEventCallback_t onAction; // me
 	ircEventCallback_t onUnknown; // others
