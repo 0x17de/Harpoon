@@ -3,10 +3,13 @@
 
 #include <libircclient.h>
 #include <list>
+#include "event/EventIrcJoinChannel.h"
+
 
 class IrcConnection_Impl {
 public:
 	irc_session_t* ircSession;
+	std::list<IrcChannelLoginData> channelLoginData;
 
 	// event callback typedef
 	typedef void (ircEventCallback_t)(irc_session_t* session,
@@ -14,6 +17,21 @@ public:
 		const char* origin,
 		const char** params,
 		unsigned int count);
+	typedef void (ircEventCodeCallback_t)(irc_session_t* session,
+		unsigned int event,
+		const char* origin,
+		const char** params,
+		unsigned int count);
+	// typedef void (ircEventDccChat_t)(irc_session_t* session,
+	// 	const char* nick,
+	// 	const char* addr,
+	// 	irc_dcc_t dccid);
+	// typedef void (*ircEventDccSend_t)(irc_session_t* session,
+	// 	const char* nick,
+	// 	const char* addr,
+	// 	const char* filename,
+	// 	unsigned long size,
+	// 	irc_dcc_t dccid);
 
 	// various event callbacks for libircclient
 
@@ -36,14 +54,16 @@ public:
 
 	// server
 	ircEventCallback_t onNotice;
+	ircEventCallback_t onChannelNotice;
 	ircEventCallback_t onInvite;
 
 	// client2client
 	ircEventCallback_t onCtcpReq;
 	ircEventCallback_t onCtcpRep;
+	ircEventCallback_t onCtcpAction;
 
-	ircEventCallback_t onAction; // me
-	ircEventCallback_t onUnknown; // others
+	// others
+	ircEventCallback_t onUnknown;
 };
 #warning STUB IrcConnection_Impl
 
