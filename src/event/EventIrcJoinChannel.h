@@ -6,18 +6,21 @@
 #include <string>
 
 
-class IrcChannelLoginData {
-	std::string username;
+struct IrcChannelLoginData {
+	std::string channel;
 	std::string password;
 };
 
 class EventIrcJoinChannel : public IEvent {
+	size_t serverId;
 	std::list<IrcChannelLoginData> loginData;
 public:
 	static UUID uuid;
 	virtual UUID getEventUuid() const override;
 
-	EventIrcJoinChannel(std::list<IrcChannelLoginData> loginData);
+	EventIrcJoinChannel(size_t serverId, std::list<IrcChannelLoginData> loginData);
+	size_t getServerId() const;
+	const std::list<IrcChannelLoginData> getLoginData() const;
 };
 
 #endif

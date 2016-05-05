@@ -1,7 +1,6 @@
 #include "IrcConnection.h"
 #include "IrcConnection_Impl.h"
 #include "event/EventQuit.h"
-#include "event/EventIrcJoinChannel.h"
 #include <map>
 
 using namespace std;
@@ -46,7 +45,7 @@ IrcConnection::IrcConnection(EventQueue* appQueue)
 	callbacks.event_invite = &onIrcEvent<&IrcConnection_Impl::onInvite>;
 	callbacks.event_ctcp_req = &onIrcEvent<&IrcConnection_Impl::onCtcpReq>;
 	callbacks.event_ctcp_rep = &onIrcEvent<&IrcConnection_Impl::onCtcpRep>;
-	callbacks.event_ctcp_action = &onIrcEvent<&IrcConnection_Impl::onAction>;
+	callbacks.event_ctcp_action = &onIrcEvent<&IrcConnection_Impl::onCtcpAction>;
 	callbacks.event_unknown = &onIrcEvent<&IrcConnection_Impl::onUnknown>;
 
 	// callbacks.irc_eventcode_callback_t event_numeric = &onIrcEvent<&IrcConnection_Impl::onNumeric>
@@ -70,6 +69,10 @@ bool IrcConnection::onEvent(std::shared_ptr<IEvent> event) {
 	UUID type = event->getEventUuid();
 	if (type == EventQuit::uuid) {
 		return false;
+	} else if (type == EventIrcJoinChannel::uuid) {
+		EventIrcJoinChannel* joinCommand = dynamic_cast<EventIrcJoinChannel*>(event.get());
+		joinCommand->getServerId();
+		joinCommand->getLoginData();
 	}
 	return true;
 }

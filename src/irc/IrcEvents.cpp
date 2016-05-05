@@ -8,6 +8,9 @@ void IrcConnection_Impl::onConnect(irc_session_t* session,
 	unsigned int count)
 {
 #warning stub onConnect
+	for (auto joinData : channelLoginData) {
+		irc_cmd_join(ircSession, joinData.channel.c_str(), joinData.password.empty() ? 0 : joinData.password.c_str());
+	}
 }
 void IrcConnection_Impl::onNick(irc_session_t* session,
 	const char* event,
@@ -97,6 +100,14 @@ void IrcConnection_Impl::onNotice(irc_session_t* session,
 {
 #warning stub onNotice
 }
+void IrcConnection_Impl::onChannelNotice(irc_session_t* session,
+        const char* event,
+        const char* origin,
+        const char** params,
+        unsigned int count)
+{
+#warning stub onChannelNotice
+}
 void IrcConnection_Impl::onInvite(irc_session_t* session,
         const char* event,
         const char* origin,
@@ -121,7 +132,7 @@ void IrcConnection_Impl::onCtcpRep(irc_session_t* session,
 {
 #warning stub onCtcpRep
 }
-void IrcConnection_Impl::onAction(irc_session_t* session,
+void IrcConnection_Impl::onCtcpAction(irc_session_t* session,
         const char* event,
         const char* origin,
         const char** params,
