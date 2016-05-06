@@ -18,6 +18,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.h
 	src/user/User.cpp src/user/User.h src/utils/uuid.h
 	src/user/UserManager.cpp src/user/UserManager.h
 	src/event/EventLogin.cpp src/event/EventLogin.h
+	src/event/EventIrcJoined.cpp src/event/EventIrcJoined.h
 	src/event/EventLoginResult.cpp src/event/EventLoginResult.h
 	src/event/EventIrcJoinChannel.cpp src/event/EventIrcJoinChannel.h
 	src/event/EventQuit.cpp src/event/EventQuit.h
