@@ -1,4 +1,9 @@
 #include "IrcConnection_Impl.h"
+#include "event/EventIrcJoinChannel.h"
+#include "event/EventIrcJoined.h"
+#include "event/EventIrcParted.h"
+
+using namespace std;
 
 
 void IrcConnection_Impl::onConnect(irc_session_t* session,
@@ -7,9 +12,9 @@ void IrcConnection_Impl::onConnect(irc_session_t* session,
 	const char** params,
 	unsigned int count)
 {
-#warning stub onConnect
+	lock_guard<mutex> lock(channelLoginDataMutex);
 	for (auto joinData : channelLoginData) {
-		irc_cmd_join(ircSession, joinData.channel.c_str(), joinData.password.empty() ? 0 : joinData.password.c_str());
+		irc_cmd_join(ircSession, joinData.second.channel.c_str(), joinData.second.password.empty() ? 0 : joinData.second.password.c_str());
 	}
 }
 void IrcConnection_Impl::onNick(irc_session_t* session,
@@ -35,6 +40,9 @@ void IrcConnection_Impl::onJoin(irc_session_t* session,
 	unsigned int count)
 {
 #warning stub onJoin
+	string username(origin);
+	string channel(params[0]);
+	make_shared<EventIrcJoined>(serverId, origin, channel);
 }
 void IrcConnection_Impl::onPart(irc_session_t* session,
 	const char* event,

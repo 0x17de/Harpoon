@@ -3,13 +3,21 @@
 
 #include <libircclient.h>
 #include <list>
-#include "event/EventIrcJoinChannel.h"
+#include <map>
+#include <mutex>
+#include <memory>
 
 
+class IEvent;
+class IrcChannelLoginData;
 class IrcConnection_Impl {
 public:
 	irc_session_t* ircSession;
-	std::list<IrcChannelLoginData> channelLoginData;
+	size_t serverId;
+	std::mutex channelLoginDataMutex;
+	std::map<size_t, IrcChannelLoginData> channelLoginData;
+
+	bool onEvent(std::shared_ptr<IEvent> event);
 
 	// event callback typedef
 	typedef void (ircEventCallback_t)(irc_session_t* session,

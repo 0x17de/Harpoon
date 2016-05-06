@@ -7,6 +7,7 @@
 
 
 struct IrcChannelLoginData {
+	size_t channelId;
 	std::string channel;
 	std::string password;
 };
