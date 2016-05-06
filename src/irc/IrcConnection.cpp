@@ -1,6 +1,8 @@
 #include "IrcConnection.h"
 #include "IrcConnection_Impl.h"
 #include "event/EventQuit.h"
+#include "event/EventIrcJoinChannel.h"
+#include "event/EventIrcPartChannel.h"
 #include <map>
 
 using namespace std;
@@ -19,14 +21,15 @@ void onIrcEvent(irc_session_t* session,
 	(cxn->*F)(session, event, origin, params, count);
 }
 
-IrcConnection::IrcConnection(EventQueue* appQueue)
+IrcConnection::IrcConnection(EventQueue* appQueue, size_t serverId)
 :
 	impl{new IrcConnection_Impl()},
 	EventLoop({
 		EventQuit::uuid,
 		EventIrcJoinChannel::uuid
 	}),
-	appQueue{appQueue}
+	appQueue{appQueue},
+	serverId{serverId}
 {
 	irc_callbacks_t callbacks;
 	callbacks.event_connect = &onIrcEvent<&IrcConnection_Impl::onConnect>;
@@ -66,13 +69,33 @@ IrcConnection::~IrcConnection() {
 }
 
 bool IrcConnection::onEvent(std::shared_ptr<IEvent> event) {
+	return impl->onEvent(event);
+}
+
+bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
 	UUID type = event->getEventUuid();
 	if (type == EventQuit::uuid) {
 		return false;
 	} else if (type == EventIrcJoinChannel::uuid) {
+		lock_guard<mutex> lock(channelLoginDataMutex);
 		EventIrcJoinChannel* joinCommand = dynamic_cast<EventIrcJoinChannel*>(event.get());
-		joinCommand->getServerId();
-		joinCommand->getLoginData();
+		for (auto& entry : joinCommand->getLoginData()) {
+			auto it = channelLoginData.find(entry.channelId);
+			if (it != channelLoginData.end())
+				continue;
+			irc_cmd_join(ircSession, it->second.channel.c_str(), it->second.password.c_str());
+			channelLoginData.emplace(entry.channelId, entry);
+		}
+	} else if (type == EventIrcPartChannel::uuid) {
+		lock_guard<mutex> lock(channelLoginDataMutex);
+		EventIrcPartChannel* partCommand = dynamic_cast<EventIrcPartChannel*>(event.get());
+		for (size_t channelId : partCommand->getChannelIds()) {
+			auto it = channelLoginData.find(channelId);
+			if (it == channelLoginData.end())
+				continue;
+			irc_cmd_part(ircSession, it->second.channel.c_str());
+			channelLoginData.erase(it);
+		}
 	}
 	return true;
 }
