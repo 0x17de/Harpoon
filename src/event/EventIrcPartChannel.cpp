@@ -1,5 +1,5 @@
-#include "EventIrcPartChannel.h"
-#include "utils/uuidGen.h"
+#include "EventIrcPartChannel.hpp"
+#include "utils/uuidGen.hpp"
 
 
 EventIrcPartChannel::EventIrcPartChannel(size_t serverId, std::list<size_t> loginData)

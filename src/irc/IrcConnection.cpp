@@ -1,8 +1,8 @@
-#include "IrcConnection.h"
-#include "IrcConnection_Impl.h"
-#include "event/EventQuit.h"
-#include "event/EventIrcJoinChannel.h"
-#include "event/EventIrcPartChannel.h"
+#include "IrcConnection.hpp"
+#include "IrcConnection_Impl.hpp"
+#include "event/EventQuit.hpp"
+#include "event/EventIrcJoinChannel.hpp"
+#include "event/EventIrcPartChannel.hpp"
 #include <map>
 
 using namespace std;

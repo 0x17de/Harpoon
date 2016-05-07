@@ -1,8 +1,8 @@
 #ifndef CHATDATABASEDUMMY_H
 #define CHATDATABASEDUMMY_H
 
-#include "queue/EventQueue.h"
-#include "queue/EventLoop.h"
+#include "queue/EventQueue.hpp"
+#include "queue/EventLoop.hpp"
 
 
 class EventLogin;

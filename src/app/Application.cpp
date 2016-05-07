@@ -2,11 +2,12 @@
 #include <csignal>
 #include <list>
 
-#include "Application.h"
-#include "queue/EventQueue.h"
-#include "user/UserManager.h"
-#include "event/EventQuit.h"
-#include "db/ChatDatabaseDummy.h"
+#include "Application.hpp"
+#include "queue/EventQueue.hpp"
+#include "user/UserManager.hpp"
+#include "event/EventInit.hpp"
+#include "event/EventQuit.hpp"
+#include "db/ChatDatabaseDummy.hpp"
 
 using namespace std;
 
@@ -19,6 +20,8 @@ Application::Application() :
 	userManager = make_shared<UserManager>(queue);
 	database = make_shared<ChatDatabaseDummy>(queue);
 	//server1 = make_shared<>(queue);
+
+	database->getEventQueue()->sendEvent(make_shared<EventInit>());
 }
 
 bool Application::onEvent(std::shared_ptr<IEvent> event) {

@@ -3,7 +3,7 @@
 
 #include <set>
 #include <memory>
-#include "utils/uuid.h"
+#include "utils/uuid.hpp"
 
 
 class IEvent;

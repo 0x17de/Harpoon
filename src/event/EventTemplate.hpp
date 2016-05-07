@@ -1,7 +1,7 @@
 #ifndef EVENTTEMPLATE_H
 #define EVENTTEMPLATE_H
 
-#include "IEvent.h"
+#include "IEvent.hpp"
 
 
 class EventTemplate : public IEvent {

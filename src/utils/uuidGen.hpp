@@ -1,7 +1,7 @@
 #ifndef UUIDGEN_H
 #define UUIDGEN_H
 
-#include "uuid.h"
+#include "uuid.hpp"
 
 
 static struct {

@@ -1,5 +1,5 @@
-#include "EventLoop.h"
-#include "queue/EventQueue.h"
+#include "EventLoop.hpp"
+#include "queue/EventQueue.hpp"
 
 EventLoop::EventLoop() :
 	t{std::thread(go, this)}

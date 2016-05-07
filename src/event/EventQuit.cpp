@@ -1,5 +1,5 @@
-#include "EventQuit.h"
-#include "utils/uuidGen.h"
+#include "EventQuit.hpp"
+#include "utils/uuidGen.hpp"
 
 
 UUID EventQuit::uuid = ::uuid.get();

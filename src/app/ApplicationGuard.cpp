@@ -1,8 +1,8 @@
-#include "ApplicationGuard.h"
+#include "ApplicationGuard.hpp"
 #include <memory>
 #include <csignal>
-#include "Application.h"
-#include "event/EventQuit.h"
+#include "Application.hpp"
+#include "event/EventQuit.hpp"
 
 using namespace std;
 

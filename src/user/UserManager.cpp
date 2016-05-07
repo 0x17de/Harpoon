@@ -1,7 +1,7 @@
 #include <iostream>
-#include "UserManager.h"
-#include "event/EventQuit.h"
-#include "event/EventLoginResult.h"
+#include "UserManager.hpp"
+#include "event/EventQuit.hpp"
+#include "event/EventLoginResult.hpp"
 
 using namespace std;
 

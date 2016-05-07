@@ -1,5 +1,5 @@
-#include "EventTemplate.h"
-#include "utils/uuidGen.h"
+#include "EventTemplate.hpp"
+#include "utils/uuidGen.hpp"
 
 
 UUID EventTemplate::uuid = ::uuid.get();

@@ -1,11 +1,11 @@
-#ifndef EVENTIRCJOINED_H
-#define EVENTIRCJOINED_H
+#ifndef EVENTIRCPARTED_H
+#define EVENTIRCPARTED_H
 
-#include "IEvent.h"
+#include "IEvent.hpp"
 #include <string>
 
 
-class EventIrcJoined : public IEvent {
+class EventIrcParted : public IEvent {
 	size_t serverId;
 	std::string username;
 	std::string channel;
@@ -13,7 +13,7 @@ public:
 	static UUID uuid;
 	virtual UUID getEventUuid() const override;
 
-	EventIrcJoined(size_t serverId, std::string username, std::string channel);
+	EventIrcParted(size_t serverId, std::string username, std::string channel);
 	size_t getServerId();
 	std::string getUsername();
 	std::string getChannel();

@@ -2,7 +2,7 @@
 #define EVENTLOGINRESULT_H
 
 #include <memory>
-#include "IEvent.h"
+#include "IEvent.hpp"
 
 
 class EventLoginResult : public IEvent {

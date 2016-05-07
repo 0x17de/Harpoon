@@ -1,14 +1,17 @@
 #include <iostream>
-#include "ChatDatabaseDummy.h"
-#include "event/EventQuit.h"
-#include "event/EventLogin.h"
-#include "event/EventLoginResult.h"
+#include "ChatDatabaseDummy.hpp"
+#include "event/EventInit.hpp"
+#include "event/EventQuit.hpp"
+#include "event/EventLogin.hpp"
+#include "event/EventLoginResult.hpp"
+#include "event/EventActivateUser.hpp"
 
 using namespace std;
 
 
 ChatDatabaseDummy::ChatDatabaseDummy(EventQueue* appQueue) :
 	EventLoop({
+		EventInit::uuid,
 		EventQuit::uuid,
 		EventLogin::uuid
 	}),
@@ -27,7 +30,14 @@ void ChatDatabaseDummy::doLogin(EventLogin* login) {
 
 bool ChatDatabaseDummy::onEvent(std::shared_ptr<IEvent> event) {
 	UUID eventType = event->getEventUuid();
-	if (eventType == EventQuit::uuid) {
+	if (eventType == EventInit::uuid) {
+		std::cout << "DB received INIT event" << std::endl;
+		string username = "Test";
+		string passwordHash = "";
+
+		//shared_ptr<EventActivateUser> user = make_shared<ActivateUser>(username, passwordHash);
+		//appQueue->sendEvent(user);
+	} else if (eventType == EventQuit::uuid) {
 		std::cout << "DB received QUIT event" << std::endl;
 		return false;
 	} else if (eventType == EventLogin::uuid) {
