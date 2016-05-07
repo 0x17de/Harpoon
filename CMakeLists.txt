@@ -17,6 +17,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/tcp/TcpClient.hpp src/tcp/TcpServer.cpp src/tcp/TcpServer.hpp
 	src/user/User.cpp src/user/User.hpp src/utils/uuid.hpp
 	src/user/UserManager.cpp src/user/UserManager.hpp
+	src/utils/Base64.cpp src/utils/Base64.hpp
 	src/utils/Crypto.cpp src/utils/Crypto.hpp
 	src/event/EventInit.cpp src/event/EventInit.hpp
 	src/event/EventActivateUser.cpp src/event/EventActivateUser.hpp
