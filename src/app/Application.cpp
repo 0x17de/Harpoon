@@ -33,6 +33,7 @@ bool Application::onEvent(std::shared_ptr<IEvent> event) {
 		if (theQueue##Queue->canProcessEvent(eventType)) \
 			theQueue##Queue->sendEvent(event);
 	TRANSMIT_EVENT(userManager)
+	userManager->sendEventToUser(event); // sends only to matching user (only if IUserEvent)
 	TRANSMIT_EVENT(database)
 	//TRANSMIT_EVENT(server1)
 	#undef TRANSMIT_EVENT

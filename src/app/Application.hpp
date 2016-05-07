@@ -5,10 +5,11 @@
 #include "ApplicationGuard.hpp"
 #include "queue/EventLoop.hpp"
 
+class UserManager;
 class IEvent;
 class Application : public EventLoop {
 	ApplicationGuard guard;
-	std::shared_ptr<EventLoop> userManager;
+	std::shared_ptr<UserManager> userManager;
 	std::shared_ptr<EventLoop> database;
 	std::shared_ptr<EventLoop> server1;
 public:
