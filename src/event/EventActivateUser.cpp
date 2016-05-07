@@ -7,3 +7,8 @@ UUID EventActivateUser::getEventUuid() const {
 	return this->uuid;
 }
 
+EventActivateUser::EventActivateUser(std::string username)
+:
+	username{username}
+{
+}

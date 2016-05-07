@@ -2,10 +2,10 @@
 #include "utils/uuidGen.hpp"
 
 
-EventIrcPartChannel::EventIrcPartChannel(size_t serverId, std::list<size_t> loginData)
+EventIrcPartChannel::EventIrcPartChannel(size_t serverId, std::list<std::string> partChannels)
 :
 	serverId{serverId},
-	channelIds{channelIds}
+	channels{channels}
 {
 }
 
@@ -17,7 +17,7 @@ UUID EventIrcPartChannel::getEventUuid() const {
 size_t EventIrcPartChannel::getServerId() const {
 	return serverId;
 };
-const std::list<size_t> EventIrcPartChannel::getChannelIds() const {
-	return channelIds;
+const std::list<std::string> EventIrcPartChannel::getChannels() const {
+	return channels;
 };
 

@@ -21,7 +21,7 @@ void onIrcEvent(irc_session_t* session,
 	(cxn->*F)(session, event, origin, params, count);
 }
 
-IrcConnection::IrcConnection(EventQueue* appQueue, size_t serverId)
+IrcConnection::IrcConnection(EventQueue* appQueue, size_t userId, size_t serverId)
 :
 	impl{new IrcConnection_Impl()},
 	EventLoop({
@@ -29,6 +29,7 @@ IrcConnection::IrcConnection(EventQueue* appQueue, size_t serverId)
 		EventIrcJoinChannel::uuid
 	}),
 	appQueue{appQueue},
+	userId{userId},
 	serverId{serverId}
 {
 	irc_callbacks_t callbacks;
@@ -78,19 +79,19 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
 		return false;
 	} else if (type == EventIrcJoinChannel::uuid) {
 		lock_guard<mutex> lock(channelLoginDataMutex);
-		EventIrcJoinChannel* joinCommand = dynamic_cast<EventIrcJoinChannel*>(event.get());
+		auto joinCommand = event->as<EventIrcJoinChannel>();
 		for (auto& entry : joinCommand->getLoginData()) {
-			auto it = channelLoginData.find(entry.channelId);
+			auto it = channelLoginData.find(entry.channel);
 			if (it != channelLoginData.end())
 				continue;
 			irc_cmd_join(ircSession, it->second.channel.c_str(), it->second.password.c_str());
-			channelLoginData.emplace(entry.channelId, entry);
+			channelLoginData.emplace(entry.channel, entry);
 		}
 	} else if (type == EventIrcPartChannel::uuid) {
 		lock_guard<mutex> lock(channelLoginDataMutex);
-		EventIrcPartChannel* partCommand = dynamic_cast<EventIrcPartChannel*>(event.get());
-		for (size_t channelId : partCommand->getChannelIds()) {
-			auto it = channelLoginData.find(channelId);
+		auto partCommand = event->as<EventIrcPartChannel>();
+		for (string channel : partCommand->getChannels()) {
+			auto it = channelLoginData.find(channel);
 			if (it == channelLoginData.end())
 				continue;
 			irc_cmd_part(ircSession, it->second.channel.c_str());
