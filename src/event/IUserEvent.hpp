@@ -4,7 +4,7 @@
 #include <cstddef>
 
 
-class IUserEvent {
+class IUserEvent : public IEvent {
 public:
 	virtual size_t getUserId() const = 0;
 };

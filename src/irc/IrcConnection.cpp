@@ -3,6 +3,7 @@
 #include "event/EventQuit.hpp"
 #include "event/EventIrcJoinChannel.hpp"
 #include "event/EventIrcPartChannel.hpp"
+#include <iostream>
 #include <map>
 
 using namespace std;
@@ -76,6 +77,7 @@ bool IrcConnection::onEvent(std::shared_ptr<IEvent> event) {
 bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
 	UUID type = event->getEventUuid();
 	if (type == EventQuit::uuid) {
+		cout << "[IC] received QUIT" << endl;
 		return false;
 	} else if (type == EventIrcJoinChannel::uuid) {
 		lock_guard<mutex> lock(channelLoginDataMutex);

@@ -17,18 +17,10 @@ UserManager::UserManager(EventQueue* appQueue) :
 {
 }
 
-void UserManager::doLogin(EventLoginResult* login) {
-	cout << "Login:" << endl
-	<< "Success: " << login->success << endl
-	<< "UserID: " << login->userId << endl; 
-	if (login->success) {
-#warning doLogin for user stub
-	}
-}
-
 void UserManager::sendEventToUser(std::shared_ptr<IEvent> event) {
 	auto userEvent = event->as<IUserEvent>();
 	if (userEvent != nullptr) {
+		cout << "NonNULL event" << endl;
 		auto it = users.find(userEvent->getUserId());
 		if (it != users.end()) {
 			EventQueue* queue = it->second.getEventQueue();
@@ -52,9 +44,10 @@ bool UserManager::onEvent(std::shared_ptr<IEvent> event) {
 		auto activateEvent = event->as<EventActivateUser>();
 		cout << "[UM] Activate user: " << activateEvent->getUserId() << endl;
 		size_t userId = activateEvent->getUserId();
-		users.emplace(std::piecewise_construct,
+		auto it = users.emplace(std::piecewise_construct,
 			std::forward_as_tuple(userId),
 			std::forward_as_tuple(appQueue));
+		it.first->second.getEventQueue()->sendEvent(event);
 	}
 	return true;
 }
