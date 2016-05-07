@@ -1,0 +1,5 @@
+class Crypto {
+	Crypto();
+	~Crypto();
+};
+

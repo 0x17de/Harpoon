@@ -1,5 +1,5 @@
-#include "EventLoginResult.h"
-#include "utils/uuidGen.h"
+#include "EventLoginResult.hpp"
+#include "utils/uuidGen.hpp"
 
 
 UUID EventLoginResult::uuid = ::uuid.get();

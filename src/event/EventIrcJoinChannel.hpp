@@ -1,7 +1,7 @@
 #ifndef EVENTIRCJOINCHANNEL_H
 #define EVENTIRCJOINCHANNEL_H
 
-#include "IEvent.h"
+#include "IEvent.hpp"
 #include <list>
 #include <string>
 

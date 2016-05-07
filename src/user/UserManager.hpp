@@ -2,8 +2,8 @@
 #define USERMANAGER_H
 
 #include <map>
-#include "queue/EventLoop.h"
-#include "User.h"
+#include "queue/EventLoop.hpp"
+#include "User.hpp"
 
 
 class EventQueue;

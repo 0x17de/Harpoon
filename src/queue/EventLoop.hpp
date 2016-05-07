@@ -4,8 +4,8 @@
 #include <thread>
 #include <memory>
 #include <set>
-#include "utils/uuid.h"
-#include "queue/EventQueue.h"
+#include "utils/uuid.hpp"
+#include "queue/EventQueue.hpp"
 
 
 class IEvent;

@@ -1,8 +1,8 @@
 #ifndef USER_H
 #define USER_H
 
-#include "queue/EventLoop.h"
-#include "User.h"
+#include "queue/EventLoop.hpp"
+#include "User.hpp"
 
 
 class EventQueue;

@@ -1,5 +1,5 @@
-#include "EventIrcParted.h"
-#include "utils/uuidGen.h"
+#include "EventIrcParted.hpp"
+#include "utils/uuidGen.hpp"
 
 
 UUID EventIrcParted::uuid = ::uuid.get();

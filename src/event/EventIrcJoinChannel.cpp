@@ -1,5 +1,5 @@
-#include "EventIrcJoinChannel.h"
-#include "utils/uuidGen.h"
+#include "EventIrcJoinChannel.hpp"
+#include "utils/uuidGen.hpp"
 
 
 EventIrcJoinChannel::EventIrcJoinChannel(size_t serverId, std::list<IrcChannelLoginData> loginData)

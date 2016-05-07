@@ -1,6 +1,6 @@
-#include "User.h"
-#include "queue/EventQueue.h"
-#include "event/EventQuit.h"
+#include "User.hpp"
+#include "queue/EventQueue.hpp"
+#include "event/EventQuit.hpp"
 
 
 User::User(EventQueue* appQueue)

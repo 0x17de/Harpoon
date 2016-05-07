@@ -2,7 +2,7 @@
 #define IRCCONNECTION_H
 
 #include <memory>
-#include "queue/EventLoop.h"
+#include "queue/EventLoop.hpp"
 
 
 class EventQueue;

@@ -2,8 +2,8 @@
 #define APPLICATION_H
 
 #include <memory>
-#include "ApplicationGuard.h"
-#include "queue/EventLoop.h"
+#include "ApplicationGuard.hpp"
+#include "queue/EventLoop.hpp"
 
 class IEvent;
 class Application : public EventLoop {

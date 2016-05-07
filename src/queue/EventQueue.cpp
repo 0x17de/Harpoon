@@ -1,5 +1,5 @@
-#include "EventQueue.h"
-#include "EventQueue_Impl.h"
+#include "EventQueue.hpp"
+#include "EventQueue_Impl.hpp"
 
 #include <chrono>
 
