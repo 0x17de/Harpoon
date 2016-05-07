@@ -10,10 +10,16 @@
 
 
 class IEvent;
+class EventQueue;
+class IrcServerConfiguration;
 class IrcChannelLoginData;
 class IrcConnection_Impl {
 public:
+	IrcConnection_Impl(EventQueue* appQueue, size_t userId, const IrcServerConfiguration& configuration);
+
 	irc_session_t* ircSession;
+	EventQueue* appQueue;
+	size_t userId;
 	size_t serverId;
 	std::mutex channelLoginDataMutex;
 	std::map<std::string, IrcChannelLoginData> channelLoginData;

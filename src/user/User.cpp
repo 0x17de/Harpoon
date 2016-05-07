@@ -36,11 +36,9 @@ bool User::onEvent(std::shared_ptr<IEvent> event) {
 		auto& loginConfiguration = activateEvent->getLoginConfiguration();
 		for (auto entry : loginConfiguration) {
 			auto& ircConfiguration = entry.second;
-			auto res = ircConnections.emplace(piecewise_construct,
+			ircConnections.emplace(piecewise_construct,
 				forward_as_tuple(ircConfiguration.serverId),
-				forward_as_tuple(appQueue, userId, ircConfiguration.serverId));
-			auto& ircConnection = res.first->second;
-#warning send server data event
+				forward_as_tuple(appQueue, userId, ircConfiguration));
 		}
 	}
 	return true;
