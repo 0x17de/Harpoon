@@ -33,15 +33,14 @@ bool ChatDatabaseDummy::onEvent(std::shared_ptr<IEvent> event) {
 	if (eventType == EventInit::uuid) {
 		std::cout << "DB received INIT event" << std::endl;
 		string username = "Test";
-		string passwordHash = "";
 
-		//shared_ptr<EventActivateUser> user = make_shared<ActivateUser>(username, passwordHash);
-		//appQueue->sendEvent(user);
+		shared_ptr<EventActivateUser> user{make_shared<EventActivateUser>(username)};
+		appQueue->sendEvent(user);
 	} else if (eventType == EventQuit::uuid) {
 		std::cout << "DB received QUIT event" << std::endl;
 		return false;
 	} else if (eventType == EventLogin::uuid) {
-		doLogin(dynamic_cast<EventLogin*>(event.get()));
+		doLogin(event->as<EventLogin>());
 	}
 	return true;
 }

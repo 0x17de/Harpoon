@@ -8,14 +8,14 @@
 
 class EventIrcPartChannel : public IEvent {
 	size_t serverId;
-	std::list<size_t> channelIds;
+	std::list<std::string> channels;
 public:
 	static UUID uuid;
 	virtual UUID getEventUuid() const override;
 
-	EventIrcPartChannel(size_t serverId, std::list<size_t> channelIds);
+	EventIrcPartChannel(size_t serverId, std::list<std::string> partChannels);
 	size_t getServerId() const;
-	const std::list<size_t> getChannelIds() const;
+	const std::list<std::string> getChannels() const;
 };
 
 #endif

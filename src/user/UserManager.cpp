@@ -31,7 +31,7 @@ bool UserManager::onEvent(std::shared_ptr<IEvent> event) {
 		cout << "UserManager received QUIT event" << endl;
 		return false;
 	} else if (eventType == EventLoginResult::uuid) {
-		doLogin(dynamic_cast<EventLoginResult*>(event.get()));
+		doLogin(event->as<EventLoginResult>());
 	}
 	return true;
 }

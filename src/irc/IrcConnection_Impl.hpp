@@ -4,6 +4,7 @@
 #include <libircclient.h>
 #include <list>
 #include <map>
+#include <string>
 #include <mutex>
 #include <memory>
 
@@ -15,7 +16,7 @@ public:
 	irc_session_t* ircSession;
 	size_t serverId;
 	std::mutex channelLoginDataMutex;
-	std::map<size_t, IrcChannelLoginData> channelLoginData;
+	std::map<std::string, IrcChannelLoginData> channelLoginData;
 
 	bool onEvent(std::shared_ptr<IEvent> event);
 
