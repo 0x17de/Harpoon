@@ -18,7 +18,7 @@ struct IrcServerConfiguration {
 	bool ssl;
 };
 
-class EventActivateUser : public IEvent, IUserEvent {
+class EventActivateUser : public IEvent {
 	size_t userId;
 	std::map<size_t, IrcServerConfiguration> loginData;
 public:
@@ -27,8 +27,8 @@ public:
 
 	EventActivateUser(size_t userId, const std::map<size_t, IrcServerConfiguration>& loginData);
 
-	virtual size_t getUserId() const override;
-	const std::map<size_t, IrcServerConfiguration> getLoginConfiguration() const;
+	size_t getUserId() const;
+	const std::map<size_t, IrcServerConfiguration>& getLoginConfiguration() const;
 };
 
 #endif
