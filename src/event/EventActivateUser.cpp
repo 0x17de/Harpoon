@@ -14,6 +14,10 @@ EventActivateUser::EventActivateUser(size_t userId, const std::map<size_t, IrcSe
 {
 }
 
-size_t EventActivateUser::getUserId() const {}
-std::string EventActivateUser::getUsername() const {}
-const std::map<size_t, IrcServerConfiguration> EventActivateUser::getLoginConfiguration() const {}
+size_t EventActivateUser::getUserId() const {
+	return userId;
+}
+
+const std::map<size_t, IrcServerConfiguration> EventActivateUser::getLoginConfiguration() const {
+
+}

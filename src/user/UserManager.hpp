@@ -15,6 +15,7 @@ class UserManager : public EventLoop {
 public:
 	UserManager(EventQueue* appQueue);
 	virtual bool onEvent(std::shared_ptr<IEvent> event) override;
+	void sendEventToUser(std::shared_ptr<IEvent> event);
 };
 
 #endif

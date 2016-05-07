@@ -9,7 +9,8 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/app/ApplicationGuard.cpp src/app/ApplicationGuard.hpp
 	src/queue/EventLoop.cpp src/queue/EventLoop.hpp
 	src/db/ChatDatabaseDummy.cpp src/db/ChatDatabaseDummy.hpp
-	src/event/IEvent.hpp src/ini/IniReader.cpp src/ini/IniReader.hpp
+	src/event/IEvent.hpp src/event/IUserEvent.hpp
+	src/ini/IniReader.cpp src/ini/IniReader.hpp
 	src/irc/IrcConnection.cpp src/irc/IrcConnection.hpp
 	src/irc/IrcConnection_Impl.hpp src/irc/IrcEvents.cpp
 	src/main.cpp src/queue/EventQueue.cpp src/queue/EventQueue.hpp
