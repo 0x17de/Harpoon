@@ -1,6 +1,7 @@
 #include "IrcConnection.hpp"
 #include "IrcConnection_Impl.hpp"
 #include "event/EventQuit.hpp"
+#include "event/EventActivateUser.hpp"
 #include "event/EventIrcJoinChannel.hpp"
 #include "event/EventIrcPartChannel.hpp"
 #include <iostream>
@@ -22,16 +23,21 @@ void onIrcEvent(irc_session_t* session,
 	(cxn->*F)(session, event, origin, params, count);
 }
 
-IrcConnection::IrcConnection(EventQueue* appQueue, size_t userId, size_t serverId)
+IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, const IrcServerConfiguration& configuration)
 :
-	impl{new IrcConnection_Impl()},
+	appQueue{appQueue},
+	userId{userId},
+	serverId{configuration.serverId}
+{
+}
+
+IrcConnection::IrcConnection(EventQueue* appQueue, size_t userId, const IrcServerConfiguration& configuration)
+:
+	impl{new IrcConnection_Impl(appQueue, userId, configuration)},
 	EventLoop({
 		EventQuit::uuid,
 		EventIrcJoinChannel::uuid
-	}),
-	appQueue{appQueue},
-	userId{userId},
-	serverId{serverId}
+	})
 {
 	irc_callbacks_t callbacks;
 	callbacks.event_connect = &onIrcEvent<&IrcConnection_Impl::onConnect>;

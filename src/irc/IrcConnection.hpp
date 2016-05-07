@@ -5,15 +5,13 @@
 #include "queue/EventLoop.hpp"
 
 
+class IrcServerConfiguration;
 class EventQueue;
 class IrcConnection_Impl;
 class IrcConnection : public EventLoop {
 	std::unique_ptr<IrcConnection_Impl> impl;
-	EventQueue* appQueue;
-	size_t userId;
-	size_t serverId;
 public:
-	IrcConnection(EventQueue* appQueue, size_t userId, size_t serverId);
+	IrcConnection(EventQueue* appQueue, size_t userId, const IrcServerConfiguration& configuration);
 	virtual ~IrcConnection();
 	virtual bool onEvent(std::shared_ptr<IEvent> event) override;
 
