@@ -7,8 +7,13 @@ UUID EventActivateUser::getEventUuid() const {
 	return this->uuid;
 }
 
-EventActivateUser::EventActivateUser(std::string username)
+EventActivateUser::EventActivateUser(size_t userId, const std::map<size_t, IrcServerConfiguration>& loginData)
 :
-	username{username}
+	userId{userId},
+	loginData{loginData}
 {
 }
+
+size_t EventActivateUser::getUserId() const {}
+std::string EventActivateUser::getUsername() const {}
+const std::map<size_t, IrcServerConfiguration> EventActivateUser::getLoginConfiguration() const {}
