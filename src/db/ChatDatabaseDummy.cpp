@@ -32,9 +32,11 @@ bool ChatDatabaseDummy::onEvent(std::shared_ptr<IEvent> event) {
 	UUID eventType = event->getEventUuid();
 	if (eventType == EventInit::uuid) {
 		std::cout << "DB received INIT event" << std::endl;
-		string username = "Test";
 
-		shared_ptr<EventActivateUser> user{make_shared<EventActivateUser>(username)};
+		size_t userId = 1;	
+		std::map<size_t, IrcServerConfiguration> loginData;
+
+		shared_ptr<EventActivateUser> user{make_shared<EventActivateUser>(userId, loginData)};
 		appQueue->sendEvent(user);
 	} else if (eventType == EventQuit::uuid) {
 		std::cout << "DB received QUIT event" << std::endl;
