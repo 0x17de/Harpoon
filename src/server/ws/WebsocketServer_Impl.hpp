@@ -1,0 +1,2 @@
+struct WebsocketServer_Impl {
+};
