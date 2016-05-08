@@ -228,7 +228,6 @@ void IrcConnection_Impl::onUnknown(irc_session_t* session,
         unsigned int count)
 {
 #warning stub onUnknown
-	string who(origin);
-	cout << "UnknownEvent<" << who << ">" << endl;
+	cout << "UnknownEvent" << endl;
 }
 
