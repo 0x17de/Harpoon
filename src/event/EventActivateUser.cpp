@@ -7,6 +7,19 @@ UUID EventActivateUser::getEventUuid() const {
 	return this->uuid;
 }
 
+IrcServerConfiguration::IrcServerConfiguration(size_t serverId, const std::string& serverName,
+	const std::string& serverHostname, const std::string& serverPassword,
+	std::list<std::string> nicks, bool ipv6, bool ssl)
+:
+	serverId{serverId},
+	serverName{serverName},
+	serverHostname{serverPassword},
+	nicks{nicks},
+	ipv6{ipv6},
+	ssl{ssl}
+{
+}
+
 EventActivateUser::EventActivateUser(size_t userId, const std::map<size_t, IrcServerConfiguration>& loginData)
 :
 	userId{userId},

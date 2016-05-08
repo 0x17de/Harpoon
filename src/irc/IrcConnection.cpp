@@ -29,16 +29,6 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, cons
 	userId{userId},
 	serverId{configuration.serverId}
 {
-}
-
-IrcConnection::IrcConnection(EventQueue* appQueue, size_t userId, const IrcServerConfiguration& configuration)
-:
-	impl{new IrcConnection_Impl(appQueue, userId, configuration)},
-	EventLoop({
-		EventQuit::uuid,
-		EventIrcJoinChannel::uuid
-	})
-{
 	irc_callbacks_t callbacks;
 	callbacks.event_connect = &onIrcEvent<&IrcConnection_Impl::onConnect>;
 	callbacks.event_nick = &onIrcEvent<&IrcConnection_Impl::onNick>;
@@ -63,10 +53,20 @@ IrcConnection::IrcConnection(EventQueue* appQueue, size_t userId, const IrcServe
 	// callbacks.irc_event_dcc_chat_t event_dcc_chat_req = &onIrcEvent<&IrcConnection_Impl::onReq>
 	// callbacks.irc_event_dcc_send_t event_dcc_send_req = &onIrcEvent<&IrcConnection_Impl::onReq>
 
-	impl->ircSession = irc_create_session(&callbacks);
-	if (impl->ircSession != 0) {
-		activeIrcConnections.emplace(impl->ircSession, impl.get());
+	ircSession = irc_create_session(&callbacks);
+	if (ircSession != 0) {
+		activeIrcConnections.emplace(ircSession, this);
 	}
+}
+
+IrcConnection::IrcConnection(EventQueue* appQueue, size_t userId, const IrcServerConfiguration& configuration)
+:
+	impl{new IrcConnection_Impl(appQueue, userId, configuration)},
+	EventLoop({
+		EventQuit::uuid,
+		EventIrcJoinChannel::uuid
+	})
+{
 }
 
 IrcConnection::~IrcConnection() {
