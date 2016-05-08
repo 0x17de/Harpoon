@@ -3,6 +3,7 @@
 
 #include "IEvent.hpp"
 #include "IUserEvent.hpp"
+#include "EventIrcJoinChannel.hpp"
 #include <string>
 #include <map>
 #include <list>
@@ -11,13 +12,16 @@
 struct IrcServerConfiguration {
 	IrcServerConfiguration(size_t serverId, const std::string& serverName,
 		const std::string& hostname, int port, const std::string& password,
-		std::list<std::string> nicks, bool ipv6, bool ssl);
+		const std::list<std::string>& nicks, 
+		const std::list<IrcChannelLoginData>& channels,
+		bool ipv6, bool ssl);
 	size_t serverId;
 	std::string serverName;
 	std::string hostname;
 	int port;
 	std::string password;
 	std::list<std::string> nicks;
+	std::list<IrcChannelLoginData> channels;
 	bool ipv6;
 	bool ssl;
 };
