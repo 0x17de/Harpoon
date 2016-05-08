@@ -2,6 +2,7 @@
 #include "event/EventIrcJoinChannel.hpp"
 #include "event/EventIrcJoined.hpp"
 #include "event/EventIrcParted.hpp"
+#include <iostream>
 
 using namespace std;
 
@@ -93,6 +94,11 @@ void IrcConnection_Impl::onChannel(irc_session_t* session,
         unsigned int count)
 {
 #warning stub onChannel
+	if (count < 2) return;
+	string username(origin);
+	string self(params[0]);
+	string message(params[1]);
+	cout << "<" << username << ">: " << message << endl;
 }
 void IrcConnection_Impl::onPrivmsg(irc_session_t* session,
         const char* event,
@@ -105,6 +111,7 @@ void IrcConnection_Impl::onPrivmsg(irc_session_t* session,
 	string username(origin);
 	string self(params[0]);
 	string message(params[1]);
+	cout << "<" << username << ">: " << message << endl;
 }
 void IrcConnection_Impl::onNotice(irc_session_t* session,
         const char* event,
