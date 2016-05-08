@@ -1,26 +1,31 @@
 #ifndef IRCCONNECTION_IMPL_H
 #define IRCCONNECTION_IMPL_h
 
+#include "event/EventActivateUser.hpp"
 #include <libircclient.h>
 #include <list>
 #include <map>
 #include <string>
 #include <mutex>
 #include <memory>
+#include <thread>
 
 
 class IEvent;
 class EventQueue;
-class IrcServerConfiguration;
 class IrcChannelLoginData;
 class IrcConnection_Impl {
 public:
 	IrcConnection_Impl(EventQueue* appQueue, size_t userId, const IrcServerConfiguration& configuration);
+	~IrcConnection_Impl();
 
 	irc_session_t* ircSession;
 	EventQueue* appQueue;
 	size_t userId;
-	size_t serverId;
+	IrcServerConfiguration configuration;
+
+	std::thread ircLoop;
+
 	std::mutex channelLoginDataMutex;
 	std::map<std::string, IrcChannelLoginData> channelLoginData;
 

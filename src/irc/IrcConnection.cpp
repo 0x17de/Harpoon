@@ -27,9 +27,9 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, cons
 :
 	appQueue{appQueue},
 	userId{userId},
-	serverId{configuration.serverId}
+	configuration{configuration}
 {
-	irc_callbacks_t callbacks;
+	irc_callbacks_t callbacks = {0};
 	callbacks.event_connect = &onIrcEvent<&IrcConnection_Impl::onConnect>;
 	callbacks.event_nick = &onIrcEvent<&IrcConnection_Impl::onNick>;
 	callbacks.event_quit = &onIrcEvent<&IrcConnection_Impl::onQuit>;
@@ -56,6 +56,26 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, cons
 	ircSession = irc_create_session(&callbacks);
 	if (ircSession != 0) {
 		activeIrcConnections.emplace(ircSession, this);
+		cout << "[IC] Session: " << ircSession << endl;
+		irc_connect(ircSession,
+			configuration.hostname.c_str(),
+			configuration.port,
+			configuration.password.empty() ? 0 : configuration.password.c_str(),
+			configuration.nicks.front().c_str(),
+			0 /* username */,
+			0 /* realname */);
+		cout << "[IC] Connect" << endl;
+		ircLoop = thread([=]{ irc_run(ircSession); });
+		cout << "[IC] Loop" << endl;
+	}
+}
+
+IrcConnection_Impl::~IrcConnection_Impl() {
+	if (ircSession != 0) {
+		irc_cmd_quit(ircSession, 0);
+		ircLoop.join();
+		activeIrcConnections.erase(ircSession);
+		irc_destroy_session(ircSession);
 	}
 }
 
@@ -70,10 +90,6 @@ IrcConnection::IrcConnection(EventQueue* appQueue, size_t userId, const IrcServe
 }
 
 IrcConnection::~IrcConnection() {
-	if (impl->ircSession != 0) {
-		activeIrcConnections.erase(impl->ircSession);
-		irc_destroy_session(impl->ircSession);
-	}
 }
 
 bool IrcConnection::onEvent(std::shared_ptr<IEvent> event) {
