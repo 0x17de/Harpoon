@@ -41,11 +41,27 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 #		src/commands/client.proto)
 
 
+if(${USE_WEBSOCKET_SERVER})
+	message("Websocket server included")
+	set(SOURCE_FILES ${SOURCE_FILES}
+		src/server/ws/WebsocketServer.cpp
+		src/server/ws/WebsocketServer.hpp
+		src/server/ws/WebsocketServer_Impl.hpp
+	)
+	add_definitions(-DUSE_WEBSOCKET_SERVER)
+	find_package(WebSocketPP REQUIRED)
+endif()
+
+
 add_executable(iirc ${SOURCE_FILES} ${PROTO_SRCS} ${PROTO_HDRS})
 
 
 target_link_libraries(iirc ${PROTOBUF_LIBRARIES})
 
+if(${USE_WEBSOCKET_SERVER})
+	include_directories(iirc ${WEBSOCKETPP_INCLUDE_DIRS})
+	target_link_libraries(iirc ${WEBSOCKETPP_LIBRARIES})
+endif()
 
 #find_package(Boost REQUIRED COMPONENTS system)
 #include_directories(${Boost_INCLUDE_DIR})
