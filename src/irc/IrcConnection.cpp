@@ -6,6 +6,8 @@
 #include "event/EventIrcPartChannel.hpp"
 #include <iostream>
 #include <map>
+#include <thread>
+#include <chrono>
 
 using namespace std;
 
@@ -27,56 +29,67 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, cons
 :
 	appQueue{appQueue},
 	userId{userId},
-	configuration{configuration}
+	configuration{configuration},
+	running{true}
 {
-	irc_callbacks_t callbacks = {0};
-	callbacks.event_connect = &onIrcEvent<&IrcConnection_Impl::onConnect>;
-	callbacks.event_nick = &onIrcEvent<&IrcConnection_Impl::onNick>;
-	callbacks.event_quit = &onIrcEvent<&IrcConnection_Impl::onQuit>;
-	callbacks.event_join = &onIrcEvent<&IrcConnection_Impl::onJoin>;
-	callbacks.event_part = &onIrcEvent<&IrcConnection_Impl::onPart>;
-	callbacks.event_mode = &onIrcEvent<&IrcConnection_Impl::onMode>;
-	callbacks.event_umode = &onIrcEvent<&IrcConnection_Impl::onUmode>;
-	callbacks.event_topic = &onIrcEvent<&IrcConnection_Impl::onTopic>;
-	callbacks.event_kick = &onIrcEvent<&IrcConnection_Impl::onKick>;
-	callbacks.event_channel = &onIrcEvent<&IrcConnection_Impl::onChannel>;
-	callbacks.event_privmsg = &onIrcEvent<&IrcConnection_Impl::onPrivmsg>;
-	callbacks.event_notice = &onIrcEvent<&IrcConnection_Impl::onNotice>;
-	callbacks.event_channel_notice = &onIrcEvent<&IrcConnection_Impl::onNotice>;
-	callbacks.event_invite = &onIrcEvent<&IrcConnection_Impl::onInvite>;
-	callbacks.event_ctcp_req = &onIrcEvent<&IrcConnection_Impl::onCtcpReq>;
-	callbacks.event_ctcp_rep = &onIrcEvent<&IrcConnection_Impl::onCtcpRep>;
-	callbacks.event_ctcp_action = &onIrcEvent<&IrcConnection_Impl::onCtcpAction>;
-	callbacks.event_unknown = &onIrcEvent<&IrcConnection_Impl::onUnknown>;
+	ircLoop = thread([this]{ 
+		irc_callbacks_t callbacks = {0};
+		callbacks.event_connect = &onIrcEvent<&IrcConnection_Impl::onConnect>;
+		callbacks.event_nick = &onIrcEvent<&IrcConnection_Impl::onNick>;
+		callbacks.event_quit = &onIrcEvent<&IrcConnection_Impl::onQuit>;
+		callbacks.event_join = &onIrcEvent<&IrcConnection_Impl::onJoin>;
+		callbacks.event_part = &onIrcEvent<&IrcConnection_Impl::onPart>;
+		callbacks.event_mode = &onIrcEvent<&IrcConnection_Impl::onMode>;
+		callbacks.event_umode = &onIrcEvent<&IrcConnection_Impl::onUmode>;
+		callbacks.event_topic = &onIrcEvent<&IrcConnection_Impl::onTopic>;
+		callbacks.event_kick = &onIrcEvent<&IrcConnection_Impl::onKick>;
+		callbacks.event_channel = &onIrcEvent<&IrcConnection_Impl::onChannel>;
+		callbacks.event_privmsg = &onIrcEvent<&IrcConnection_Impl::onPrivmsg>;
+		callbacks.event_notice = &onIrcEvent<&IrcConnection_Impl::onNotice>;
+		callbacks.event_channel_notice = &onIrcEvent<&IrcConnection_Impl::onNotice>;
+		callbacks.event_invite = &onIrcEvent<&IrcConnection_Impl::onInvite>;
+		callbacks.event_ctcp_req = &onIrcEvent<&IrcConnection_Impl::onCtcpReq>;
+		callbacks.event_ctcp_rep = &onIrcEvent<&IrcConnection_Impl::onCtcpRep>;
+		callbacks.event_ctcp_action = &onIrcEvent<&IrcConnection_Impl::onCtcpAction>;
+		callbacks.event_unknown = &onIrcEvent<&IrcConnection_Impl::onUnknown>;
+	
+		// callbacks.irc_eventcode_callback_t event_numeric = &onIrcEvent<&IrcConnection_Impl::onNumeric>
+		// callbacks.irc_event_dcc_chat_t event_dcc_chat_req = &onIrcEvent<&IrcConnection_Impl::onReq>
+		// callbacks.irc_event_dcc_send_t event_dcc_send_req = &onIrcEvent<&IrcConnection_Impl::onReq>
 
-	// callbacks.irc_eventcode_callback_t event_numeric = &onIrcEvent<&IrcConnection_Impl::onNumeric>
-	// callbacks.irc_event_dcc_chat_t event_dcc_chat_req = &onIrcEvent<&IrcConnection_Impl::onReq>
-	// callbacks.irc_event_dcc_send_t event_dcc_send_req = &onIrcEvent<&IrcConnection_Impl::onReq>
-
-	ircSession = irc_create_session(&callbacks);
-	if (ircSession != 0) {
+		ircSession = irc_create_session(&callbacks);
 		// remember session
 		activeIrcConnections.emplace(ircSession, this);
 		cout << "[IC] Session: " << ircSession << endl;
 
-		// copy channels to login
-		for (auto& channel : configuration.channels)
-			channelLoginData.emplace(channel.channel, channel);
+		while (ircSession != 0 && running) {
 
-		// connect to server
-		irc_connect(ircSession,
-			configuration.hostname.c_str(),
-			configuration.port,
-			configuration.password.empty() ? 0 : configuration.password.c_str(),
-			configuration.nicks.front().c_str(),
-			0 /* username */,
-			0 /* realname */);
-		cout << "[IC] Connect" << endl;
+			// copy channels to login
+			for (auto& channel : this->configuration.channels)
+				channelLoginData.emplace(channel.channel, channel);
 
-		// run irc event loop
-		ircLoop = thread([=]{ irc_run(ircSession); });
-		cout << "[IC] Loop" << endl;
-	}
+			// connect to server
+			irc_connect(ircSession,
+				this->configuration.hostname.c_str(),
+				this->configuration.port,
+				this->configuration.password.empty() ? 0 : this->configuration.password.c_str(),
+				this->configuration.nicks.front().c_str(),
+				0 /* username */,
+				0 /* realname */);
+			cout << "[IC] Connect" << endl;
+
+			// run irc event loop
+			irc_run(ircSession);
+			cout << "[IC] Loop finished" << endl;
+
+			irc_disconnect(ircSession);
+
+			if (running) {
+				// reconnect
+				this_thread::sleep_for(chrono::seconds(1));
+			}
+		}
+	});
 }
 
 IrcConnection_Impl::~IrcConnection_Impl() {
@@ -108,6 +121,7 @@ bool IrcConnection::onEvent(std::shared_ptr<IEvent> event) {
 bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
 	UUID type = event->getEventUuid();
 	if (type == EventQuit::uuid) {
+		running = false;
 		cout << "[IC] received QUIT" << endl;
 		return false;
 	} else if (type == EventIrcJoinChannel::uuid) {

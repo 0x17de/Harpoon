@@ -19,6 +19,7 @@ public:
 	IrcConnection_Impl(EventQueue* appQueue, size_t userId, const IrcServerConfiguration& configuration);
 	~IrcConnection_Impl();
 
+	bool running;
 	irc_session_t* ircSession;
 	EventQueue* appQueue;
 	size_t userId;
