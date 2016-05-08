@@ -10,12 +10,13 @@
 
 struct IrcServerConfiguration {
 	IrcServerConfiguration(size_t serverId, const std::string& serverName,
-		const std::string& serverHostname, const std::string& serverPassword,
+		const std::string& hostname, int port, const std::string& password,
 		std::list<std::string> nicks, bool ipv6, bool ssl);
 	size_t serverId;
 	std::string serverName;
-	std::string serverHostname;
-	std::string serverPassword;
+	std::string hostname;
+	int port;
+	std::string password;
 	std::list<std::string> nicks;
 	bool ipv6;
 	bool ssl;

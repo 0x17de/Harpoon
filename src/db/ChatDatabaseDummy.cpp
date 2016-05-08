@@ -39,7 +39,7 @@ bool ChatDatabaseDummy::onEvent(std::shared_ptr<IEvent> event) {
 		size_t serverId = 1;
 		loginData.emplace(piecewise_construct,
 			forward_as_tuple(serverId),
-			forward_as_tuple(serverId, "TestServer", "192.168.1.3", "", list<string>{"iirc", "iirc2", "iirc3"}, false, false));
+			forward_as_tuple(serverId, "TestServer", "192.168.1.3", 6667, "", list<string>{"iirc", "iirc2", "iirc3"}, false, false));
 
 		appQueue->sendEvent({make_shared<EventActivateUser>(userId, loginData)});
 	} else if (eventType == EventQuit::uuid) {

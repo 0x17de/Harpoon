@@ -41,7 +41,7 @@ void IrcConnection_Impl::onJoin(irc_session_t* session,
 {
 	string username(origin);
 	string channel(params[0]);
-	make_shared<EventIrcJoined>(serverId, origin, channel);
+	make_shared<EventIrcJoined>(configuration.serverId, origin, channel);
 }
 void IrcConnection_Impl::onPart(irc_session_t* session,
 	const char* event,
