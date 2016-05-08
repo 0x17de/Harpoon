@@ -36,6 +36,7 @@ bool User::onEvent(std::shared_ptr<IEvent> event) {
 		auto& loginConfiguration = activateEvent->getLoginConfiguration();
 		for (auto entry : loginConfiguration) {
 			auto& ircConfiguration = entry.second;
+			cout << "[US] CONFIG: " << ircConfiguration.serverId << endl;
 			ircConnections.emplace(piecewise_construct,
 				forward_as_tuple(ircConfiguration.serverId),
 				forward_as_tuple(appQueue, userId, ircConfiguration));
