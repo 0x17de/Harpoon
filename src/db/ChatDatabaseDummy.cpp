@@ -5,6 +5,7 @@
 #include "event/EventLogin.hpp"
 #include "event/EventLoginResult.hpp"
 #include "event/EventActivateUser.hpp"
+#include "event/EventIrcJoinChannel.hpp"
 
 using namespace std;
 
@@ -39,9 +40,10 @@ bool ChatDatabaseDummy::onEvent(std::shared_ptr<IEvent> event) {
 		size_t serverId = 1;
 		loginData.emplace(piecewise_construct,
 			forward_as_tuple(serverId),
-			forward_as_tuple(serverId, "TestServer", "192.168.1.3", 6667, "", list<string>{"iirc", "iirc2", "iirc3"}, false, false));
+			forward_as_tuple(serverId, "TestServer", "192.168.1.3", 6667, "", list<string>{"iirc", "iirc2", "iirc3"}, list<IrcChannelLoginData>{{1, "#test", ""}}, false, false));
 
-		appQueue->sendEvent({make_shared<EventActivateUser>(userId, loginData)});
+		appQueue->sendEvent(make_shared<EventActivateUser>(userId, loginData));
+
 	} else if (eventType == EventQuit::uuid) {
 		std::cout << "DB received QUIT event" << std::endl;
 		return false;

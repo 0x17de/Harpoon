@@ -55,8 +55,15 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, cons
 
 	ircSession = irc_create_session(&callbacks);
 	if (ircSession != 0) {
+		// remember session
 		activeIrcConnections.emplace(ircSession, this);
 		cout << "[IC] Session: " << ircSession << endl;
+
+		// copy channels to login
+		for (auto& channel : configuration.channels)
+			channelLoginData.emplace(channel.channel, channel);
+
+		// connect to server
 		irc_connect(ircSession,
 			configuration.hostname.c_str(),
 			configuration.port,
@@ -65,6 +72,8 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, cons
 			0 /* username */,
 			0 /* realname */);
 		cout << "[IC] Connect" << endl;
+
+		// run irc event loop
 		ircLoop = thread([=]{ irc_run(ircSession); });
 		cout << "[IC] Loop" << endl;
 	}

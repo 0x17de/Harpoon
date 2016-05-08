@@ -3,6 +3,7 @@
 #include "queue/EventQueue.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventActivateUser.hpp"
+#include "event/EventIrcJoinChannel.hpp"
 #include <iostream>
 
 using namespace std;
@@ -12,7 +13,8 @@ User::User(EventQueue* appQueue)
 :
 	EventLoop({
 		EventQuit::uuid,
-		EventActivateUser::uuid
+		EventActivateUser::uuid,
+		EventIrcJoinChannel::uuid
 	}),
 	appQueue{appQueue}
 {
@@ -30,6 +32,8 @@ bool User::onEvent(std::shared_ptr<IEvent> event) {
 		for (auto& connection : ircConnections)
 			connection.second.join();
 		return false;
+	} else if (type == EventIrcJoinChannel::uuid) {
+		cout << "[US] Received JOIN" << endl;
 	} else if (type == EventActivateUser::uuid) {
 		cout << "[US] Received ActivateUser" << endl;
 		auto activateEvent = event->as<EventActivateUser>();
