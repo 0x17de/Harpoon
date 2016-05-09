@@ -1,7 +1,9 @@
 #include "IrcConnection_Impl.hpp"
+#include "queue/EventQueue.hpp"
 #include "event/EventIrcJoinChannel.hpp"
 #include "event/EventIrcJoined.hpp"
 #include "event/EventIrcParted.hpp"
+#include "event/EventIrcMessage.hpp"
 #include <iostream>
 
 using namespace std;
@@ -53,7 +55,7 @@ void IrcConnection_Impl::onJoin(irc_session_t* session,
 {
 	string who(origin);
 	string channel(params[0]);
-	make_shared<EventIrcJoined>(configuration.serverId, origin, channel);
+	appQueue->sendEvent(make_shared<EventIrcJoined>(configuration.serverId, origin, channel));
 	if (count < 2) {
 		cout << "JOIN<" << who << ">: " << channel << endl;
 	} else {
@@ -144,6 +146,7 @@ void IrcConnection_Impl::onChannel(irc_session_t* session,
 	string channel(params[0]);
 	string message(params[1]);
 	cout << "<" << channel << ":" << who << ">: " << message << endl;
+	appQueue->sendEvent(make_shared<EventIrcMessage>(who, channel, message));
 }
 void IrcConnection_Impl::onPrivmsg(irc_session_t* session,
         const char* event,
@@ -157,6 +160,7 @@ void IrcConnection_Impl::onPrivmsg(irc_session_t* session,
 	string self(params[0]);
 	string message(params[1]);
 	cout << "<" << who << "|" << self << ">: " << message << endl;
+	appQueue->sendEvent(make_shared<EventIrcMessage>(who, who, message));
 }
 void IrcConnection_Impl::onNotice(irc_session_t* session,
         const char* event,
