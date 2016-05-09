@@ -28,6 +28,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/event/EventIrcPartChannel.cpp src/event/EventIrcPartChannel.hpp
 	src/event/EventIrcJoined.cpp src/event/EventIrcJoined.hpp
 	src/event/EventIrcJoinChannel.cpp src/event/EventIrcJoinChannel.hpp
+	src/event/EventIrcMessage.cpp src/event/EventIrcMessage.hpp
 	src/event/EventQuit.cpp src/event/EventQuit.hpp
 	)
 
