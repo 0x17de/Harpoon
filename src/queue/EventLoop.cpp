@@ -12,6 +12,9 @@ EventLoop::EventLoop(std::set<UUID> processableEvents) :
 {
 }
 
+EventLoop::~EventLoop() {
+}
+
 void EventLoop::go(EventLoop* loop) {
 	loop->run();
 }
@@ -34,5 +37,20 @@ EventQueue* EventLoop::getEventQueue() {
 
 void EventLoop::join() {
 	t.join();
+}
+
+ManagingEventLoop::ManagingEventLoop()
+:
+	EventLoop()
+{
+}
+
+ManagingEventLoop::ManagingEventLoop(std::set<UUID> processableEvents)
+:
+	EventLoop(processableEvents)
+{
+}
+
+ManagingEventLoop::~ManagingEventLoop() {
 }
 

@@ -38,8 +38,12 @@ bool Application::onEvent(std::shared_ptr<IEvent> event) {
 		auto eventQueue = eventHandler->getEventQueue();
 		if (eventQueue->canProcessEvent(eventType))
 			eventQueue->sendEvent(event);
+
+		// send events to managed subqueues
+		auto userEventLoop = dynamic_cast<ManagingEventLoop*>(eventHandler.get());
+		if (userEventLoop != nullptr)
+			userEventLoop->sendEventToUser(event); // sends only to matching user (only if IUserEvent)
 	}
-	userManager->sendEventToUser(event); // sends only to matching user (only if IUserEvent)
 
 	if (eventType == EventQuit::uuid) {
 		cout << "Received Quit Event" << endl;

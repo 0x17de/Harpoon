@@ -20,8 +20,18 @@ protected:
 public:
 	EventLoop();
 	EventLoop(std::set<UUID> processableEvents);
+	~EventLoop();
 	EventQueue* getEventQueue();
 	void join();
 };
+
+class ManagingEventLoop : public EventLoop {
+public:
+	ManagingEventLoop();
+	ManagingEventLoop(std::set<UUID> processableEvents);
+	~ManagingEventLoop();
+	virtual void sendEventToUser(std::shared_ptr<IEvent> event) = 0;
+};
+
 
 #endif
