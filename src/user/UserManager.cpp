@@ -8,7 +8,7 @@ using namespace std;
 
 
 UserManager::UserManager(EventQueue* appQueue) :
-	EventLoop({
+	ManagingEventLoop({
 		EventQuit::uuid,
 		EventLoginResult::uuid,
 		EventActivateUser::uuid

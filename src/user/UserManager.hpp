@@ -8,13 +8,13 @@
 
 class EventQueue;
 class EventLoginResult;
-class UserManager : public EventLoop {
+class UserManager : public ManagingEventLoop {
 	EventQueue* appQueue;
 	std::map<size_t, User> users;
 public:
 	UserManager(EventQueue* appQueue);
 	virtual bool onEvent(std::shared_ptr<IEvent> event) override;
-	void sendEventToUser(std::shared_ptr<IEvent> event);
+	virtual void sendEventToUser(std::shared_ptr<IEvent> event) override;
 };
 
 #endif
