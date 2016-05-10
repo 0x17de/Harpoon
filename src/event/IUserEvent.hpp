@@ -2,6 +2,7 @@
 #define IUSEREVENT_H
 
 #include <cstddef>
+#include "IEvent.hpp"
 
 
 class IUserEvent : public IEvent {
