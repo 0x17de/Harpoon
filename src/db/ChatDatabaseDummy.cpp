@@ -26,7 +26,7 @@ void ChatDatabaseDummy::doLogin(EventLogin* login) {
 	loginResult->success = true;
 	loginResult->userId = 1;
 #warning login always successful
-	appQueue->sendEvent(loginResult);
+	login->target->sendEvent(loginResult);
 }
 
 bool ChatDatabaseDummy::onEvent(std::shared_ptr<IEvent> event) {
