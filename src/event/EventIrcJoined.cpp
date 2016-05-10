@@ -7,23 +7,28 @@ UUID EventIrcJoined::getEventUuid() const {
 	return this->uuid;
 }
 
-EventIrcJoined::EventIrcJoined(size_t serverId, std::string username, std::string channel)
+EventIrcJoined::EventIrcJoined(size_t userId, size_t serverId, std::string username, std::string channel)
 :
+	userId{userId},
 	serverId{serverId},
 	username{username},
 	channel{channel}
 {
 }
 
-size_t EventIrcJoined::getServerId() {
+size_t EventIrcJoined::getUserId() const {
+	return userId;
+}
+
+size_t EventIrcJoined::getServerId() const {
 	return serverId;
 }
 
-std::string EventIrcJoined::getUsername() {
+std::string EventIrcJoined::getUsername() const {
 	return username;
 }
 
-std::string EventIrcJoined::getChannel() {
+std::string EventIrcJoined::getChannel() const {
 	return channel;
 }
 
