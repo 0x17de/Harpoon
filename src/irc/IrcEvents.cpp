@@ -3,6 +3,7 @@
 #include "event/EventIrcJoinChannel.hpp"
 #include "event/EventIrcJoined.hpp"
 #include "event/EventIrcParted.hpp"
+#include "event/EventIrcQuit.hpp"
 #include "event/EventIrcMessage.hpp"
 #include <iostream>
 
@@ -40,12 +41,15 @@ void IrcConnection_Impl::onQuit(irc_session_t* session,
 {
 #warning stub onQuit
 	string who(origin);
+	string reason;
 	if (count < 1) {
 		cout << "Q<" << origin << ">" << endl;
+		reason = "";
 	} else {
-		string reason(params[0]);
+		reason = params[0];
 		cout << "Q<" << origin << ">: " << reason << endl;
 	}
+	appQueue->sendEvent(make_shared<EventIrcQuit>(userId, configuration.serverId, who, reason));
 }
 void IrcConnection_Impl::onJoin(irc_session_t* session,
 	const char* event,
