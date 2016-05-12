@@ -24,6 +24,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/event/EventActivateUser.cpp src/event/EventActivateUser.hpp
 	src/event/EventLogin.cpp src/event/EventLogin.hpp
 	src/event/EventLoginResult.cpp src/event/EventLoginResult.hpp
+	src/event/EventIrcTopic.cpp src/event/EventIrcTopic.hpp
 	src/event/EventIrcQuit.cpp src/event/EventIrcQuit.hpp
 	src/event/EventIrcParted.cpp src/event/EventIrcParted.hpp
 	src/event/EventIrcPartChannel.cpp src/event/EventIrcPartChannel.hpp
