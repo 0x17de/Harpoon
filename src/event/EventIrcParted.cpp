@@ -7,7 +7,7 @@ UUID EventIrcParted::getEventUuid() const {
 	return this->uuid;
 }
 
-EventIrcParted::EventIrcParted(size_t userId, size_t serverId, std::string username, std::string channel)
+EventIrcParted::EventIrcParted(size_t userId, size_t serverId, const std::string& username, const std::string& channel)
 :
 	userId{userId},
 	serverId{serverId},
