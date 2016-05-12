@@ -27,6 +27,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/event/EventIrcQuit.cpp src/event/EventIrcQuit.hpp
 	src/event/EventIrcParted.cpp src/event/EventIrcParted.hpp
 	src/event/EventIrcPartChannel.cpp src/event/EventIrcPartChannel.hpp
+	src/event/EventIrcKicked.cpp src/event/EventIrcKicked.hpp
 	src/event/EventIrcJoined.cpp src/event/EventIrcJoined.hpp
 	src/event/EventIrcJoinChannel.cpp src/event/EventIrcJoinChannel.hpp
 	src/event/EventIrcMessage.cpp src/event/EventIrcMessage.hpp

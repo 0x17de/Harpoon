@@ -3,6 +3,7 @@
 #include "event/EventIrcJoinChannel.hpp"
 #include "event/EventIrcJoined.hpp"
 #include "event/EventIrcParted.hpp"
+#include "event/EventIrcKicked.hpp"
 #include "event/EventIrcQuit.hpp"
 #include "event/EventIrcMessage.hpp"
 #include <iostream>
@@ -41,14 +42,8 @@ void IrcConnection_Impl::onQuit(irc_session_t* session,
 {
 #warning stub onQuit
 	string who(origin);
-	string reason;
-	if (count < 1) {
-		cout << "Q<" << origin << ">" << endl;
-		reason = "";
-	} else {
-		reason = params[0];
-		cout << "Q<" << origin << ">: " << reason << endl;
-	}
+	string reason = count < 1 ? "" : params[0];
+	cout << "Q<" << origin << ">: " << reason << endl;
 	appQueue->sendEvent(make_shared<EventIrcQuit>(userId, configuration.serverId, who, reason));
 }
 void IrcConnection_Impl::onJoin(irc_session_t* session,
@@ -60,12 +55,7 @@ void IrcConnection_Impl::onJoin(irc_session_t* session,
 	string who(origin);
 	string channel(params[0]);
 	appQueue->sendEvent(make_shared<EventIrcJoined>(userId, configuration.serverId, who, channel));
-	if (count < 2) {
-		cout << "JOIN<" << who << ">: " << channel << endl;
-	} else {
-		string reason(params[1]);
-		cout << "JOIN<" << who << ">: " << channel << ": " << reason << endl;
-	}
+	cout << "JOIN<" << who << ">: " << channel << endl;
 }
 void IrcConnection_Impl::onPart(irc_session_t* session,
 	const char* event,
@@ -76,13 +66,9 @@ void IrcConnection_Impl::onPart(irc_session_t* session,
 #warning stub onPart
 	string who(origin);
 	string channel(params[0]);
+	string reason = count < 2 ? "" : params[1];
 	appQueue->sendEvent(make_shared<EventIrcParted>(userId, configuration.serverId, who, channel));
-	if (count < 2) {
-		cout << "PART<" << who << ">: " << channel << endl;
-	} else {
-		string reason(params[1]);
-		cout << "PART<" << who << ">: " << channel << ": " << reason << endl;
-	}
+	cout << "PART<" << who << ">: " << channel << ": " << reason << endl;
 }
 void IrcConnection_Impl::onMode(irc_session_t* session,
         const char* event,
@@ -94,12 +80,8 @@ void IrcConnection_Impl::onMode(irc_session_t* session,
 	string who(origin);
 	string channel(params[0]);
 	string mode(params[1]);
-	if (count < 3) {
-		cout << "MODE<" << who << ">: " << channel << " " << mode << endl;
-	} else {
-		string arg(params[2]);
-		cout << "MODE<" << who << ">: " << channel << " " << mode << ": " << arg << endl;
-	}
+	string arg = count < 3 ? "" : params[2];
+	cout << "MODE<" << who << ">: " << channel << " " << mode << ": " << arg << endl;
 }
 void IrcConnection_Impl::onUmode(irc_session_t* session,
         const char* event,
@@ -111,12 +93,8 @@ void IrcConnection_Impl::onUmode(irc_session_t* session,
 	string who(origin);
 	string channel(params[0]);
 	string mode(params[1]);
-	if (count < 3) {
-		cout << "UMODE<" << who << ">: " << channel << " " << mode << endl;
-	} else {
-		string arg(params[2]);
-		cout << "UMODE<" << who << ">: " << channel << " " << mode << ": " << arg << endl;
-	}
+	string arg = count < 3 ? "" : params[2];
+	cout << "UMODE<" << who << ">: " << channel << " " << mode << ": " << arg << endl;
 }
 void IrcConnection_Impl::onTopic(irc_session_t* session,
         const char* event,
@@ -137,6 +115,12 @@ void IrcConnection_Impl::onKick(irc_session_t* session,
         unsigned int count)
 {
 #warning stub onKick
+	if (count < 2) return;
+	string who(origin);
+	string channel(params[0]);
+	string target = count < 2 ? "" : params[1];
+	string reason = count < 3 ? "" : params[2];
+	appQueue->sendEvent(make_shared<EventIrcKicked>(userId, configuration.serverId, who, channel, target, reason));
 }
 void IrcConnection_Impl::onChannel(irc_session_t* session,
         const char* event,
