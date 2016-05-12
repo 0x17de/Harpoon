@@ -5,6 +5,7 @@
 #include "event/EventIrcParted.hpp"
 #include "event/EventIrcKicked.hpp"
 #include "event/EventIrcQuit.hpp"
+#include "event/EventIrcTopic.hpp"
 #include "event/EventIrcMessage.hpp"
 #include <iostream>
 
@@ -103,10 +104,12 @@ void IrcConnection_Impl::onTopic(irc_session_t* session,
         unsigned int count)
 {
 #warning stub onTopic
+	if (count < 1) return;
 	string who(origin);
 	string channel(params[0]);
-	string topic(params[1]);
+	string topic = count < 2 ? "" : (params[1]);
 	cout << "TOPIC<" << who << ">: " << channel << ": " << topic << endl;
+	appQueue->sendEvent(make_shared<EventIrcTopic>(userId, configuration.serverId, who, channel, topic));
 }
 void IrcConnection_Impl::onKick(irc_session_t* session,
         const char* event,
