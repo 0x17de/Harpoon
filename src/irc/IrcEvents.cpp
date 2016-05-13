@@ -7,6 +7,7 @@
 #include "event/EventIrcQuit.hpp"
 #include "event/EventIrcTopic.hpp"
 #include "event/EventIrcMessage.hpp"
+#include "event/EventIrcNickChanged.hpp"
 #include <iostream>
 
 using namespace std;
@@ -31,9 +32,10 @@ void IrcConnection_Impl::onNick(irc_session_t* session,
 {
 #warning stub onNick
 	if (count < 1) return;
-	string originalNick(origin);
+	string who(origin);
 	string newNick(params[0]);
-	cout << "Nickchange<" << originalNick << ">: " << newNick << endl;
+	cout << "Nickchange<" << who << ">: " << newNick << endl;
+	appQueue->sendEvent(make_shared<EventIrcNickChanged>(userId, configuration.serverId, who, newNick));
 }
 void IrcConnection_Impl::onQuit(irc_session_t* session,
 	const char* event,
