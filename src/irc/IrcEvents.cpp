@@ -1,6 +1,7 @@
 #include "IrcConnection_Impl.hpp"
 #include "queue/EventQueue.hpp"
 #include "event/EventIrcConnected.hpp"
+#include "event/EventIrcModeChanged.hpp"
 #include "event/EventIrcNickChanged.hpp"
 #include "event/EventIrcJoinChannel.hpp"
 #include "event/EventIrcJoined.hpp"
@@ -86,6 +87,7 @@ void IrcConnection_Impl::onMode(irc_session_t* session,
 	string channel(params[0]);
 	string mode(params[1]);
 	string arg = count < 3 ? "" : params[2];
+	appQueue->sendEvent(make_shared<EventIrcModeChanged>(userId, configuration.serverId, who, channel, mode, arg));
 	cout << "MODE<" << who << ">: " << channel << " " << mode << ": " << arg << endl;
 }
 void IrcConnection_Impl::onUmode(irc_session_t* session,
