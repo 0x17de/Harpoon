@@ -11,6 +11,8 @@
 #include "event/EventIrcQuit.hpp"
 #include "event/EventIrcTopic.hpp"
 #include "event/EventIrcMessage.hpp"
+#include "event/EventIrcNoticed.hpp"
+#include "event/EventIrcChannelNoticed.hpp"
 #include <iostream>
 
 using namespace std;
@@ -171,11 +173,12 @@ void IrcConnection_Impl::onNotice(irc_session_t* session,
         unsigned int count)
 {
 #warning stub onNotice
-	if (count < 2) return;
+	if (count < 1) return;
 	string who(origin);
-	string self(params[0]);
-	string message(params[1]);
-	cout << "N<" << who << "|" << self << ">: " << message << endl;
+	string target(params[0]);
+	string message = count < 2 ? "" : params[1];
+	appQueue->sendEvent(make_shared<EventIrcNoticed>(userId, configuration.serverId, who, target, message));
+	cout << "N<" << who << "|" << target << ">: " << message << endl;
 }
 void IrcConnection_Impl::onChannelNotice(irc_session_t* session,
         const char* event,
@@ -184,11 +187,12 @@ void IrcConnection_Impl::onChannelNotice(irc_session_t* session,
         unsigned int count)
 {
 #warning stub onChannelNotice
-	if (count < 2) return;
+	if (count < 1) return;
 	string who(origin);
-	string self(params[0]);
-	string message(params[1]);
-	cout << "CN<" << who << "|" << self << ">: " << message << endl;
+	string channel(params[0]);
+	string message = count < 2 ? "" : params[1];
+	appQueue->sendEvent(make_shared<EventIrcChannelNoticed>(userId, configuration.serverId, who, channel, message));
+	cout << "CN<" << who << "|" << channel << ">: " << message << endl;
 }
 void IrcConnection_Impl::onInvite(irc_session_t* session,
         const char* event,
