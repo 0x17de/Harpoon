@@ -26,6 +26,8 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/event/EventLoginResult.cpp src/event/EventLoginResult.hpp
 	src/event/EventIrcConnected.cpp src/event/EventIrcConnected.hpp
 	src/event/EventIrcTopic.cpp src/event/EventIrcTopic.hpp
+	src/event/EventIrcChannelNoticed.cpp src/event/EventIrcChannelNoticed.hpp
+	src/event/EventIrcNoticed.cpp src/event/EventIrcNoticed.hpp
 	src/event/EventIrcModeChanged.cpp src/event/EventIrcModeChanged.hpp
 	src/event/EventIrcUserModeChanged.cpp src/event/EventIrcUserModeChanged.hpp
 	src/event/EventIrcQuit.cpp src/event/EventIrcQuit.hpp
