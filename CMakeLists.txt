@@ -27,6 +27,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/event/EventIrcConnected.cpp src/event/EventIrcConnected.hpp
 	src/event/EventIrcTopic.cpp src/event/EventIrcTopic.hpp
 	src/event/EventIrcModeChanged.cpp src/event/EventIrcModeChanged.hpp
+	src/event/EventIrcUserModeChanged.cpp src/event/EventIrcUserModeChanged.hpp
 	src/event/EventIrcQuit.cpp src/event/EventIrcQuit.hpp
 	src/event/EventIrcParted.cpp src/event/EventIrcParted.hpp
 	src/event/EventIrcNickChanged.cpp src/event/EventIrcNickChanged.hpp
