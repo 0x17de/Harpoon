@@ -1,5 +1,7 @@
 #include "IrcConnection_Impl.hpp"
 #include "queue/EventQueue.hpp"
+#include "event/EventIrcConnected.hpp"
+#include "event/EventIrcNickChanged.hpp"
 #include "event/EventIrcJoinChannel.hpp"
 #include "event/EventIrcJoined.hpp"
 #include "event/EventIrcParted.hpp"
@@ -7,7 +9,6 @@
 #include "event/EventIrcQuit.hpp"
 #include "event/EventIrcTopic.hpp"
 #include "event/EventIrcMessage.hpp"
-#include "event/EventIrcNickChanged.hpp"
 #include <iostream>
 
 using namespace std;
@@ -23,6 +24,7 @@ void IrcConnection_Impl::onConnect(irc_session_t* session,
 	for (auto joinData : channelLoginData) {
 		irc_cmd_join(ircSession, joinData.second.channel.c_str(), joinData.second.password.empty() ? 0 : joinData.second.password.c_str());
 	}
+	appQueue->sendEvent(make_shared<EventIrcConnected>(userId, configuration.serverId));
 }
 void IrcConnection_Impl::onNick(irc_session_t* session,
 	const char* event,
