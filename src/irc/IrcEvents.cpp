@@ -2,6 +2,7 @@
 #include "queue/EventQueue.hpp"
 #include "event/EventIrcConnected.hpp"
 #include "event/EventIrcModeChanged.hpp"
+#include "event/EventIrcUserModeChanged.hpp"
 #include "event/EventIrcNickChanged.hpp"
 #include "event/EventIrcJoinChannel.hpp"
 #include "event/EventIrcJoined.hpp"
@@ -58,6 +59,7 @@ void IrcConnection_Impl::onJoin(irc_session_t* session,
 	const char** params,
 	unsigned int count)
 {
+	if (count < 1) return;
 	string who(origin);
 	string channel(params[0]);
 	appQueue->sendEvent(make_shared<EventIrcJoined>(userId, configuration.serverId, who, channel));
@@ -70,6 +72,7 @@ void IrcConnection_Impl::onPart(irc_session_t* session,
 	unsigned int count)
 {
 #warning stub onPart
+	if (count < 1) return;
 	string who(origin);
 	string channel(params[0]);
 	string reason = count < 2 ? "" : params[1];
@@ -83,6 +86,7 @@ void IrcConnection_Impl::onMode(irc_session_t* session,
         unsigned int count)
 {
 #warning stub onMode
+	if (count < 2) return;
 	string who(origin);
 	string channel(params[0]);
 	string mode(params[1]);
@@ -97,11 +101,12 @@ void IrcConnection_Impl::onUmode(irc_session_t* session,
         unsigned int count)
 {
 #warning stub onUmode
+	if (count < 2) return;
 	string who(origin);
 	string channel(params[0]);
 	string mode(params[1]);
-	string arg = count < 3 ? "" : params[2];
-	cout << "UMODE<" << who << ">: " << channel << " " << mode << ": " << arg << endl;
+	appQueue->sendEvent(make_shared<EventIrcUserModeChanged>(userId, configuration.serverId, who, channel, mode));
+	cout << "UMODE<" << who << ">: " << channel << " " << mode << endl;
 }
 void IrcConnection_Impl::onTopic(irc_session_t* session,
         const char* event,
