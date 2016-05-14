@@ -13,6 +13,7 @@
 #include "event/EventIrcMessage.hpp"
 #include "event/EventIrcNoticed.hpp"
 #include "event/EventIrcChannelNoticed.hpp"
+#include "event/EventIrcInvited.hpp"
 #include <iostream>
 
 using namespace std;
@@ -201,11 +202,12 @@ void IrcConnection_Impl::onInvite(irc_session_t* session,
         unsigned int count)
 {
 #warning stub onInvite
-	if (count < 2) return;
+	if (count < 1) return;
 	string who(origin);
-	string nick(params[0]);
-	string channel(params[1]);
-	cout << "Invite<" << who << ">: " << channel << ": " << nick << endl;
+	string target(params[0]);
+	string channel = count < 2 ? "" : params[1];
+	appQueue->sendEvent(make_shared<EventIrcInvited>(userId, configuration.serverId, who, target, channel));
+	cout << "Invite<" << who << ">: " << channel << ": " << target << endl;
 }
 void IrcConnection_Impl::onCtcpReq(irc_session_t* session,
         const char* event,
