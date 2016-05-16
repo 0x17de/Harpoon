@@ -94,6 +94,5 @@ public:
 	// others
 	ircEventCallback_t onUnknown;
 };
-#warning STUB IrcConnection_Impl
 
 #endif
