@@ -4,6 +4,7 @@
 #include "event/EventActivateUser.hpp"
 #include <libircclient.h>
 #include <list>
+#include <vector>
 #include <map>
 #include <string>
 #include <mutex>
@@ -41,18 +42,23 @@ public:
 	typedef void (ircEventCodeCallback_t)(irc_session_t* session,
 		unsigned int event,
 		const char* origin,
-		const char** params,
-		unsigned int count);
-	// typedef void (ircEventDccChat_t)(irc_session_t* session,
-	// 	const char* nick,
-	// 	const char* addr,
-	// 	irc_dcc_t dccid);
-	// typedef void (*ircEventDccSend_t)(irc_session_t* session,
-	// 	const char* nick,
-	// 	const char* addr,
-	// 	const char* filename,
-	// 	unsigned long size,
-	// 	irc_dcc_t dccid);
+		const std::vector<std::string>& parameters);
+	typedef void (ircEventDccChat_t)(irc_session_t* session,
+		const char* nick,
+		const char* addr,
+		irc_dcc_t dccid);
+	typedef void (ircEventDccSend_t)(irc_session_t* session,
+		const char* nick,
+		const char* addr,
+		const char* filename,
+		unsigned long size,
+		irc_dcc_t dccid);
+	typedef void (ircDccCallback_t)(irc_session_t* session,
+		irc_dcc_t id,
+		int status,
+		void* ctx,
+		const char* data,
+		unsigned int length);
 
 	// various event callbacks for libircclient
 
@@ -82,6 +88,9 @@ public:
 	ircEventCallback_t onCtcpReq;
 	ircEventCallback_t onCtcpRep;
 	ircEventCallback_t onCtcpAction;
+
+	// numeric response
+	ircEventCodeCallback_t onNumeric;
 
 	// others
 	ircEventCallback_t onUnknown;
