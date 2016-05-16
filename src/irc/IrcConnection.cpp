@@ -14,15 +14,18 @@ using namespace std;
 
 static map<irc_session_t*, IrcConnection_Impl*> activeIrcConnections;
 
-template <void (IrcConnection_Impl::*F)(irc_session_t*, const char*, const char*, const char**, unsigned int)>
+template <void (IrcConnection_Impl::*F)(irc_session_t*, const char*, const char*, const vector<string>&)>
 void onIrcEvent(irc_session_t* session,
 	const char* event,
 	const char* origin,
 	const char** params,
 	unsigned int count)
 {
+	vector<string> parameters(count);
+	for (unsigned int i = 0; i < count; ++i)
+		parameters.push_back(string(params[i]));
 	IrcConnection_Impl* cxn = activeIrcConnections.at(session);
-	(cxn->*F)(session, event, origin, params, count);
+	(cxn->*F)(session, event, origin, parameters);
 }
 template <void (IrcConnection_Impl::*F)(irc_session_t*, unsigned int, const char*, const vector<string>&)>
 void onIrcNumeric(irc_session_t* session,
