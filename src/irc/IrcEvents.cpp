@@ -14,6 +14,7 @@
 #include "event/EventIrcNoticed.hpp"
 #include "event/EventIrcChannelNoticed.hpp"
 #include "event/EventIrcInvited.hpp"
+#include "event/EventIrcNumeric.hpp"
 #include <iostream>
 
 using namespace std;
@@ -37,7 +38,6 @@ void IrcConnection_Impl::onNick(irc_session_t* session,
 	const char** params,
 	unsigned int count)
 {
-#warning stub onNick
 	if (count < 1) return;
 	string who(origin);
 	string newNick(params[0]);
@@ -50,7 +50,6 @@ void IrcConnection_Impl::onQuit(irc_session_t* session,
 	const char** params,
 	unsigned int count)
 {
-#warning stub onQuit
 	string who(origin);
 	string reason = count < 1 ? "" : params[0];
 	cout << "Q<" << origin << ">: " << reason << endl;
@@ -74,7 +73,6 @@ void IrcConnection_Impl::onPart(irc_session_t* session,
 	const char** params,
 	unsigned int count)
 {
-#warning stub onPart
 	if (count < 1) return;
 	string who(origin);
 	string channel(params[0]);
@@ -88,7 +86,6 @@ void IrcConnection_Impl::onMode(irc_session_t* session,
         const char** params,
         unsigned int count)
 {
-#warning stub onMode
 	if (count < 2) return;
 	string who(origin);
 	string channel(params[0]);
@@ -103,7 +100,6 @@ void IrcConnection_Impl::onUmode(irc_session_t* session,
         const char** params,
         unsigned int count)
 {
-#warning stub onUmode
 	if (count < 2) return;
 	string who(origin);
 	string channel(params[0]);
@@ -117,7 +113,6 @@ void IrcConnection_Impl::onTopic(irc_session_t* session,
         const char** params,
         unsigned int count)
 {
-#warning stub onTopic
 	if (count < 1) return;
 	string who(origin);
 	string channel(params[0]);
@@ -131,7 +126,6 @@ void IrcConnection_Impl::onKick(irc_session_t* session,
         const char** params,
         unsigned int count)
 {
-#warning stub onKick
 	if (count < 2) return;
 	string who(origin);
 	string channel(params[0]);
@@ -145,7 +139,6 @@ void IrcConnection_Impl::onChannel(irc_session_t* session,
         const char** params,
         unsigned int count)
 {
-#warning stub onChannel
 	if (count < 2) return;
 	string who(origin);
 	string channel(params[0]);
@@ -159,7 +152,6 @@ void IrcConnection_Impl::onPrivmsg(irc_session_t* session,
         const char** params,
         unsigned int count)
 {
-#warning stub onPrivmsg
 	if (count < 2) return;
 	string who(origin);
 	string self(params[0]);
@@ -173,7 +165,6 @@ void IrcConnection_Impl::onNotice(irc_session_t* session,
         const char** params,
         unsigned int count)
 {
-#warning stub onNotice
 	if (count < 1) return;
 	string who(origin);
 	string target(params[0]);
@@ -187,7 +178,6 @@ void IrcConnection_Impl::onChannelNotice(irc_session_t* session,
         const char** params,
         unsigned int count)
 {
-#warning stub onChannelNotice
 	if (count < 1) return;
 	string who(origin);
 	string channel(params[0]);
@@ -201,7 +191,6 @@ void IrcConnection_Impl::onInvite(irc_session_t* session,
         const char** params,
         unsigned int count)
 {
-#warning stub onInvite
 	if (count < 1) return;
 	string who(origin);
 	string target(params[0]);
@@ -232,6 +221,18 @@ void IrcConnection_Impl::onCtcpAction(irc_session_t* session,
         unsigned int count)
 {
 #warning stub onAction
+}
+void IrcConnection_Impl::onNumeric(irc_session_t* session,
+	unsigned int event,
+	const char* origin,
+	const std::vector<std::string>& parameters)
+{
+	string who = origin == 0 ? "" : origin;
+	appQueue->sendEvent(make_shared<EventIrcNumeric>(userId, configuration.serverId, event, who, parameters));
+	cout << "Numeric<" << who << ">: " << event;
+	for (string s : parameters)
+		cout << " | " << s;
+	cout << endl;
 }
 void IrcConnection_Impl::onUnknown(irc_session_t* session,
         const char* event,

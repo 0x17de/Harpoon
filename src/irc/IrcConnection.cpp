@@ -24,6 +24,19 @@ void onIrcEvent(irc_session_t* session,
 	IrcConnection_Impl* cxn = activeIrcConnections.at(session);
 	(cxn->*F)(session, event, origin, params, count);
 }
+template <void (IrcConnection_Impl::*F)(irc_session_t*, unsigned int, const char*, const vector<string>&)>
+void onIrcNumeric(irc_session_t* session,
+	unsigned int eventCode,
+	const char* origin,
+	const char** params,
+	unsigned int count)
+{
+	vector<string> parameters(count);
+	for (unsigned int i = 0; i < count; ++i)
+		parameters.push_back(string(params[i]));
+	IrcConnection_Impl* cxn = activeIrcConnections.at(session);
+	(cxn->*F)(session, eventCode, origin, parameters);
+}
 
 IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, const IrcServerConfiguration& configuration)
 :
@@ -52,8 +65,9 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, cons
 		callbacks.event_ctcp_rep = &onIrcEvent<&IrcConnection_Impl::onCtcpRep>;
 		callbacks.event_ctcp_action = &onIrcEvent<&IrcConnection_Impl::onCtcpAction>;
 		callbacks.event_unknown = &onIrcEvent<&IrcConnection_Impl::onUnknown>;
-	
-		// callbacks.irc_eventcode_callback_t event_numeric = &onIrcEvent<&IrcConnection_Impl::onNumeric>
+
+		callbacks.event_numeric = &onIrcNumeric<&IrcConnection_Impl::onNumeric>;
+
 		// callbacks.irc_event_dcc_chat_t event_dcc_chat_req = &onIrcEvent<&IrcConnection_Impl::onReq>
 		// callbacks.irc_event_dcc_send_t event_dcc_send_req = &onIrcEvent<&IrcConnection_Impl::onReq>
 
