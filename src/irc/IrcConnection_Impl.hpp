@@ -37,8 +37,7 @@ public:
 	typedef void (ircEventCallback_t)(irc_session_t* session,
 		const char* event,
 		const char* origin,
-		const char** params,
-		unsigned int count);
+		const std::vector<std::string>& parameters);
 	typedef void (ircEventCodeCallback_t)(irc_session_t* session,
 		unsigned int event,
 		const char* origin,

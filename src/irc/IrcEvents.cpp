@@ -23,8 +23,7 @@ using namespace std;
 void IrcConnection_Impl::onConnect(irc_session_t* session,
 	const char* event,
 	const char* origin,
-	const char** params,
-	unsigned int count)
+	const std::vector<std::string>& params)
 {
 	lock_guard<mutex> lock(channelLoginDataMutex);
 	for (auto joinData : channelLoginData) {
@@ -35,190 +34,174 @@ void IrcConnection_Impl::onConnect(irc_session_t* session,
 void IrcConnection_Impl::onNick(irc_session_t* session,
 	const char* event,
 	const char* origin,
-	const char** params,
-	unsigned int count)
+	const std::vector<std::string>& params)
 {
-	if (count < 1) return;
+	if (params.size() < 1) return;
 	string who(origin);
-	string newNick(params[0]);
+	string newNick(params.at(0));
 	cout << "Nickchange<" << who << ">: " << newNick << endl;
 	appQueue->sendEvent(make_shared<EventIrcNickChanged>(userId, configuration.serverId, who, newNick));
 }
 void IrcConnection_Impl::onQuit(irc_session_t* session,
 	const char* event,
 	const char* origin,
-	const char** params,
-	unsigned int count)
+	const std::vector<std::string>& params)
 {
 	string who(origin);
-	string reason = count < 1 ? "" : params[0];
+	string reason = params.size() < 1 ? "" : params.at(0);
 	cout << "Q<" << origin << ">: " << reason << endl;
 	appQueue->sendEvent(make_shared<EventIrcQuit>(userId, configuration.serverId, who, reason));
 }
 void IrcConnection_Impl::onJoin(irc_session_t* session,
 	const char* event,
 	const char* origin,
-	const char** params,
-	unsigned int count)
+	const std::vector<std::string>& params)
 {
-	if (count < 1) return;
+	if (params.size() < 1) return;
 	string who(origin);
-	string channel(params[0]);
+	string channel(params.at(0));
 	appQueue->sendEvent(make_shared<EventIrcJoined>(userId, configuration.serverId, who, channel));
 	cout << "JOIN<" << who << ">: " << channel << endl;
 }
 void IrcConnection_Impl::onPart(irc_session_t* session,
 	const char* event,
 	const char* origin,
-	const char** params,
-	unsigned int count)
+	const std::vector<std::string>& params)
 {
-	if (count < 1) return;
+	if (params.size() < 1) return;
 	string who(origin);
-	string channel(params[0]);
-	string reason = count < 2 ? "" : params[1];
+	string channel(params.at(0));
+	string reason = params.size() < 2 ? "" : params.at(1);
 	appQueue->sendEvent(make_shared<EventIrcParted>(userId, configuration.serverId, who, channel));
 	cout << "PART<" << who << ">: " << channel << ": " << reason << endl;
 }
 void IrcConnection_Impl::onMode(irc_session_t* session,
         const char* event,
         const char* origin,
-        const char** params,
-        unsigned int count)
+        const std::vector<std::string>& params)
 {
-	if (count < 2) return;
+	if (params.size() < 2) return;
 	string who(origin);
-	string channel(params[0]);
-	string mode(params[1]);
-	string arg = count < 3 ? "" : params[2];
+	string channel(params.at(0));
+	string mode(params.at(1));
+	string arg = params.size() < 3 ? "" : params.at(2);
 	appQueue->sendEvent(make_shared<EventIrcModeChanged>(userId, configuration.serverId, who, channel, mode, arg));
 	cout << "MODE<" << who << ">: " << channel << " " << mode << ": " << arg << endl;
 }
 void IrcConnection_Impl::onUmode(irc_session_t* session,
         const char* event,
         const char* origin,
-        const char** params,
-        unsigned int count)
+        const std::vector<std::string>& params)
 {
-	if (count < 2) return;
+	if (params.size() < 2) return;
 	string who(origin);
-	string channel(params[0]);
-	string mode(params[1]);
+	string channel(params.at(0));
+	string mode(params.at(1));
 	appQueue->sendEvent(make_shared<EventIrcUserModeChanged>(userId, configuration.serverId, who, channel, mode));
 	cout << "UMODE<" << who << ">: " << channel << " " << mode << endl;
 }
 void IrcConnection_Impl::onTopic(irc_session_t* session,
         const char* event,
         const char* origin,
-        const char** params,
-        unsigned int count)
+        const std::vector<std::string>& params)
 {
-	if (count < 1) return;
+	if (params.size() < 1) return;
 	string who(origin);
-	string channel(params[0]);
-	string topic = count < 2 ? "" : (params[1]);
+	string channel(params.at(0));
+	string topic = params.size() < 2 ? "" : (params.at(1));
 	cout << "TOPIC<" << who << ">: " << channel << ": " << topic << endl;
 	appQueue->sendEvent(make_shared<EventIrcTopic>(userId, configuration.serverId, who, channel, topic));
 }
 void IrcConnection_Impl::onKick(irc_session_t* session,
         const char* event,
         const char* origin,
-        const char** params,
-        unsigned int count)
+        const std::vector<std::string>& params)
 {
-	if (count < 2) return;
+	if (params.size() < 2) return;
 	string who(origin);
-	string channel(params[0]);
-	string target = count < 2 ? "" : params[1];
-	string reason = count < 3 ? "" : params[2];
+	string channel(params.at(0));
+	string target = params.size() < 2 ? "" : params.at(1);
+	string reason = params.size() < 3 ? "" : params.at(2);
 	appQueue->sendEvent(make_shared<EventIrcKicked>(userId, configuration.serverId, who, channel, target, reason));
 }
 void IrcConnection_Impl::onChannel(irc_session_t* session,
         const char* event,
         const char* origin,
-        const char** params,
-        unsigned int count)
+        const std::vector<std::string>& params)
 {
-	if (count < 2) return;
+	if (params.size() < 2) return;
 	string who(origin);
-	string channel(params[0]);
-	string message(params[1]);
+	string channel(params.at(0));
+	string message(params.at(1));
 	cout << "<" << channel << ":" << who << ">: " << message << endl;
 	appQueue->sendEvent(make_shared<EventIrcMessage>(userId, configuration.serverId, who, channel, message));
 }
 void IrcConnection_Impl::onPrivmsg(irc_session_t* session,
         const char* event,
         const char* origin,
-        const char** params,
-        unsigned int count)
+        const std::vector<std::string>& params)
 {
-	if (count < 2) return;
+	if (params.size() < 2) return;
 	string who(origin);
-	string self(params[0]);
-	string message(params[1]);
+	string self(params.at(0));
+	string message(params.at(1));
 	cout << "<" << who << "|" << self << ">: " << message << endl;
 	appQueue->sendEvent(make_shared<EventIrcMessage>(userId, configuration.serverId, who, who, message));
 }
 void IrcConnection_Impl::onNotice(irc_session_t* session,
         const char* event,
         const char* origin,
-        const char** params,
-        unsigned int count)
+        const std::vector<std::string>& params)
 {
-	if (count < 1) return;
+	if (params.size() < 1) return;
 	string who(origin);
-	string target(params[0]);
-	string message = count < 2 ? "" : params[1];
+	string target(params.at(0));
+	string message = params.size() < 2 ? "" : params.at(1);
 	appQueue->sendEvent(make_shared<EventIrcNoticed>(userId, configuration.serverId, who, target, message));
 	cout << "N<" << who << "|" << target << ">: " << message << endl;
 }
 void IrcConnection_Impl::onChannelNotice(irc_session_t* session,
         const char* event,
         const char* origin,
-        const char** params,
-        unsigned int count)
+        const std::vector<std::string>& params)
 {
-	if (count < 1) return;
+	if (params.size() < 1) return;
 	string who(origin);
-	string channel(params[0]);
-	string message = count < 2 ? "" : params[1];
+	string channel(params.at(0));
+	string message = params.size() < 2 ? "" : params.at(1);
 	appQueue->sendEvent(make_shared<EventIrcChannelNoticed>(userId, configuration.serverId, who, channel, message));
 	cout << "CN<" << who << "|" << channel << ">: " << message << endl;
 }
 void IrcConnection_Impl::onInvite(irc_session_t* session,
         const char* event,
         const char* origin,
-        const char** params,
-        unsigned int count)
+        const std::vector<std::string>& params)
 {
-	if (count < 1) return;
+	if (params.size() < 1) return;
 	string who(origin);
-	string target(params[0]);
-	string channel = count < 2 ? "" : params[1];
+	string target(params.at(0));
+	string channel = params.size() < 2 ? "" : params.at(1);
 	appQueue->sendEvent(make_shared<EventIrcInvited>(userId, configuration.serverId, who, target, channel));
 	cout << "Invite<" << who << ">: " << channel << ": " << target << endl;
 }
 void IrcConnection_Impl::onCtcpReq(irc_session_t* session,
         const char* event,
         const char* origin,
-        const char** params,
-        unsigned int count)
+        const std::vector<std::string>& params)
 {
 #warning stub onCtcpReq
 }
 void IrcConnection_Impl::onCtcpRep(irc_session_t* session,
         const char* event,
         const char* origin,
-        const char** params,
-        unsigned int count)
+        const std::vector<std::string>& params)
 {
 #warning stub onCtcpRep
 }
 void IrcConnection_Impl::onCtcpAction(irc_session_t* session,
         const char* event,
         const char* origin,
-        const char** params,
-        unsigned int count)
+        const std::vector<std::string>& params)
 {
 #warning stub onAction
 }
@@ -237,10 +220,8 @@ void IrcConnection_Impl::onNumeric(irc_session_t* session,
 void IrcConnection_Impl::onUnknown(irc_session_t* session,
         const char* event,
         const char* origin,
-        const char** params,
-        unsigned int count)
+        const std::vector<std::string>& params)
 {
-#warning stub onUnknown
 	cout << "UnknownEvent" << endl;
 }
 
