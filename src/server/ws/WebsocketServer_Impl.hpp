@@ -1,6 +1,7 @@
 #ifndef WEBSOCKETSERVER_IMPL_H
 #define WEBSOCKETSERVER_IMPL_H
 #include <memory>
+#include <WebSocket.h>
 
 
 class EventQueue;
