@@ -61,7 +61,7 @@ if(${USE_WEBSOCKET_SERVER})
 		src/server/ws/WebsocketServer_Impl.hpp
 	)
 	add_definitions(-DUSE_WEBSOCKET_SERVER)
-	find_package(WebSocketPP REQUIRED)
+	find_package(Seasocks REQUIRED)
 endif()
 
 
@@ -71,10 +71,10 @@ add_executable(iirc ${SOURCE_FILES} ${PROTO_SRCS} ${PROTO_HDRS})
 target_link_libraries(iirc ${PROTOBUF_LIBRARIES})
 
 if(${USE_WEBSOCKET_SERVER})
-  if(${WEBSOCKETPP_FOUND})
-    include_directories(iirc ${WEBSOCKETPP_INCLUDE_DIR})
+if(${SEASOCKS_FOUND})
+  include_directories(iirc ${SEASOCKS_INCLUDE_DIR})
   else()
-    message(WARNING "WEBSOCKETPP NOT FOUND")
+    message(WARNING "SEASOCKS NOT FOUND")
     set(MISSING_LIB 1)
   endif()
 endif()
