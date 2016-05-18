@@ -27,6 +27,16 @@ WebsocketServer_Impl::WebsocketServer_Impl(EventQueue* appQueue)
 
 }
 
+void WebsocketServer_Impl::onConnect(WebSocket* connection) {
+#warning onConnect stub
+}
+void WebsocketServer_Impl::onData(WebSocket* connection, const char* data) {
+#warning onData stub
+}
+void WebsocketServer_Impl::onDisconnect(WebSocket* connection) {
+#warning onDisconnect stub
+}
+
 bool WebsocketServer_Impl::onEvent(std::shared_ptr<IEvent> event) {
 	UUID eventType = event->getEventUuid();
 	if (eventType == EventQuit::uuid) {
