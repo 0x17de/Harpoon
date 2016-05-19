@@ -10,14 +10,14 @@ using namespace seasocks;
 class EventQueue;
 class WebsocketServer_Impl : public WebSocket::Handler {
 	std::unordered_map<WebSocket*, size_t> _connections;
-public:
 	EventQueue* appQueue;
+public:
+	WebsocketServer_Impl(EventQueue* appQueue);
 
 	virtual void onConnect(WebSocket* connection);
 	virtual void onData(WebSocket* connection, const char* data);
 	virtual void onDisconnect(WebSocket* connection);
 
-	WebsocketServer_Impl(EventQueue* appQueue);
 	bool onEvent(std::shared_ptr<IEvent> event);
 };
 
