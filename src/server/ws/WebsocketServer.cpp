@@ -3,6 +3,7 @@
 #include "event/IUserEvent.hpp"
 #include "event/EventQuit.hpp"
 #include <iostream>
+#include <json/json.h>
 
 using namespace std;
 
