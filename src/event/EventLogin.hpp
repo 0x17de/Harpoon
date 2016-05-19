@@ -7,13 +7,20 @@
 
 class EventQueue;
 class EventLogin : public IEvent {
-public:
-	static UUID uuid;
-	virtual UUID getEventUuid() const override;
-	//std::shared_ptr<IClient> client;
 	EventQueue* target;
+	void* data;
 	std::string username;
 	std::string password;
+public:
+	EventLogin(EventQueue* target, void* data, std::string username, std::string password);
+
+	static UUID uuid;
+	virtual UUID getEventUuid() const override;
+
+	EventQueue* getTarget() const;
+	void* getData() const;
+	std::string getUsername() const;
+	std::string getPassword() const;
 };
 
 #endif

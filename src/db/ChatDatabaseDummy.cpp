@@ -21,12 +21,9 @@ ChatDatabaseDummy::ChatDatabaseDummy(EventQueue* appQueue) :
 }
 
 void ChatDatabaseDummy::doLogin(EventLogin* login) {
-	shared_ptr<EventLoginResult> loginResult{make_shared<EventLoginResult>()};
-	//loginResult->client = login->client;
-	loginResult->success = true;
-	loginResult->userId = 1;
+	shared_ptr<EventLoginResult> loginResult{make_shared<EventLoginResult>(true, 1, login->getData())};
 #warning login always successful
-	login->target->sendEvent(loginResult);
+	login->getTarget()->sendEvent(loginResult);
 }
 
 bool ChatDatabaseDummy::onEvent(std::shared_ptr<IEvent> event) {
