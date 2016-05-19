@@ -6,12 +6,18 @@
 
 
 class EventLoginResult : public IEvent {
-public:
-	static UUID uuid;
-	virtual UUID getEventUuid() const override;
-	//std::shared_ptr<IClient> client;
 	bool success;
 	size_t userId;
+	void* data;
+public:
+	EventLoginResult(bool success, size_t userId, void* data);
+
+	static UUID uuid;
+	virtual UUID getEventUuid() const override;
+
+	bool getSuccess() const;
+	size_t getUserId() const;
+	void* getData() const;
 };
 
 #endif
