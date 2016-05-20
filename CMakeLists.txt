@@ -57,6 +57,7 @@ if(${USE_WEBSOCKET_SERVER})
 	message("Websocket server included")
 	set(SOURCE_FILES ${SOURCE_FILES}
 		src/server/ws/WebsocketServer.cpp
+		src/server/ws/WebsocketHandler.cpp
 		src/server/ws/WebsocketServer.hpp
 		src/server/ws/WebsocketServer_Impl.hpp
 	)

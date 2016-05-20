@@ -1,6 +1,6 @@
 SET(_Seasocks_REQUIRED_VARS Seasocks_INCLUDE_DIR Seasocks_LIBRARY)
 
-FIND_PATH(Seasocks_INCLUDE_DIR WebSocket.h
+FIND_PATH(Seasocks_INCLUDE_DIR seasocks/WebSocket.h
   PATH_SUFFIXES "" "seasocks"
   PATHS ${Seasocks_PKGCONF_INCLUDE_DIRS}
       /usr/include /sw/include /usr/local/include
