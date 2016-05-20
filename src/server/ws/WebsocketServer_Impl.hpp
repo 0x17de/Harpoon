@@ -1,23 +1,41 @@
 #ifndef WEBSOCKETSERVER_IMPL_H
 #define WEBSOCKETSERVER_IMPL_H
+
 #include <memory>
 #include <unordered_map>
-#include <WebSocket.h>
-
-using namespace seasocks;
-
+#include <thread>
+#include <seasocks/WebSocket.h>
+#include <seasocks/Server.h>
 
 class EventQueue;
-class WebsocketServer_Impl : public WebSocket::Handler {
-	std::unordered_map<WebSocket*, size_t> clients;
+
+
+class WebsocketHandler : public seasocks::WebSocket::Handler {
+	EventQueue* appQueue;
+	EventQueue* queue;
+	std::unordered_map<seasocks::WebSocket*, size_t>& clients;
+public:
+
+	WebsocketHandler(EventQueue* appQueue,
+		EventQueue* queue,
+		std::unordered_map<seasocks::WebSocket*, size_t>& clients);
+	virtual ~WebsocketHandler();
+	virtual void onConnect(seasocks::WebSocket* connection);
+	virtual void onData(seasocks::WebSocket* connection, const char* data);
+	virtual void onDisconnect(seasocks::WebSocket* connection);
+};
+
+class WebsocketServer_Impl {
 	EventQueue* queue;
 	EventQueue* appQueue;
+	// websocket server
+	std::shared_ptr<WebsocketHandler> websocketHandler;
+	std::unordered_map<seasocks::WebSocket*, size_t> clients;
+	seasocks::Server server;
+	std::thread serverThread;
 public:
 	WebsocketServer_Impl(EventQueue* queue, EventQueue* appQueue);
-
-	virtual void onConnect(WebSocket* connection);
-	virtual void onData(WebSocket* connection, const char* data);
-	virtual void onDisconnect(WebSocket* connection);
+	~WebsocketServer_Impl();
 
 	bool onEvent(std::shared_ptr<IEvent> event);
 };
