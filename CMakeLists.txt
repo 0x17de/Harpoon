@@ -23,6 +23,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/event/EventInit.cpp src/event/EventInit.hpp
 	src/event/EventActivateUser.cpp src/event/EventActivateUser.hpp
 	src/event/EventLogin.cpp src/event/EventLogin.hpp
+	src/event/EventLogout.cpp src/event/EventLogout.hpp
 	src/event/EventLoginResult.cpp src/event/EventLoginResult.hpp
 	src/event/EventIrcConnected.cpp src/event/EventIrcConnected.hpp
 	src/event/EventIrcTopic.cpp src/event/EventIrcTopic.hpp

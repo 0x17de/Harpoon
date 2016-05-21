@@ -1,6 +1,7 @@
 #include "WebsocketServer.hpp"
 #include "WebsocketServer_Impl.hpp"
 #include "event/EventLogin.hpp"
+#include "event/EventLogout.hpp"
 #include <sstream>
 #include <json/json.h>
 
@@ -9,7 +10,7 @@ using namespace std;
 
 WebsocketHandler::WebsocketHandler(EventQueue* appQueue,
 	EventQueue* queue,
-	std::unordered_map<seasocks::WebSocket*, size_t>& clients)
+	const std::unordered_map<seasocks::WebSocket*, size_t>& clients)
 :
 	appQueue{appQueue},
 	queue{queue},
@@ -25,20 +26,11 @@ void WebsocketHandler::onConnect(seasocks::WebSocket* connection) {
 }
 
 void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata) {
-#warning onData stub
-	
-	auto it = clients.find(connection);
-	size_t userId;
-	if (it == clients.end()) {
-		clients.emplace(connection, 0);
-		userId = 0;
-	} else {
-		userId = it->second;
-	}
-
 	string data{cdata};
+
+	auto it = clients.find(connection);
 	// until login verified use plaintext protocol
-	if (userId == 0) {
+	if (it == clients.end()) {
 		if (data.size() > 512) return; // ignore large data during login
 		istringstream is(data);
 		string line;
@@ -54,18 +46,19 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
 				appQueue->sendEvent(make_shared<EventLogin>(queue, connection, username, password));
 			}
 		}
-	} else {
+	} else { // logged in
 		Json::Value root;
 		Json::Reader reader;
 		if (!reader.parse(data, root)) return;
 
 		string cmd = root.get("cmd", "" ).asString();
+#warning onData commands stub
 #warning json parse stub
 	}
 }
 
 void WebsocketHandler::onDisconnect(seasocks::WebSocket* connection) {
-#warning onDisconnect stub
+	queue->sendEvent(make_shared<EventLogout>(connection));
 }
 
 
