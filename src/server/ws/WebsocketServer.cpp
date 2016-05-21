@@ -2,7 +2,8 @@
 #include "WebsocketServer_Impl.hpp"
 #include "event/IUserEvent.hpp"
 #include "event/EventQuit.hpp"
-#include "event/EventLogin.hpp"
+#include "event/EventLoginResult.hpp"
+#include "event/EventLogout.hpp"
 #include <iostream>
 #include <sstream>
 #include <json/json.h>
@@ -47,8 +48,11 @@ bool WebsocketServer_Impl::onEvent(std::shared_ptr<IEvent> event) {
 	UUID eventType = event->getEventUuid();
 	if (eventType == EventQuit::uuid) {
 		return false;
-	}
+	} else if (eventType == EventLoginResult::uuid) {
 #warning handle EventLoginResult
+	} else if (eventType == EventLogout::uuid) {
+#warning handle EventLogout
+	}
 	return true;
 }
 

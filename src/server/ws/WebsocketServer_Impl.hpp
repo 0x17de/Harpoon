@@ -13,12 +13,12 @@ class EventQueue;
 class WebsocketHandler : public seasocks::WebSocket::Handler {
 	EventQueue* appQueue;
 	EventQueue* queue;
-	std::unordered_map<seasocks::WebSocket*, size_t>& clients;
+	const std::unordered_map<seasocks::WebSocket*, size_t>& clients;
 public:
 
 	WebsocketHandler(EventQueue* appQueue,
 		EventQueue* queue,
-		std::unordered_map<seasocks::WebSocket*, size_t>& clients);
+		const std::unordered_map<seasocks::WebSocket*, size_t>& clients);
 	virtual ~WebsocketHandler();
 	virtual void onConnect(seasocks::WebSocket* connection);
 	virtual void onData(seasocks::WebSocket* connection, const char* data);
