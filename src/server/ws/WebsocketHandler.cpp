@@ -10,7 +10,7 @@ using namespace std;
 
 WebsocketHandler::WebsocketHandler(EventQueue* appQueue,
 	EventQueue* queue,
-	const std::unordered_map<seasocks::WebSocket*, size_t>& clients)
+	const std::unordered_map<seasocks::WebSocket*, std::list<WebsocketClientData>::iterator>& clients)
 :
 	appQueue{appQueue},
 	queue{queue},
