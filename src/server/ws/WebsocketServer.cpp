@@ -62,12 +62,13 @@ bool WebsocketServer_Impl::onEvent(std::shared_ptr<IEvent> event) {
 		return false;
 	} else if (eventType == EventLoginResult::uuid) {
 		auto* loginResult = event->as<EventLoginResult>();
+		seasocks::WebSocket* socket = (seasocks::WebSocket*)loginResult->getData();
 		if (loginResult->getSuccess()) {
-			addClient(loginResult->getUserId(), (seasocks::WebSocket*)loginResult->getData());
+			addClient(loginResult->getUserId(), socket);
+#warning send current status to client (servers/channels/...)
 		} else {
-#warning close socket on error / handle error
+			socket->close();
 		}
-#warning handle EventLoginResult
 	} else if (eventType == EventLogout::uuid) {
 #warning handle EventLogout
 		auto logout = event->as<EventLogout>();
