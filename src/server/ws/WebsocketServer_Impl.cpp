@@ -7,7 +7,14 @@
 #include <iostream>
 #include <sstream>
 #include <json/json.h>
+
+#ifdef USE_WEBSOCKET_SERVER_VERBOSE
+#include <seasocks/PrintfLogger.h>
+#define WEBSOCKET_LOGGER_TYPE seasocks::PrintfLogger
+#else
 #include <seasocks/IgnoringLogger.h>
+#define WEBSOCKET_LOGGER_TYPE seasocks::IgnoringLogger
+#endif
 
 using namespace std;
 
@@ -16,7 +23,7 @@ WebsocketServer_Impl::WebsocketServer_Impl(EventQueue* queue, EventQueue* appQue
 :
 	queue{queue},
 	appQueue{appQueue},
-	server{make_shared<seasocks::IgnoringLogger>()}
+	server{make_shared<WEBSOCKET_LOGGER_TYPE>()}
 {
 	server.addWebSocketHandler("/ws", make_shared<WebsocketHandler>(appQueue, queue, clients));
 	serverThread = thread([this]{
