@@ -56,6 +56,10 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 if(${USE_WEBSOCKET_SERVER})
 	message("Websocket server included")
+	if(${USE_WEBSOCKET_SERVER_VERBOSE})
+		message("Websocket server verbose")
+		add_definitions(-DUSE_WEBSOCKET_SERVER_VERBOSE)
+	endif()
 	set(SOURCE_FILES ${SOURCE_FILES}
 		src/server/ws/WebsocketServer.cpp
 		src/server/ws/WebsocketServer_Impl.cpp
