@@ -46,7 +46,7 @@ bool UserManager::onEvent(std::shared_ptr<IEvent> event) {
 		size_t userId = activateEvent->getUserId();
 		auto it = users.emplace(std::piecewise_construct,
 			std::forward_as_tuple(userId),
-			std::forward_as_tuple(appQueue));
+			std::forward_as_tuple(userId, appQueue));
 		it.first->second.getEventQueue()->sendEvent(event);
 	}
 	return true;
