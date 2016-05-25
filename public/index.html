@@ -3,24 +3,43 @@
 <head>
 <meta charset="utf-8" />
 <script type="text/javascript">
-var proto = document.location.protocol.replace(/^http/, "ws");
-var ws = new WebSocket(proto+"//"+document.domain+":8080/ws");
-ws.onopen = function() {
-	putLine("Connected");
+var username = "testuser";
+var password = "testpassword";
+function startChat() {
+	var proto = document.location.protocol.replace(/^http/, "ws");
+	var ws = new WebSocket(proto+"//"+document.domain+":8080/ws");
+	ws.onopen = function() {
+		putLine("Connected");
+		ws.send("LOGIN "+username+" "+password+"\n");
+	}
+	ws.onclose = function() {
+		putLine("Disconnected");
+		setTimeout(startChat, 1000);
+	}
+	ws.onmessage = function(msg) {
+		if (msg.data instanceof Blob
+		 || msg.data instanceof ArrayBuffer) {
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				onMessage(e.target.result);
+			};
+			reader.readAsText(msg.data);
+		} else {
+			onMessage(msg.data);
+		}
+	}
+	function onMessage(msg) {
+		//var json = JSON.parse(msg);
+		putLine(msg);
+	}
+	function putLine(msg) {
+		var text = document.createTextNode(msg);
+		var p = document.createElement("div");
+		p.appendChild(text);
+		document.getElementById('log').appendChild(p);
+	}
 }
-ws.onclose = function() {
-	putLine("Disconnected");
-}
-ws.onmessage = function(msg) {
-	putLine(msg);
-	//var json = JSON.parse(msg.data);
-}
-function putLine(msg) {
-	var text = document.createTextNode(msg);
-	var p = document.createElement("div");
-	p.appendChild(text);
-	document.getElementById('log').appendChild(p);
-}
+startChat();
 </script>
 </head>
 <body>

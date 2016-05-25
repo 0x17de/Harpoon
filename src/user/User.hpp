@@ -12,7 +12,7 @@ class User : public EventLoop {
 	EventQueue* appQueue;
 	std::map<size_t, IrcConnection> ircConnections;
 public:
-	User(EventQueue* appQueue);
+	User(size_t userId, EventQueue* appQueue);
 	virtual ~User();
 	virtual bool onEvent(std::shared_ptr<IEvent> event) override;
 };

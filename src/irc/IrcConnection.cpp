@@ -21,9 +21,10 @@ void onIrcEvent(irc_session_t* session,
 	const char** params,
 	unsigned int count)
 {
-	vector<string> parameters(count);
+	vector<string> parameters;
 	for (unsigned int i = 0; i < count; ++i)
 		parameters.push_back(string(params[i]));
+
 	IrcConnection_Impl* cxn = activeIrcConnections.at(session);
 	(cxn->*F)(session, event, origin, parameters);
 }
@@ -34,9 +35,10 @@ void onIrcNumeric(irc_session_t* session,
 	const char** params,
 	unsigned int count)
 {
-	vector<string> parameters(count);
+	vector<string> parameters;
 	for (unsigned int i = 0; i < count; ++i)
 		parameters.push_back(string(params[i]));
+
 	IrcConnection_Impl* cxn = activeIrcConnections.at(session);
 	(cxn->*F)(session, eventCode, origin, parameters);
 }
@@ -48,6 +50,7 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, cons
 	configuration{configuration},
 	running{true}
 {
+	cout << "IrcFor" << userId << endl;
 	ircLoop = thread([this]{ 
 		irc_callbacks_t callbacks = {0};
 		callbacks.event_connect = &onIrcEvent<&IrcConnection_Impl::onConnect>;

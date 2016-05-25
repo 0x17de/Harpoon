@@ -9,13 +9,14 @@
 using namespace std;
 
 
-User::User(EventQueue* appQueue)
+User::User(size_t userId, EventQueue* appQueue)
 :
 	EventLoop({
 		EventQuit::uuid,
 		EventActivateUser::uuid,
 		EventIrcJoinChannel::uuid
 	}),
+	userId{userId},
 	appQueue{appQueue}
 {
 }

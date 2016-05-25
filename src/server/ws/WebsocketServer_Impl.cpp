@@ -2,6 +2,7 @@
 #include "WebsocketServer_Impl.hpp"
 #include "event/IUserEvent.hpp"
 #include "event/EventQuit.hpp"
+#include "event/EventIrcMessage.hpp"
 #include "event/EventLoginResult.hpp"
 #include "event/EventLogout.hpp"
 #include <iostream>
@@ -58,8 +59,9 @@ bool WebsocketServer_Impl::onEvent(std::shared_ptr<IEvent> event) {
 }
 
 void WebsocketServer_Impl::addClient(size_t userId, seasocks::WebSocket* socket) {
+	cout << "New Client: " << userId << endl;
 	auto it = userToClients.find(userId);
-	bool found = it == userToClients.end();
+	bool found = it != userToClients.end();
 	std::list<WebsocketClientData>* dataList;
 	if (!found) {
 		auto dataListIt = userToClients.emplace(
@@ -80,6 +82,7 @@ void WebsocketServer_Impl::removeClient(seasocks::WebSocket* socket) {
 	if (it != clients.end()) {
 		auto data = it->second;
 		size_t userId = data->userId;
+		cout << "Remove Client: " << userId << endl;
 		auto clientListIt = userToClients.find(userId);
 		if (clientListIt != userToClients.end()) {
 			clientListIt->second.erase(data);
@@ -90,16 +93,35 @@ void WebsocketServer_Impl::removeClient(seasocks::WebSocket* socket) {
 	}
 }
 
+std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
+	Json::Value root{Json::objectValue};
+
+	UUID eventType = event->getEventUuid();
+	if (eventType == EventIrcMessage::uuid) {
+		cout << "eventToJson => IrcMessage" << endl;
+		auto message = event->as<EventIrcMessage>();
+		root["cmd"] = "chat";
+		root["channel"] = message->getChannel();
+		root["nick"] = message->getFrom();
+		root["msg"] = message->getMessage();
+	}
+
+	return Json::FastWriter{}.write(root);
+}
+
 void WebsocketServer_Impl::sendEventToUser(std::shared_ptr<IEvent> event) {
 	auto userEvent = event->as<IUserEvent>();
 	if (userEvent != nullptr) {
-		cout << "NonNULL event" << endl;
+		cout << "Event for User: " << userEvent->getUserId() << endl;
 		auto it = userToClients.find(userEvent->getUserId());
 		if (it != userToClients.end()) {
+			cout << "User found" << endl;
+			std::string json = eventToJson(event);
 			list<WebsocketClientData>& clientDataList = it->second;
 			for (auto& clientData : clientDataList) {
-				clientData.socket;
-#warning send event to user stub
+				server.execute([=] {
+					clientData.socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
+				});
 			}
 		}
 	}

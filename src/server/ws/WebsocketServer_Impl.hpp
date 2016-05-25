@@ -41,6 +41,8 @@ class WebsocketServer_Impl {
 	std::unordered_map<seasocks::WebSocket*, std::list<WebsocketClientData>::iterator> clients;
 	seasocks::Server server;
 	std::thread serverThread;
+
+	std::string eventToJson(std::shared_ptr<IEvent> event);
 public:
 	WebsocketServer_Impl(EventQueue* queue, EventQueue* appQueue);
 	~WebsocketServer_Impl();
