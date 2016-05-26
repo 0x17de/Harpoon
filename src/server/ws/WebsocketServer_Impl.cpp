@@ -2,7 +2,7 @@
 #include "WebsocketServer_Impl.hpp"
 #include "event/IUserEvent.hpp"
 #include "event/EventQuit.hpp"
-#include "event/EventIrcMessage.hpp"
+#include "event/irc/EventIrcMessage.hpp"
 #include "event/EventLoginResult.hpp"
 #include "event/EventLogout.hpp"
 #include <iostream>

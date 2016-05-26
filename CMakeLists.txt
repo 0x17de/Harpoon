@@ -25,22 +25,22 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/event/EventLogin.cpp src/event/EventLogin.hpp
 	src/event/EventLogout.cpp src/event/EventLogout.hpp
 	src/event/EventLoginResult.cpp src/event/EventLoginResult.hpp
-	src/event/EventIrcConnected.cpp src/event/EventIrcConnected.hpp
-	src/event/EventIrcTopic.cpp src/event/EventIrcTopic.hpp
-	src/event/EventIrcChannelNoticed.cpp src/event/EventIrcChannelNoticed.hpp
-	src/event/EventIrcNoticed.cpp src/event/EventIrcNoticed.hpp
-	src/event/EventIrcInvited.cpp src/event/EventIrcInvited.hpp
-	src/event/EventIrcModeChanged.cpp src/event/EventIrcModeChanged.hpp
-	src/event/EventIrcUserModeChanged.cpp src/event/EventIrcUserModeChanged.hpp
-	src/event/EventIrcQuit.cpp src/event/EventIrcQuit.hpp
-	src/event/EventIrcParted.cpp src/event/EventIrcParted.hpp
-	src/event/EventIrcNickChanged.cpp src/event/EventIrcNickChanged.hpp
-	src/event/EventIrcPartChannel.cpp src/event/EventIrcPartChannel.hpp
-	src/event/EventIrcKicked.cpp src/event/EventIrcKicked.hpp
-	src/event/EventIrcJoined.cpp src/event/EventIrcJoined.hpp
-	src/event/EventIrcJoinChannel.cpp src/event/EventIrcJoinChannel.hpp
-	src/event/EventIrcMessage.cpp src/event/EventIrcMessage.hpp
-	src/event/EventIrcNumeric.cpp src/event/EventIrcNumeric.hpp
+	src/event/irc/EventIrcConnected.cpp src/event/irc/EventIrcConnected.hpp
+	src/event/irc/EventIrcTopic.cpp src/event/irc/EventIrcTopic.hpp
+	src/event/irc/EventIrcChannelNoticed.cpp src/event/irc/EventIrcChannelNoticed.hpp
+	src/event/irc/EventIrcNoticed.cpp src/event/irc/EventIrcNoticed.hpp
+	src/event/irc/EventIrcInvited.cpp src/event/irc/EventIrcInvited.hpp
+	src/event/irc/EventIrcModeChanged.cpp src/event/irc/EventIrcModeChanged.hpp
+	src/event/irc/EventIrcUserModeChanged.cpp src/event/irc/EventIrcUserModeChanged.hpp
+	src/event/irc/EventIrcQuit.cpp src/event/irc/EventIrcQuit.hpp
+	src/event/irc/EventIrcParted.cpp src/event/irc/EventIrcParted.hpp
+	src/event/irc/EventIrcNickChanged.cpp src/event/irc/EventIrcNickChanged.hpp
+	src/event/irc/EventIrcPartChannel.cpp src/event/irc/EventIrcPartChannel.hpp
+	src/event/irc/EventIrcKicked.cpp src/event/irc/EventIrcKicked.hpp
+	src/event/irc/EventIrcJoined.cpp src/event/irc/EventIrcJoined.hpp
+	src/event/irc/EventIrcJoinChannel.cpp src/event/irc/EventIrcJoinChannel.hpp
+	src/event/irc/EventIrcMessage.cpp src/event/irc/EventIrcMessage.hpp
+	src/event/irc/EventIrcNumeric.cpp src/event/irc/EventIrcNumeric.hpp
 	src/event/EventQuit.cpp src/event/EventQuit.hpp
 	)
 

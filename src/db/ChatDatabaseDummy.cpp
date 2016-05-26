@@ -5,7 +5,7 @@
 #include "event/EventLogin.hpp"
 #include "event/EventLoginResult.hpp"
 #include "event/EventActivateUser.hpp"
-#include "event/EventIrcJoinChannel.hpp"
+#include "event/irc/EventIrcJoinChannel.hpp"
 
 using namespace std;
 
