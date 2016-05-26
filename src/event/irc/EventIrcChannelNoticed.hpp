@@ -1,32 +1,29 @@
-#ifndef EVENTIRCMODECHANGED_H
-#define EVENTIRCMODECHANGED_H
+#ifndef EVENTIRCCHANNELNOTICED_H
+#define EVENTIRCCHANNELNOTICED_H
 
-#include "IEvent.hpp"
+#include "../IEvent.hpp"
 #include <string>
 
 
-class EventIrcModeChanged : public IEvent {
+class EventIrcChannelNoticed : public IEvent {
 	size_t userId;
 	size_t serverId;
 	std::string username;
 	std::string channel;
-	std::string mode;
-	std::string arg;
+	std::string message;
 public:
 	static UUID uuid;
 	virtual UUID getEventUuid() const override;
 
-	EventIrcModeChanged(size_t userId, size_t serverId,
+	EventIrcChannelNoticed(size_t userId, size_t serverId,
 		const std::string& username,
 		const std::string& channel,
-		const std::string& mode,
-		const std::string& arg);
+		const std::string& message);
 	size_t getUserId() const;
 	size_t getServerId() const;
 	std::string getUsername() const;
 	std::string getChannel() const;
-	std::string getMode() const;
-	std::string getArg() const;
+	std::string getMessage() const;
 };
 
 #endif

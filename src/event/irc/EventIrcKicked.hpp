@@ -1,7 +1,7 @@
 #ifndef EVENTIRCKICKED_H
 #define EVENTIRCKICKED_H
 
-#include "IEvent.hpp"
+#include "../IEvent.hpp"
 #include <string>
 
 

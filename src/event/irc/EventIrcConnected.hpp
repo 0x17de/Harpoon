@@ -1,7 +1,7 @@
 #ifndef EVENTIRCCONNECTED_H
 #define EVENTIRCCONNECTED_H
 
-#include "IEvent.hpp"
+#include "../IEvent.hpp"
 #include <cstdlib>
 
 

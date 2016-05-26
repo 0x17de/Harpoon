@@ -1,29 +1,29 @@
-#ifndef EVENTIRCCHANNELNOTICED_H
-#define EVENTIRCCHANNELNOTICED_H
+#ifndef EVENTIRCINVITED_H
+#define EVENTIRCINVITED_H
 
-#include "IEvent.hpp"
+#include "../IEvent.hpp"
 #include <string>
 
 
-class EventIrcChannelNoticed : public IEvent {
+class EventIrcInvited : public IEvent {
 	size_t userId;
 	size_t serverId;
 	std::string username;
+	std::string target;
 	std::string channel;
-	std::string message;
 public:
 	static UUID uuid;
 	virtual UUID getEventUuid() const override;
 
-	EventIrcChannelNoticed(size_t userId, size_t serverId,
+	EventIrcInvited(size_t userId, size_t serverId,
 		const std::string& username,
-		const std::string& channel,
-		const std::string& message);
+		const std::string& target,
+		const std::string& channel);
 	size_t getUserId() const;
 	size_t getServerId() const;
 	std::string getUsername() const;
+	std::string getTarget() const;
 	std::string getChannel() const;
-	std::string getMessage() const;
 };
 
 #endif

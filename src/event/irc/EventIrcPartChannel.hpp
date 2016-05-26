@@ -1,7 +1,7 @@
 #ifndef EVENTIRCPARTCHANNEL_H
 #define EVENTIRCPARTCHANNEL_H
 
-#include "IEvent.hpp"
+#include "../IEvent.hpp"
 #include <list>
 #include <string>
 

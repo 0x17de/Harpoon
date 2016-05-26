@@ -1,7 +1,7 @@
 #ifndef EVENTIRCNUMERIC_H
 #define EVENTIRCNUMERIC_H
 
-#include "IEvent.hpp"
+#include "../IEvent.hpp"
 #include <string>
 #include <vector>
 

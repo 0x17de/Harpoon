@@ -2,8 +2,8 @@
 #include "IrcConnection_Impl.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventActivateUser.hpp"
-#include "event/EventIrcJoinChannel.hpp"
-#include "event/EventIrcPartChannel.hpp"
+#include "event/irc/EventIrcJoinChannel.hpp"
+#include "event/irc/EventIrcPartChannel.hpp"
 #include <iostream>
 #include <map>
 #include <thread>

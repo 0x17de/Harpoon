@@ -1,7 +1,7 @@
 #ifndef EVENTIRCTOPIC_H
 #define EVENTIRCTOPIC_H
 
-#include "IEvent.hpp"
+#include "../IEvent.hpp"
 #include <string>
 
 

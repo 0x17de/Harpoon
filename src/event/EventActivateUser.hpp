@@ -3,10 +3,11 @@
 
 #include "IEvent.hpp"
 #include "IUserEvent.hpp"
-#include "EventIrcJoinChannel.hpp"
 #include <string>
 #include <map>
 #include <list>
+
+class IrcChannelLoginData;
 
 
 struct IrcServerConfiguration {

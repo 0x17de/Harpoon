@@ -1,7 +1,7 @@
 #ifndef EVENTIRCMESSAGE_H
 #define EVENTIRCMESSAGE_H
 
-#include "IUserEvent.hpp"
+#include "../IUserEvent.hpp"
 #include <string>
 
 

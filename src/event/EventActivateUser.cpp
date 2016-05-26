@@ -1,5 +1,6 @@
 #include "EventActivateUser.hpp"
 #include "utils/uuidGen.hpp"
+#include "irc/EventIrcJoinChannel.hpp"
 
 
 UUID EventActivateUser::uuid = ::uuid.get();

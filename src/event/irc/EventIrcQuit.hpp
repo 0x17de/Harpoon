@@ -1,8 +1,8 @@
 #ifndef EVENTIRCQUIT_H
 #define EVENTIRCQUIT_H
 
-#include "IEvent.hpp"
-#include "IUserEvent.hpp"
+#include "../IEvent.hpp"
+#include "../IUserEvent.hpp"
 #include <cstdlib>
 #include <string>
 

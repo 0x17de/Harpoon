@@ -3,7 +3,7 @@
 #include "queue/EventQueue.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventActivateUser.hpp"
-#include "event/EventIrcJoinChannel.hpp"
+#include "event/irc/EventIrcJoinChannel.hpp"
 #include <iostream>
 
 using namespace std;

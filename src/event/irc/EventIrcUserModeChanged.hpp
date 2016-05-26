@@ -1,7 +1,7 @@
 #ifndef EVENTIRCUSERMODECHANGED_H
 #define EVENTIRCUSERMODECHANGED_H
 
-#include "IEvent.hpp"
+#include "../IEvent.hpp"
 #include <string>
 
 
