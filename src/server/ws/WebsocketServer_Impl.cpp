@@ -5,6 +5,7 @@
 #include "event/irc/EventIrcMessage.hpp"
 #include "event/EventLoginResult.hpp"
 #include "event/EventLogout.hpp"
+#include "event/EventQueryChats.hpp"
 #include <iostream>
 #include <sstream>
 #include <json/json.h>
@@ -75,6 +76,8 @@ void WebsocketServer_Impl::addClient(size_t userId, seasocks::WebSocket* socket)
 
 	dataList->emplace_back(userId, socket);
 	clients.emplace(socket, (++dataList->rbegin()).base()); // iterator to last element
+
+	appQueue->sendEvent(make_shared<EventQueryChats>(userId, queue));
 }
 
 void WebsocketServer_Impl::removeClient(seasocks::WebSocket* socket) {
