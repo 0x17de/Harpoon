@@ -25,6 +25,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/event/EventLogin.cpp src/event/EventLogin.hpp
 	src/event/EventLogout.cpp src/event/EventLogout.hpp
 	src/event/EventLoginResult.cpp src/event/EventLoginResult.hpp
+	src/event/EventQueryChats.cpp src/event/EventQueryChats.hpp
 	src/event/irc/EventIrcConnected.cpp src/event/irc/EventIrcConnected.hpp
 	src/event/irc/EventIrcTopic.cpp src/event/irc/EventIrcTopic.hpp
 	src/event/irc/EventIrcChannelNoticed.cpp src/event/irc/EventIrcChannelNoticed.hpp
