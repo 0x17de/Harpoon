@@ -5,9 +5,22 @@
 <script type="text/javascript">
 var username = "testuser";
 var password = "testpassword";
+var ws;
+var activeChannel = "#test";
+function sendInput() {
+	var input = document.getElementById('input');
+	sendMessage(input.value);
+	input.value = '';
+}
+function sendMessage(msg) {
+	send({cmd:"chat", channel:activeChannel, msg:msg});
+}
+function send(json) {
+	ws.send(JSON.stringify(json));
+}
 function startChat() {
 	var proto = document.location.protocol.replace(/^http/, "ws");
-	var ws = new WebSocket(proto+"//"+document.domain+":8080/ws");
+	ws = new WebSocket(proto+"//"+document.domain+":8080/ws");
 	ws.onopen = function() {
 		putLine("Connected");
 		ws.send("LOGIN "+username+" "+password+"\n");
@@ -43,6 +56,7 @@ startChat();
 </script>
 </head>
 <body>
+<div><input id="input" type="text" /><input type="button" value="send" onclick="sendInput()" /></div>
 <div id="log"></div>
 </body>
 </html>
