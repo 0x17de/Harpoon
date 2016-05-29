@@ -4,6 +4,7 @@
 #include "event/EventActivateUser.hpp"
 #include "event/irc/EventIrcJoinChannel.hpp"
 #include "event/irc/EventIrcPartChannel.hpp"
+#include "event/irc/EventIrcSendMessage.hpp"
 #include <iostream>
 #include <map>
 #include <thread>
@@ -126,7 +127,8 @@ IrcConnection::IrcConnection(EventQueue* appQueue, size_t userId, const IrcServe
 	impl{new IrcConnection_Impl(appQueue, userId, configuration)},
 	EventLoop({
 		EventQuit::uuid,
-		EventIrcJoinChannel::uuid
+		EventIrcJoinChannel::uuid,
+		EventIrcSendMessage::uuid
 	})
 {
 }
@@ -164,6 +166,9 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
 			irc_cmd_part(ircSession, it->second.channel.c_str());
 			channelLoginData.erase(it);
 		}
+	} else if (type == EventIrcSendMessage::uuid) {
+		auto message = event->as<EventIrcSendMessage>();
+		irc_cmd_msg(ircSession, message->getChannel().c_str(), message->getMessage().c_str());
 	}
 	return true;
 }

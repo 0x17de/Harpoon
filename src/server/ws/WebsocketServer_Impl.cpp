@@ -104,6 +104,8 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
 		cout << "eventToJson => IrcMessage" << endl;
 		auto message = event->as<EventIrcMessage>();
 		root["cmd"] = "chat";
+		// jsonpp has no clue of size_t and clients only need to store it
+		root["server"] = to_string(message->getServerId());
 		root["channel"] = message->getChannel();
 		root["nick"] = message->getFrom();
 		root["msg"] = message->getMessage();
