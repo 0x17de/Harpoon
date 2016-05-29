@@ -2,7 +2,6 @@
 #define EVENTACTIVATEUSER_H
 
 #include "IEvent.hpp"
-#include "IUserEvent.hpp"
 #include <string>
 #include <map>
 #include <list>
