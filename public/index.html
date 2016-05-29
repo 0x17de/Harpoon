@@ -6,14 +6,17 @@
 var username = "testuser";
 var password = "testpassword";
 var ws;
-var activeChannel = "#test";
+
+var activeServer = 1;
+var activeChannel = '#test';
+
 function sendInput() {
 	var input = document.getElementById('input');
 	sendMessage(input.value);
 	input.value = '';
 }
 function sendMessage(msg) {
-	send({cmd:"chat", channel:activeChannel, msg:msg});
+	send({cmd:"chat", server:activeServer, channel:activeChannel, msg:msg});
 }
 function send(json) {
 	ws.send(JSON.stringify(json));

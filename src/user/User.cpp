@@ -4,6 +4,7 @@
 #include "event/EventQuit.hpp"
 #include "event/EventActivateUser.hpp"
 #include "event/irc/EventIrcJoinChannel.hpp"
+#include "event/irc/EventIrcSendMessage.hpp"
 #include <iostream>
 
 using namespace std;
@@ -14,7 +15,8 @@ User::User(size_t userId, EventQueue* appQueue)
 	EventLoop({
 		EventQuit::uuid,
 		EventActivateUser::uuid,
-		EventIrcJoinChannel::uuid
+		EventIrcJoinChannel::uuid,
+		EventIrcSendMessage::uuid
 	}),
 	userId{userId},
 	appQueue{appQueue}
@@ -46,6 +48,11 @@ bool User::onEvent(std::shared_ptr<IEvent> event) {
 				forward_as_tuple(ircConfiguration.serverId),
 				forward_as_tuple(appQueue, userId, ircConfiguration));
 		}
+	} else if (type == EventIrcSendMessage::uuid) {
+		auto message = event->as<EventIrcSendMessage>();
+		auto it = ircConnections.find(message->getServerId());
+		if (it != ircConnections.end())
+			it->second.getEventQueue()->sendEvent(event);
 	}
 	return true;
 }
