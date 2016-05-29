@@ -1,5 +1,6 @@
 #include <iostream>
 #include "UserManager.hpp"
+#include "event/IUserEvent.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventLoginResult.hpp"
 #include "event/EventActivateUser.hpp"
