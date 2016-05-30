@@ -1,11 +1,11 @@
 #ifndef EVENTIRCMESSAGE_H
 #define EVENTIRCMESSAGE_H
 
-#include "../IUserEvent.hpp"
+#include "../IClientEvent.hpp"
 #include <string>
 
 
-class EventIrcMessage : public IUserEvent {
+class EventIrcMessage : public IClientEvent {
 	size_t userId;
 	size_t serverId;
 	std::string from;

@@ -2,12 +2,12 @@
 #define EVENTIRCQUIT_H
 
 #include "../IEvent.hpp"
-#include "../IUserEvent.hpp"
+#include "../IClientEvent.hpp"
 #include <cstdlib>
 #include <string>
 
 
-class EventIrcQuit : public IUserEvent {
+class EventIrcQuit : public IClientEvent {
 	size_t userId;
 	size_t serverId;
 	std::string who;
