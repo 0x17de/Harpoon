@@ -1,7 +1,7 @@
-#ifndef EVENTACTIVATEUSER_H
-#define EVENTACTIVATEUSER_H
+#ifndef EVENTIRCACTIVATEUSER_H
+#define EVENTIRCACTIVATEUSER_H
 
-#include "IEvent.hpp"
+#include "../IActivateUserEvent.hpp"
 #include <string>
 #include <map>
 #include <list>
@@ -26,14 +26,15 @@ struct IrcServerConfiguration {
 	bool ssl;
 };
 
-class EventActivateUser : public IEvent {
+class EventIrcActivateUser : public IActivateUserEvent {
 	size_t userId;
 	std::map<size_t, IrcServerConfiguration> loginData;
 public:
 	static UUID uuid;
 	virtual UUID getEventUuid() const override;
 
-	EventActivateUser(size_t userId, const std::map<size_t, IrcServerConfiguration>& loginData);
+	EventIrcActivateUser(size_t userId, const std::map<size_t, IrcServerConfiguration>& loginData);
+	virtual std::shared_ptr<EventLoop> instantiateService(size_t userId, EventQueue* appQueue) const override;
 
 	size_t getUserId() const;
 	const std::map<size_t, IrcServerConfiguration>& getLoginConfiguration() const;

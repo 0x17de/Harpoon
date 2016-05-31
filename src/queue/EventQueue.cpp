@@ -9,9 +9,12 @@ EventQueue::EventQueue() :
 {
 }
 
-EventQueue::EventQueue(std::set<UUID> eventsToBeProcessed) :
+EventQueue::EventQueue(std::set<UUID> eventsToBeProcessed, std::list<bool(*)(IEvent*)> eventGuards)
+:
 	impl{new EventQueue_Impl()},
-	eventsToBeProcessed{eventsToBeProcessed} {
+	eventsToBeProcessed{eventsToBeProcessed},
+	eventGuards{eventGuards}
+{
 }
 
 EventQueue::~EventQueue() {
@@ -49,7 +52,11 @@ int EventQueue::getEvent(int timeout /* milliseconds */, std::shared_ptr<IEvent>
 	return true;
 }
 
-bool EventQueue::canProcessEvent(UUID eventType) {
-	return eventsToBeProcessed.size() == 0 || eventsToBeProcessed.count(eventType) > 0;
+bool EventQueue::canProcessEvent(IEvent* event) {
+	if (eventsToBeProcessed.size() == 0 || eventsToBeProcessed.count(event->getEventUuid()) > 0)
+		return true;
+	for (auto& guard : eventGuards)
+		if (guard(event)) return true;
+	return false;
 }
 

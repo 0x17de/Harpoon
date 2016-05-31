@@ -2,15 +2,15 @@
 #define USERMANAGER_H
 
 #include <map>
+#include <memory>
 #include "queue/EventLoop.hpp"
-#include "User.hpp"
 
 
 class EventQueue;
 class EventLoginResult;
 class UserManager : public ManagingEventLoop {
 	EventQueue* appQueue;
-	std::map<size_t, User> users;
+	std::map<size_t, std::shared_ptr<EventLoop>> users;
 public:
 	UserManager(EventQueue* appQueue);
 	virtual bool onEvent(std::shared_ptr<IEvent> event) override;

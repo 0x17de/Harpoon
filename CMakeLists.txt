@@ -8,7 +8,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/app/ApplicationGuard.cpp src/app/ApplicationGuard.hpp
 	src/queue/EventLoop.cpp src/queue/EventLoop.hpp
-	src/db/ChatDatabaseDummy.cpp src/db/ChatDatabaseDummy.hpp
+	src/db/LoginDatabase_Dummy.cpp src/db/LoginDatabase_Dummy.hpp
+	src/db/IrcDatabase_Dummy.cpp src/db/IrcDatabase_Dummy.hpp
 	src/event/IEvent.hpp src/event/IClientEvent.hpp
 	src/ini/IniReader.cpp src/ini/IniReader.hpp
 	src/irc/IrcConnection.cpp src/irc/IrcConnection.hpp
@@ -16,12 +17,13 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/main.cpp src/queue/EventQueue.cpp src/queue/EventQueue.hpp
 	src/queue/EventQueue_Impl.hpp src/tcp/TcpClient.cpp
 	src/tcp/TcpClient.hpp src/tcp/TcpServer.cpp src/tcp/TcpServer.hpp
-	src/user/User.cpp src/user/User.hpp src/utils/uuid.hpp
+	src/irc/IrcService.cpp src/irc/IrcService.hpp src/utils/uuid.hpp
 	src/user/UserManager.cpp src/user/UserManager.hpp
 	src/utils/Base64.cpp src/utils/Base64.hpp
 	src/utils/Crypto.cpp src/utils/Crypto.hpp
 	src/event/EventInit.cpp src/event/EventInit.hpp
-	src/event/EventActivateUser.cpp src/event/EventActivateUser.hpp
+	src/event/IActivateUserEvent.hpp
+	src/event/irc/EventIrcActivateUser.cpp src/event/irc/EventIrcActivateUser.hpp
 	src/event/EventLogin.cpp src/event/EventLogin.hpp
 	src/event/EventLogout.cpp src/event/EventLogout.hpp
 	src/event/EventLoginResult.cpp src/event/EventLoginResult.hpp

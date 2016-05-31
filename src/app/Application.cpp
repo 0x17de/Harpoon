@@ -7,7 +7,8 @@
 #include "user/UserManager.hpp"
 #include "event/EventInit.hpp"
 #include "event/EventQuit.hpp"
-#include "db/ChatDatabaseDummy.hpp"
+#include "db/LoginDatabase_Dummy.hpp"
+#include "db/IrcDatabase_Dummy.hpp"
 #include "server/ws/WebsocketServer.hpp"
 
 using namespace std;
@@ -20,7 +21,8 @@ Application::Application() :
 	EventQueue* queue = getEventQueue();
 	userManager = make_shared<UserManager>(queue);
 	eventHandlers.push_back(userManager);
-	eventHandlers.push_back(make_shared<ChatDatabaseDummy>(queue));
+	eventHandlers.push_back(make_shared<LoginDatabase_Dummy>(queue));
+	eventHandlers.push_back(make_shared<IrcDatabase_Dummy>(queue));
 
 #ifdef USE_WEBSOCKET_SERVER
 	eventHandlers.push_back(make_shared<WebsocketServer>(queue));
@@ -36,7 +38,7 @@ bool Application::onEvent(std::shared_ptr<IEvent> event) {
 
 	for (auto& eventHandler : eventHandlers) {
 		auto eventQueue = eventHandler->getEventQueue();
-		if (eventQueue->canProcessEvent(eventType))
+		if (eventQueue->canProcessEvent(event.get()))
 			eventQueue->sendEvent(event);
 
 		// send events to managed subqueues
