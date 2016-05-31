@@ -22,8 +22,8 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/utils/Base64.cpp src/utils/Base64.hpp
 	src/utils/Crypto.cpp src/utils/Crypto.hpp
 	src/event/EventInit.cpp src/event/EventInit.hpp
-	src/event/IActivateUserEvent.hpp
-	src/event/irc/EventIrcActivateUser.cpp src/event/irc/EventIrcActivateUser.hpp
+	src/event/IActivateServiceEvent.hpp
+	src/event/irc/EventIrcActivateService.cpp src/event/irc/EventIrcActivateService.hpp
 	src/event/EventLogin.cpp src/event/EventLogin.hpp
 	src/event/EventLogout.cpp src/event/EventLogout.hpp
 	src/event/EventLoginResult.cpp src/event/EventLoginResult.hpp
