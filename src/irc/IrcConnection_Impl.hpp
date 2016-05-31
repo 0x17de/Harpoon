@@ -1,7 +1,7 @@
 #ifndef IRCCONNECTION_IMPL_H
 #define IRCCONNECTION_IMPL_h
 
-#include "event/irc/EventIrcActivateUser.hpp"
+#include "event/irc/EventIrcActivateService.hpp"
 #include <libircclient.h>
 #include <list>
 #include <vector>

@@ -1,7 +1,7 @@
 #include "IrcConnection.hpp"
 #include "IrcConnection_Impl.hpp"
 #include "event/EventQuit.hpp"
-#include "event/IActivateUserEvent.hpp"
+#include "event/IActivateServiceEvent.hpp"
 #include "event/irc/EventIrcJoinChannel.hpp"
 #include "event/irc/EventIrcPartChannel.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"

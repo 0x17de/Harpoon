@@ -2,7 +2,7 @@
 #include "irc/IrcConnection.hpp"
 #include "queue/EventQueue.hpp"
 #include "event/EventQuit.hpp"
-#include "event/irc/EventIrcActivateUser.hpp"
+#include "event/irc/EventIrcActivateService.hpp"
 #include "event/irc/EventIrcJoinChannel.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"
 #include <iostream>
@@ -17,7 +17,7 @@ IrcService::IrcService(size_t userId, EventQueue* appQueue)
 		EventIrcJoinChannel::uuid,
 		EventIrcSendMessage::uuid
 	}, {
-		&EventGuard<IActivateUserEvent>
+		&EventGuard<IActivateServiceEvent>
 	}),
 	userId{userId},
 	appQueue{appQueue}
@@ -30,7 +30,7 @@ IrcService::~IrcService() {
 bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
 	UUID type = event->getEventUuid();
 
-	auto activateUser = event->as<EventIrcActivateUser>();
+	auto activateUser = event->as<EventIrcActivateService>();
 	if (activateUser) {
 		cout << "[US] Received ActivateUser" << endl;
 		auto& loginConfiguration = activateUser->getLoginConfiguration();

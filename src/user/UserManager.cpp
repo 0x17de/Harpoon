@@ -3,7 +3,7 @@
 #include "event/IUserEvent.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventLoginResult.hpp"
-#include "event/IActivateUserEvent.hpp"
+#include "event/IActivateServiceEvent.hpp"
 
 using namespace std;
 
@@ -13,7 +13,7 @@ UserManager::UserManager(EventQueue* appQueue) :
 		EventQuit::uuid,
 		EventLoginResult::uuid,
 	}, {
-		&EventGuard<IActivateUserEvent>
+		&EventGuard<IActivateServiceEvent>
 	}),
 	appQueue{appQueue}
 {
@@ -40,7 +40,7 @@ bool UserManager::onEvent(std::shared_ptr<IEvent> event) {
 		std::cout << "UM received User event" << std::endl;
 		size_t userId = userEvent->getUserId();
 
-		auto activateEvent = event->as<IActivateUserEvent>();
+		auto activateEvent = event->as<IActivateServiceEvent>();
 		if (activateEvent) {
 			std::cout << "UM received Activate event" << std::endl;
 			cout << "[UM] Activate user: " << activateEvent->getUserId() << endl;
@@ -60,3 +60,4 @@ bool UserManager::onEvent(std::shared_ptr<IEvent> event) {
 
 	return true;
 }
+

@@ -3,7 +3,7 @@
 #include "event/EventInit.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventLoginResult.hpp"
-#include "event/irc/EventIrcActivateUser.hpp"
+#include "event/irc/EventIrcActivateService.hpp"
 #include "event/irc/EventIrcJoinChannel.hpp" // IrcChannelLoginData
 
 using namespace std;
@@ -35,7 +35,7 @@ bool IrcDatabase_Dummy::onEvent(std::shared_ptr<IEvent> event) {
 			forward_as_tuple(serverId),
 			forward_as_tuple(serverId, "TestServer", "192.168.1.3", 6667, "", list<string>{"iirc", "iirc2", "iirc3"}, list<IrcChannelLoginData>{{1, "#test", ""}}, false, false));
 
-		appQueue->sendEvent(make_shared<EventIrcActivateUser>(userId, loginData));
+		appQueue->sendEvent(make_shared<EventIrcActivateService>(userId, loginData));
 	}
 	return true;
 }
