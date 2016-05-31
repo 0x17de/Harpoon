@@ -4,9 +4,15 @@
 #include <thread>
 #include <memory>
 #include <set>
+#include <list>
 #include "utils/uuid.hpp"
 #include "queue/EventQueue.hpp"
 
+
+template<class T>
+bool EventGuard(IEvent* event) {
+	return dynamic_cast<T*>(event) != nullptr;
+}
 
 class IEvent;
 class EventQueue;
@@ -19,7 +25,7 @@ protected:
 	virtual bool onEvent(std::shared_ptr<IEvent> event) = 0;
 public:
 	EventLoop();
-	EventLoop(std::set<UUID> processableEvents);
+	EventLoop(std::set<UUID> processableEvents, std::list<bool(*)(IEvent*)> = {});
 	~EventLoop();
 	EventQueue* getEventQueue();
 	void join();
@@ -28,7 +34,7 @@ public:
 class ManagingEventLoop : public EventLoop {
 public:
 	ManagingEventLoop();
-	ManagingEventLoop(std::set<UUID> processableEvents);
+	ManagingEventLoop(std::set<UUID> processableEvents, std::list<bool(*)(IEvent*)> = {});
 	~ManagingEventLoop();
 	virtual void sendEventToUser(std::shared_ptr<IEvent> event) = 0;
 };

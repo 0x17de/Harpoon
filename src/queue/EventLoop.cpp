@@ -1,13 +1,15 @@
 #include "EventLoop.hpp"
 #include "queue/EventQueue.hpp"
 
-EventLoop::EventLoop() :
+EventLoop::EventLoop()
+:
 	t{std::thread(go, this)}
 {
 }
 
-EventLoop::EventLoop(std::set<UUID> processableEvents) :
-	queue{processableEvents},
+EventLoop::EventLoop(std::set<UUID> processableEvents, std::list<bool(*)(IEvent*)> eventGuards)
+:
+	queue{processableEvents, eventGuards},
 	t{std::thread(go, this)}
 {
 }
@@ -45,9 +47,9 @@ ManagingEventLoop::ManagingEventLoop()
 {
 }
 
-ManagingEventLoop::ManagingEventLoop(std::set<UUID> processableEvents)
+ManagingEventLoop::ManagingEventLoop(std::set<UUID> processableEvents, std::list<bool(*)(IEvent*)> eventGuards)
 :
-	EventLoop(processableEvents)
+	EventLoop(processableEvents, eventGuards)
 {
 }
 
