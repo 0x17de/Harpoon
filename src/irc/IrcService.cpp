@@ -2,9 +2,11 @@
 #include "irc/IrcConnection.hpp"
 #include "queue/EventQueue.hpp"
 #include "event/EventQuit.hpp"
+#include "event/EventLoginResult.hpp"
 #include "event/irc/EventIrcActivateService.hpp"
 #include "event/irc/EventIrcJoinChannel.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"
+#include "event/irc/IrcChatListing.hpp"
 #include <iostream>
 
 using namespace std;
@@ -14,6 +16,7 @@ IrcService::IrcService(size_t userId, EventQueue* appQueue)
 :
 	EventLoop({
 		EventQuit::uuid,
+		EventLoginResult::uuid,
 		EventIrcJoinChannel::uuid,
 		EventIrcSendMessage::uuid
 	}, {
@@ -50,6 +53,19 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
 		for (auto& connection : ircConnections)
 			connection.second.join();
 		return false;
+	} else if (type == EventLoginResult::uuid) {
+		auto login = event->as<EventLoginResult>();
+
+		auto listing = make_shared<IrcChatListing>();
+		for (auto& cxnPair : ircConnections) {
+			auto& connection = cxnPair.second;
+/*			IrcServerListing& server = listing->addServer(
+				connection.getId(),
+				connection.getName());*/
+#warning continue with channels, think about locking and unlock after sendEvent
+		}
+
+		login->getTarget()->sendEvent(listing);
 	} else if (type == EventIrcJoinChannel::uuid) {
 		cout << "[US] Received JOIN" << endl;
 	} else if (type == EventIrcSendMessage::uuid) {
