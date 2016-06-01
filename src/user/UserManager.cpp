@@ -25,9 +25,11 @@ void UserManager::sendEventToUser(std::shared_ptr<IEvent> event) {
 		cout << "NonNULL event" << endl;
 		auto it = users.find(userEvent->getUserId());
 		if (it != users.end()) {
-			EventQueue* queue = it->second->getEventQueue();
-			if (queue->canProcessEvent(event.get()))
-				queue->sendEvent(event);
+			for (auto loop : it->second) {
+				EventQueue* queue = loop.second->getEventQueue();
+				if (queue->canProcessEvent(event.get()))
+					queue->sendEvent(event);
+			}
 		}
 	}
 }
@@ -44,17 +46,45 @@ bool UserManager::onEvent(std::shared_ptr<IEvent> event) {
 		if (activateEvent) {
 			std::cout << "UM received Activate event" << std::endl;
 			cout << "[UM] Activate user: " << activateEvent->getUserId() << endl;
-			auto it = users.emplace(userId, activateEvent->instantiateService(userId, appQueue));
-			it.first->second->getEventQueue()->sendEvent(event);
+			std::map<size_t, std::shared_ptr<EventLoop>>* serviceMap;
+			auto serviceMapIt = users.find(userId);
+			if (serviceMapIt == users.end()) {
+				auto it = users.emplace(piecewise_construct,
+					forward_as_tuple(userId),
+					forward_as_tuple());
+				serviceMap = &it.first->second;
+			} else {
+				serviceMap = &serviceMapIt->second;
+			}
+			auto serviceIt = serviceMap->find(eventType);
+			if (serviceIt == serviceMap->end()) {
+				auto serviceInstanceIt = serviceMap->emplace(eventType, activateEvent->instantiateService(userId, appQueue));
+				serviceInstanceIt.first->second->getEventQueue()->sendEvent(event);
+			}
+		}
+		if (eventType == EventLoginResult::uuid) {
+			auto loginResult = event->as<EventLoginResult>();
+			if (loginResult->getSuccess()) {
+				auto it = users.find(userId);
+				if (it != users.end()) {
+					for (auto p : it->second) {
+						p.second->getEventQueue()->sendEvent(event);
+					}
+				}
+			}
 		}
 	}
 
 	if (eventType == EventQuit::uuid) {
 		cout << "[UM] received QUIT event" << endl;
-		for (auto& user : users)
-			user.second->getEventQueue()->sendEvent(event);
-		for (auto& user : users)
-			user.second->join();
+		for (auto& user : users) {
+			for (auto p : user.second)
+				p.second->getEventQueue()->sendEvent(event);
+		}
+		for (auto& user : users) {
+			for (auto p : user.second)
+				p.second->join();
+		}
 		return false;
 	}
 
