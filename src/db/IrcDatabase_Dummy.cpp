@@ -33,7 +33,7 @@ bool IrcDatabase_Dummy::onEvent(std::shared_ptr<IEvent> event) {
 		size_t serverId = 1;
 		loginData.emplace(piecewise_construct,
 			forward_as_tuple(serverId),
-			forward_as_tuple(serverId, "TestServer", "192.168.1.3", 6667, "", list<string>{"iirc", "iirc2", "iirc3"}, list<IrcChannelLoginData>{{1, "#test", ""}}, false, false));
+			forward_as_tuple(serverId, "TestServer", "127.0.0.1", 6667, "wealllikedebian", list<string>{"iirc", "iirc2", "iirc3"}, list<IrcChannelLoginData>{{1, "#test", ""}}, false, false));
 
 		appQueue->sendEvent(make_shared<EventIrcActivateService>(userId, loginData));
 	}
