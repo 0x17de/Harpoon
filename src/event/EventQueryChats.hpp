@@ -1,21 +1,24 @@
 #ifndef EVENTQUERYCHATS_H
 #define EVENTQUERYCHATS_H
 
-#include "IEvent.hpp"
+#include "IUserEvent.hpp"
 #include <cstdlib>
 
 
 class EventQueue;
-class EventQueryChats : public IEvent {
+class EventQueryChats : public IUserEvent {
 	size_t userId;
 	EventQueue* target;
+	void* data;
 public:
 	static UUID uuid;
 	virtual UUID getEventUuid() const override;
 
-	EventQueryChats(size_t userId, EventQueue* target);
+	EventQueryChats(size_t userId, EventQueue* target, void* data);
+
 	size_t getUserId() const;
 	EventQueue* getTarget() const;
+	void* getData() const;
 };
 
 #endif

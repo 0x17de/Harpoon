@@ -1,7 +1,7 @@
-#ifndef IRCCHATLISTING_H
-#define IRCCHATLISTING_H
+#ifndef EVENTIRCCHATLISTING_H
+#define EVENTIRCCHATLISTING_H
 
-#include "../IClientEvent.hpp"
+#include "../ISingleClientEvent.hpp"
 #include <string>
 #include <list>
 
@@ -27,17 +27,20 @@ public:
 	const std::list<IrcChannelListing>& getChannels() const;
 };
 
-class IrcChatListing : public IClientEvent {
+class EventIrcChatListing : public ISingleClientEvent {
 	size_t userId;
 	std::list<IrcServerListing> servers;
+	void* data;
 public:
 	static UUID uuid;
 	virtual UUID getEventUuid() const override;
 
+	EventIrcChatListing(size_t userId, void* data);
 	IrcServerListing& addServer(size_t serverId, std::string serverName);
 
 	size_t getUserId() const override;
 	const std::list<IrcServerListing>& getServerList() const;
+	void* getData() const;
 };
 
 #endif

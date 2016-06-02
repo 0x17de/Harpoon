@@ -11,7 +11,7 @@ using namespace std;
 UserManager::UserManager(EventQueue* appQueue) :
 	ManagingEventLoop({
 		EventQuit::uuid,
-		EventLoginResult::uuid,
+		EventLoginResult::uuid
 	}, {
 		&EventGuard<IActivateServiceEvent>
 	}),
@@ -39,7 +39,6 @@ bool UserManager::onEvent(std::shared_ptr<IEvent> event) {
 
 	auto userEvent = event->as<IUserEvent>();
 	if (userEvent) {
-		std::cout << "UM received User event" << std::endl;
 		size_t userId = userEvent->getUserId();
 
 		auto activateEvent = event->as<IActivateServiceEvent>();
@@ -61,8 +60,8 @@ bool UserManager::onEvent(std::shared_ptr<IEvent> event) {
 				auto serviceInstanceIt = serviceMap->emplace(eventType, activateEvent->instantiateService(userId, appQueue));
 				serviceInstanceIt.first->second->getEventQueue()->sendEvent(event);
 			}
-		}
-		if (eventType == EventLoginResult::uuid) {
+		} else if (eventType == EventLoginResult::uuid) {
+			std::cout << "UM received User login result event" << std::endl;
 			auto loginResult = event->as<EventLoginResult>();
 			if (loginResult->getSuccess()) {
 				auto it = users.find(userId);
@@ -70,6 +69,14 @@ bool UserManager::onEvent(std::shared_ptr<IEvent> event) {
 					for (auto p : it->second) {
 						p.second->getEventQueue()->sendEvent(event);
 					}
+				}
+			}
+		} else {
+			std::cout << "UM received other User event" << std::endl;
+			auto it = users.find(userId);
+			if (it != users.end()) {
+				for (auto p : it->second) {
+					p.second->getEventQueue()->sendEvent(event);
 				}
 			}
 		}

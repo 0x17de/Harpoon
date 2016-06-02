@@ -3,6 +3,7 @@
 #include "event/IUserEvent.hpp"
 #include "event/EventQuit.hpp"
 #include "event/irc/EventIrcMessage.hpp"
+#include "event/irc/EventIrcChatListing.hpp"
 #include "event/EventLoginResult.hpp"
 #include "event/EventLogout.hpp"
 #include "event/EventQueryChats.hpp"
@@ -40,6 +41,10 @@ WebsocketServer_Impl::~WebsocketServer_Impl() {
 
 bool WebsocketServer_Impl::onEvent(std::shared_ptr<IEvent> event) {
 	UUID eventType = event->getEventUuid();
+
+	if (event->as<ISingleClientEvent>())
+		sendEventToUser(event);
+
 	if (eventType == EventQuit::uuid) {
 		return false;
 	} else if (eventType == EventLoginResult::uuid) {
@@ -77,7 +82,7 @@ void WebsocketServer_Impl::addClient(size_t userId, seasocks::WebSocket* socket)
 	dataList->emplace_back(userId, socket);
 	clients.emplace(socket, (++dataList->rbegin()).base()); // iterator to last element
 
-	appQueue->sendEvent(make_shared<EventQueryChats>(userId, queue));
+	appQueue->sendEvent(make_shared<EventQueryChats>(userId, queue, socket));
 }
 
 void WebsocketServer_Impl::removeClient(seasocks::WebSocket* socket) {
@@ -109,6 +114,21 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
 		root["channel"] = message->getChannel();
 		root["nick"] = message->getFrom();
 		root["msg"] = message->getMessage();
+	} else if (eventType == EventIrcChatListing::uuid) {
+		cout << "eventToJson => IrcChatListing" << endl;
+		auto listing = event->as<EventIrcChatListing>();
+		root["cmd"] = "chatlist";
+		root["type"] = "irc";
+		Json::Value& serverList = root["servers"];
+		for (auto& serverData : listing->getServerList()) {
+			Json::Value& server = serverList[to_string(serverData.getServerId())];
+			server["name"] = serverData.getServerName();
+			Json::Value& channelList = server["channels"];
+			for (auto& channelData : serverData.getChannels()) {
+				Json::Value& channel = channelList[channelData.getChannelName()];
+				channel = true;
+			}
+		}
 	}
 
 	return Json::FastWriter{}.write(root);
@@ -117,7 +137,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
 void WebsocketServer_Impl::sendEventToUser(std::shared_ptr<IEvent> event) {
 	auto userEvent = event->as<IClientEvent>();
 	if (userEvent != nullptr) {
-		cout << "Event for User: " << userEvent->getUserId() << endl;
+		cout << "Event for client: " << userEvent->getUserId() << endl;
 		auto it = userToClients.find(userEvent->getUserId());
 		if (it != userToClients.end()) {
 			cout << "User found" << endl;
@@ -127,6 +147,27 @@ void WebsocketServer_Impl::sendEventToUser(std::shared_ptr<IEvent> event) {
 				server.execute([=] {
 					clientData.socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
 				});
+			}
+		}
+	} else {
+		auto singleClientEvent = event->as<ISingleClientEvent>();
+		if (singleClientEvent) {
+			cout << "Event for single client: " << singleClientEvent->getUserId() << endl;
+			size_t userId = singleClientEvent->getUserId();
+			auto it = userToClients.find(singleClientEvent->getUserId());
+			if (it != userToClients.end()) {
+				cout << "User found" << endl;
+				std::string json = eventToJson(event);
+				list<WebsocketClientData>& clientDataList = it->second;
+
+				void* data = singleClientEvent->getData();
+				for (auto& clientData : clientDataList) {
+					if (clientData.socket == data) {
+						server.execute([=] {
+							clientData.socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
+						});
+					}
+				}
 			}
 		}
 	}
