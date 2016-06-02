@@ -27,15 +27,24 @@ bool IrcDatabase_Dummy::onEvent(std::shared_ptr<IEvent> event) {
 	} else if (eventType == EventInit::uuid) {
 		std::cout << "IrcDB received INIT event" << std::endl;
 
-		size_t userId = 1;	
-		std::map<size_t, IrcServerConfiguration> loginData;
+		size_t userId = 1;
+		auto login = make_shared<EventIrcActivateService>(userId);
 
 		size_t serverId = 1;
-		loginData.emplace(piecewise_construct,
-			forward_as_tuple(serverId),
-			forward_as_tuple(serverId, "TestServer", "127.0.0.1", 6667, "wealllikedebian", list<string>{"iirc", "iirc2", "iirc3"}, list<IrcChannelLoginData>{{1, "#test", ""}}, false, false));
+		auto& loginConfiguration = login->addLoginConfiguration(serverId,
+			"TestServer",
+			"127.0.0.1",
+			6667,
+			"wealllikedebian",
+			false,
+			false);
 
-		appQueue->sendEvent(make_shared<EventIrcActivateService>(userId, loginData));
+		loginConfiguration.addNick("iirc");
+		loginConfiguration.addNick("iirc2");
+		loginConfiguration.addNick("iirc3");
+		loginConfiguration.addChannelLoginData(1, "#test", "");
+
+		appQueue->sendEvent(login);
 	}
 	return true;
 }

@@ -2,18 +2,30 @@
 #include "utils/uuidGen.hpp"
 
 
-IrcChannelLoginData::IrcChannelLoginData(size_t channelId, const std::string& channel, const std::string& password)
+IrcChannelLoginData::IrcChannelLoginData(size_t channelId, const std::string& channelName, const std::string& channelPassword)
 :
 	channelId{channelId},
-	channel{channel},
-	password{password}
+	channelName{channelName},
+	channelPassword{channelPassword}
 {
 }
 
-EventIrcJoinChannel::EventIrcJoinChannel(size_t userId, size_t serverId, std::list<IrcChannelLoginData> loginData)
+size_t IrcChannelLoginData::getChannelId() const {
+	return channelId;
+}
+
+std::string IrcChannelLoginData::getChannelName() const {
+	return channelName;
+}
+
+std::string IrcChannelLoginData::getChannelPassword() const {
+	return channelPassword;
+}
+
+EventIrcJoinChannel::EventIrcJoinChannel(size_t userId, size_t serverId)
 :
-	serverId{serverId},
-	loginData{loginData.begin(), loginData.end()}
+	userId{userId},
+	serverId{serverId}
 {
 }
 
@@ -28,6 +40,9 @@ size_t EventIrcJoinChannel::getUserId() const {
 
 size_t EventIrcJoinChannel::getServerId() const {
 	return serverId;
+}
+std::list<IrcChannelLoginData> EventIrcJoinChannel::getLoginData() {
+	return loginData;
 }
 const std::list<IrcChannelLoginData> EventIrcJoinChannel::getLoginData() const {
 	return loginData;

@@ -85,9 +85,12 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, cons
 
 		while (ircSession != 0 && running) {
 
-			// copy channels to login
-			for (auto& channel : this->configuration.channels)
-				channelLoginData.emplace(channel.channel, channel);
+			{
+				lock_guard<mutex> lock(channelLoginDataMutex);
+				// copy channels to login
+				for (auto& channel : this->configuration.channels)
+					channelLoginData.emplace(channel.getChannelName(), channel);
+			}
 
 			// connect to server
 			irc_connect(ircSession,
@@ -150,11 +153,14 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
 		lock_guard<mutex> lock(channelLoginDataMutex);
 		auto joinCommand = event->as<EventIrcJoinChannel>();
 		for (auto& entry : joinCommand->getLoginData()) {
-			auto it = channelLoginData.find(entry.channel);
+			auto it = channelLoginData.find(entry.getChannelName());
 			if (it != channelLoginData.end())
 				continue;
-			irc_cmd_join(ircSession, it->second.channel.c_str(), it->second.password.c_str());
-			channelLoginData.emplace(entry.channel, entry);
+			IrcChannelLoginData& loginData = it->second;
+			irc_cmd_join(ircSession,
+				loginData.getChannelName().c_str(),
+				loginData.getChannelPassword().c_str());
+			channelLoginData.emplace(entry.getChannelName(), entry);
 		}
 	} else if (type == EventIrcPartChannel::uuid) {
 		lock_guard<mutex> lock(channelLoginDataMutex);
@@ -163,7 +169,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
 			auto it = channelLoginData.find(channel);
 			if (it == channelLoginData.end())
 				continue;
-			irc_cmd_part(ircSession, it->second.channel.c_str());
+			irc_cmd_part(ircSession, it->second.getChannelName().c_str());
 			channelLoginData.erase(it);
 		}
 	} else if (type == EventIrcSendMessage::uuid) {
@@ -172,4 +178,21 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
 	}
 	return true;
 }
+
+size_t IrcConnection::getServerId() const {
+	return impl->configuration.serverId;
+}
+
+std::string IrcConnection::getServerName() const {
+	return impl->configuration.serverName;
+}
+
+std::mutex& IrcConnection::getChannelLoginDataMutex() const {
+	return impl->channelLoginDataMutex;
+}
+
+const std::map<std::string, IrcChannelLoginData>& IrcConnection::getChannelLoginData() const {
+	return impl->channelLoginData;
+}
+
 
