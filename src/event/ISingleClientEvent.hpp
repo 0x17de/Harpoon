@@ -2,10 +2,10 @@
 #define ISINGLECLIENTEVENT_H
 
 #include <cstddef>
-#include "IUserEvent.hpp"
+#include "IClientEvent.hpp"
 
 
-class ISingleClientEvent : public IUserEvent {
+class ISingleClientEvent : public IClientEvent {
 public:
 	virtual void* getData() const = 0;
 };
