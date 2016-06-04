@@ -1,11 +1,11 @@
 #ifndef EVENTIRCPARTED_H
 #define EVENTIRCPARTED_H
 
-#include "../IEvent.hpp"
+#include "../IClientEvent.hpp"
 #include <string>
 
 
-class EventIrcParted : public IEvent {
+class EventIrcParted : public IClientEvent {
 	size_t userId;
 	size_t serverId;
 	std::string username;
@@ -15,7 +15,7 @@ public:
 	virtual UUID getEventUuid() const override;
 
 	EventIrcParted(size_t userId, size_t serverId, const std::string& username, const std::string& channel);
-	size_t getUserId() const;
+	size_t getUserId() const override;
 	size_t getServerId() const;
 	std::string getUsername() const;
 	std::string getChannel() const;

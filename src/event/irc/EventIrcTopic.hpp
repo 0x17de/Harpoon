@@ -1,11 +1,11 @@
 #ifndef EVENTIRCTOPIC_H
 #define EVENTIRCTOPIC_H
 
-#include "../IEvent.hpp"
+#include "../IClientEvent.hpp"
 #include <string>
 
 
-class EventIrcTopic : public IEvent {
+class EventIrcTopic : public IClientEvent {
 	size_t userId;
 	size_t serverId;
 	std::string username;
@@ -16,7 +16,7 @@ public:
 	virtual UUID getEventUuid() const override;
 
 	EventIrcTopic(size_t userId, size_t serverId, const std::string& username, const std::string& channel, const std::string& topic);
-	size_t getUserId() const;
+	size_t getUserId() const override;
 	size_t getServerId() const;
 };
 

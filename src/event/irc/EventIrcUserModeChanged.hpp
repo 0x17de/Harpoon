@@ -1,11 +1,11 @@
 #ifndef EVENTIRCUSERMODECHANGED_H
 #define EVENTIRCUSERMODECHANGED_H
 
-#include "../IEvent.hpp"
+#include "../IClientEvent.hpp"
 #include <string>
 
 
-class EventIrcUserModeChanged : public IEvent {
+class EventIrcUserModeChanged : public IClientEvent {
 	size_t userId;
 	size_t serverId;
 	std::string username;
@@ -19,7 +19,7 @@ public:
 		const std::string& username,
 		const std::string& channel,
 		const std::string& mode);
-	size_t getUserId() const;
+	size_t getUserId() const override;
 	size_t getServerId() const;
 	std::string getUsername() const;
 	std::string getChannel() const;
