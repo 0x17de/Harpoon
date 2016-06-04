@@ -76,7 +76,7 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
 		}
 
 		cout << "[US] Sending chat listing" << endl;
-		query->getTarget()->sendEvent(listing);
+		appQueue->sendEvent(listing);
 	} else if (type == EventIrcJoinChannel::uuid) {
 		cout << "[US] Received JOIN" << endl;
 	} else if (type == EventIrcSendMessage::uuid) {
