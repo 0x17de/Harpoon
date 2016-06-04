@@ -51,7 +51,6 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, cons
 	configuration{configuration},
 	running{true}
 {
-	cout << "IrcFor" << userId << endl;
 	ircLoop = thread([this]{ 
 		irc_callbacks_t callbacks = {0};
 		callbacks.event_connect = &onIrcEvent<&IrcConnection_Impl::onConnect>;
@@ -81,7 +80,6 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, cons
 		ircSession = irc_create_session(&callbacks);
 		// remember session
 		activeIrcConnections.emplace(ircSession, this);
-		cout << "[IC] Session: " << ircSession << endl;
 
 		while (ircSession != 0 && running) {
 

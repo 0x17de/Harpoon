@@ -1,12 +1,12 @@
 #ifndef EVENTIRCNUMERIC_H
 #define EVENTIRCNUMERIC_H
 
-#include "../IEvent.hpp"
+#include "../IClientEvent.hpp"
 #include <string>
 #include <vector>
 
 
-class EventIrcNumeric : public IEvent {
+class EventIrcNumeric : public IClientEvent {
 	size_t userId;
 	size_t serverId;
 	unsigned int eventCode;
@@ -20,7 +20,7 @@ public:
 		unsigned int eventCode,
 		std::string from,
 		std::vector<std::string> parameters);
-	size_t getUserId() const;
+	size_t getUserId() const override;
 	size_t getServerId() const;
 	unsigned int getEventCode() const;
 	std::string getFrom() const;

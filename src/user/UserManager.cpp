@@ -22,7 +22,6 @@ UserManager::UserManager(EventQueue* appQueue) :
 void UserManager::sendEventToUser(std::shared_ptr<IEvent> event) {
 	auto userEvent = event->as<IUserEvent>();
 	if (userEvent != nullptr) {
-		cout << "NonNULL event" << endl;
 		auto it = users.find(userEvent->getUserId());
 		if (it != users.end()) {
 			for (auto loop : it->second) {

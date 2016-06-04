@@ -1,11 +1,11 @@
 #ifndef EVENTIRCCONNECTED_H
 #define EVENTIRCCONNECTED_H
 
-#include "../IEvent.hpp"
+#include "../IClientEvent.hpp"
 #include <cstdlib>
 
 
-class EventIrcConnected : public IEvent {
+class EventIrcConnected : public IClientEvent {
 	size_t userId;
 	size_t serverId;
 public:

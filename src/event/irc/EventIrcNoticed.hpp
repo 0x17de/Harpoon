@@ -1,11 +1,11 @@
 #ifndef EVENTIRCNOTICED_H
 #define EVENTIRCNOTICED_H
 
-#include "../IEvent.hpp"
+#include "../IClientEvent.hpp"
 #include <string>
 
 
-class EventIrcNoticed : public IEvent {
+class EventIrcNoticed : public IClientEvent {
 	size_t userId;
 	size_t serverId;
 	std::string username;
@@ -19,7 +19,7 @@ public:
 		const std::string& username,
 		const std::string& target,
 		const std::string& message);
-	size_t getUserId() const;
+	size_t getUserId() const override;
 	size_t getServerId() const;
 	std::string getUsername() const;
 	std::string getTarget() const;

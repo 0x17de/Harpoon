@@ -134,10 +134,8 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
 void WebsocketServer_Impl::sendEventToUser(std::shared_ptr<IEvent> event) {
 	auto userEvent = event->as<IClientEvent>();
 	if (userEvent == nullptr) return;
-	cout << "Event for client: " << userEvent->getUserId() << endl;
 	auto it = userToClients.find(userEvent->getUserId());
 	if (it != userToClients.end()) {
-		cout << "User found" << endl;
 		std::string json = eventToJson(event);
 		list<WebsocketClientData>& clientDataList = it->second;
 		auto singleClientEvent = event->as<ISingleClientEvent>();
