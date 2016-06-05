@@ -3,6 +3,8 @@
 #include "event/IUserEvent.hpp"
 #include "event/EventQuit.hpp"
 #include "event/irc/EventIrcMessage.hpp"
+#include "event/irc/EventIrcJoined.hpp"
+#include "event/irc/EventIrcParted.hpp"
 #include "event/irc/EventIrcChatListing.hpp"
 #include "event/EventLoginResult.hpp"
 #include "event/EventLogout.hpp"
@@ -106,6 +108,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
 		cout << "eventToJson => IrcMessage" << endl;
 		auto message = event->as<EventIrcMessage>();
 		root["cmd"] = "chat";
+		root["type"] = "irc";
 		// jsonpp has no clue of size_t and clients only need to store it
 		root["server"] = to_string(message->getServerId());
 		root["channel"] = message->getChannel();
@@ -126,6 +129,22 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
 				channel = true;
 			}
 		}
+	} else if (eventType == EventIrcJoined::uuid) {
+		cout << "eventToJson => IrcJoined" << endl;
+		auto join = event->as<EventIrcJoined>();
+		root["cmd"] = "join";
+		root["type"] = "irc";
+		root["server"] = to_string(join->getServerId());
+		root["nick"] = join->getUsername();
+		root["channel"] = join->getChannel();
+	} else if (eventType == EventIrcParted::uuid) {
+		cout << "eventToJson => IrcParted" << endl;
+		auto part = event->as<EventIrcParted>();
+		root["cmd"] = "part";
+		root["type"] = "irc";
+		root["server"] = to_string(part->getServerId());
+		root["nick"] = part->getUsername();
+		root["channel"] = part->getChannel();
 	}
 
 	return Json::FastWriter{}.write(root);
