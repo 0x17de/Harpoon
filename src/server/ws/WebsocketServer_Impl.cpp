@@ -6,6 +6,8 @@
 #include "event/irc/EventIrcJoined.hpp"
 #include "event/irc/EventIrcParted.hpp"
 #include "event/irc/EventIrcChatListing.hpp"
+#include "event/irc/EventIrcQuit.hpp"
+#include "event/irc/EventIrcTopic.hpp"
 #include "event/EventLoginResult.hpp"
 #include "event/EventLogout.hpp"
 #include "event/EventQueryChats.hpp"
@@ -145,6 +147,23 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
 		root["server"] = to_string(part->getServerId());
 		root["nick"] = part->getUsername();
 		root["channel"] = part->getChannel();
+	} else if (eventType == EventIrcQuit::uuid) {
+		cout << "eventToJson => IrcQuit" << endl;
+	        auto quit = event->as<EventIrcQuit>();
+		root["cmd"] = "quit";
+		root["type"] = "irc";
+		root["server"] = to_string(quit->getServerId());
+		root["nick"] = quit->getWho();
+		root["reason"] = quit->getReason();
+	} else if (eventType == EventIrcTopic::uuid) {
+		cout << "eventToJson => IrcTopic" << endl;
+		auto topic = event->as<EventIrcTopic>();
+		root["cmd"] = "topic";
+		root["type"] = "irc";
+		root["server"] = to_string(topic->getServerId());
+		root["nick"] = topic->getUsername();
+		root["topic"] = topic->getTopic();
+		root["channel"] = topic->getChannel();
 	}
 
 	return Json::FastWriter{}.write(root);
