@@ -1,0 +1,54 @@
+html, body {
+	height:100vh; width:100vw;
+	margin:0; padding:0;
+	font-family: "Lucida Console", Monaco, monospace;
+	color:#100;
+}
+h2 {
+	margin:0; padding:1pt 7pt;
+	background:#f16745; /* red */
+	-webkit-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.25);
+	-moz-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.25);
+	box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.25);
+}
+.bar {
+	position:absolute;
+	left:0; top:0;
+	width:15em; height:100%;
+	background:#eee;
+	-webkit-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
+	-moz-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
+	box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
+}
+.area {
+	position:absolute;
+	top:0; right:0;
+	width:calc(100% - 15em);
+	height:100%;
+}
+.top {
+	width:100%;
+	height:calc(100% - 22pt - 4px);
+}
+.topmargin {
+	border:1em solid transparent;
+	box-sizing:border-box;
+	width:100%; height:100%;
+}
+#log {
+	overflow:auto;
+	width:100%; height:100%;
+}
+.bottom {
+	position:absolute;
+	left:0px; bottom:0px;
+	border:1px solid #444;
+	width:calc(100% - 2px);
+}
+#input {
+	height:calc(22pt + 4px); width:calc(100% - 1.5em);
+	display:table;
+	margin:0 auto; padding:0;
+	font-size:12pt;
+	border:0;
+}
