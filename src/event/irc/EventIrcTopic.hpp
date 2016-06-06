@@ -18,6 +18,9 @@ public:
 	EventIrcTopic(size_t userId, size_t serverId, const std::string& username, const std::string& channel, const std::string& topic);
 	size_t getUserId() const override;
 	size_t getServerId() const;
+	std::string getUsername() const;
+	std::string getChannel() const;
+	std::string getTopic() const;
 };
 
 #endif

@@ -25,3 +25,15 @@ size_t EventIrcTopic::getServerId() const {
 	return serverId;
 }
 
+std::string EventIrcTopic::getUsername() const {
+	return username;
+}
+
+std::string EventIrcTopic::getChannel() const {
+	return channel;
+}
+
+std::string EventIrcTopic::getTopic() const {
+	return topic;
+}
+
