@@ -99,6 +99,7 @@ function putLog(time, nick, msg, style) {
 	    .add(emsg=(new Element("div").text(msg).class('msg')))
 	);
 	if (style) row.class(style);
+	log.get().scrollIntoView(false);
 }
 function putLine(msg) {
 	log.add(
