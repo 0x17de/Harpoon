@@ -88,6 +88,11 @@ function onIrcMessage(json) {
 	case 'chat':
 		putLog(timestamp(), nick, json.msg);
 		break;
+	case 'nickchange':
+		putLog(timestamp(), '<->', pureNick+' is now known as '+json.newNick, 'event');
+		break;
+	default:
+		console.warning("Unknown command: "+json.cmd);
 	}
 }
 function putLog(time, nick, msg, style) {

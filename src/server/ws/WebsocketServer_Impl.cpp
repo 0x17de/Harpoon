@@ -8,6 +8,7 @@
 #include "event/irc/EventIrcChatListing.hpp"
 #include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcTopic.hpp"
+#include "event/irc/EventIrcNickChanged.hpp"
 #include "event/EventLoginResult.hpp"
 #include "event/EventLogout.hpp"
 #include "event/EventQueryChats.hpp"
@@ -164,6 +165,14 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
 		root["nick"] = topic->getUsername();
 		root["topic"] = topic->getTopic();
 		root["channel"] = topic->getChannel();
+	} else if (eventType == EventIrcNickChanged::uuid) {
+		cout << "eventToJson => IrcNickChanged" << endl;
+		auto nick = event->as<EventIrcNickChanged>();
+		root["cmd"] = "nickchange";
+		root["type"] = "irc";
+		root["server"] = to_string(nick->getServerId());
+		root["nick"] = nick->getUsername();
+		root["newNick"] = nick->getNewNick();
 	}
 
 	return Json::FastWriter{}.write(root);
