@@ -6,7 +6,7 @@ var activeNick = 'iirc';
 var activeServer = 1;
 var activeChannel = '#test';
 
-var input, log;
+var input, log, logscroll;
 
 function sendInput() {
 	var input = document.getElementById('input');
@@ -91,6 +91,7 @@ function onIrcMessage(json) {
 	}
 }
 function putLog(time, nick, msg, style) {
+	var doScroll = logscroll.scrollHeight - logscroll.clientHeight <= logscroll.scrollTop + 5 /*tolerance*/;
 	var row;
 	log.add(
 	  row = (new Element("div")).class('row')
@@ -99,7 +100,7 @@ function putLog(time, nick, msg, style) {
 	    .add(emsg=(new Element("div").text(msg).class('msg')))
 	);
 	if (style) row.class(style);
-	log.get().scrollIntoView(false);
+	if (doScroll) log.get().scrollIntoView(false);
 }
 function putLine(msg) {
 	log.add(
@@ -109,6 +110,7 @@ function putLine(msg) {
 function init() {
 	input = new Element('#input');
 	log = new Element('#log');
+	logscroll = log.get().parentNode.parentNode;
 	input.get().onkeydown = function(e) {
 		if (e.keyCode == 13 && !e.shiftKey) {
 			e.preventDefault();
