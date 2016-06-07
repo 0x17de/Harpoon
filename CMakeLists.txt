@@ -100,10 +100,6 @@ if(${USE_WEBSOCKET_SERVER})
   endif()
 endif()
 
-#find_package(Boost REQUIRED COMPONENTS system)
-#include_directories(${Boost_INCLUDE_DIR})
-#target_link_libraries(iirc ${Boost_LIBRARIES})
-
 find_package(OpenSSL REQUIRED)
 if(${OPENSSL_FOUND})
   include_directories(${OPENSSL_INCLUDE_DIR})
