@@ -6,21 +6,29 @@ html, body {
 }
 h2 {
 	margin:0; padding:1pt 7pt;
+}
+.topbar {
+	z-index:100;
+	position:absolute;
+	left:0; top:0;
+	width:100vw; height:24pt;
 	background:#f16745; /* red */
 	-webkit-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.25);
 	-moz-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.25);
 	box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.25);
 }
 .bar {
+	z-index:50;
 	position:absolute;
-	left:0; top:0;
-	width:15em; height:100%;
+	left:0; top:24pt;
+	width:15em; height:calc(100% - 24pt);
 	background:#eee;
 	-webkit-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
 	-moz-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
 	box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
 }
 .area {
+	z-index:120;
 	position:absolute;
 	top:0; right:0;
 	width:calc(100% - 15em);
@@ -36,8 +44,29 @@ h2 {
 	width:100%; height:100%;
 }
 #log {
+	display:table;
 	overflow:auto;
-	width:100%; height:100%;
+	width:100%;
+	word-break: break-all;
+}
+#log .event {
+	color:#73446d; /* purple */
+}
+#log .row {
+	display:table-row;
+}
+#log .row .time,
+#log .row .nick,
+#log .row .msg {
+	display:table-cell;
+	padding:0.1em 0.3em;
+}
+#log .row .time {
+	width:6em;
+}
+#log .row .nick {
+	width:8em;
+	text-align:right;
 }
 .bottom {
 	position:absolute;

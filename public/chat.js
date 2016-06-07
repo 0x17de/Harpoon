@@ -22,7 +22,7 @@ function startChat() {
 	var proto = document.location.protocol.replace(/^http/, "ws");
 	ws = new WebSocket(proto+"//"+document.domain+":8080/ws");
 	ws.onopen = function() {
-		putLine("Connected");
+		putLog(timestamp(), "--", "Connected", 'event');
 		ws.send("LOGIN "+username+" "+password+"\n");
 	};
 	ws.onclose = function() {
@@ -43,27 +43,65 @@ function startChat() {
 	};
 }
 function onMessage(msg) {
-	//var json = JSON.parse(msg);
-	putLine(msg);
+	var json = JSON.parse(msg);
+	if (!json) {
+		console.log(msg);
+		return;
+	}
+	if (json.type == 'irc')
+		onIrcMessage(json);
+}
+function twoDigit(e) {
+	return e < 10 ? '0'+e : ''+e;
+}
+function timestamp() {
+	var d = new Date();
+	return twoDigit(d.getHours()) + ":" + twoDigit(d.getMinutes()) + ":" + twoDigit(d.getSeconds());
+}
+function onIrcMessage(json) {
+	var pureNick = json.nick && json.nick.substr(0, json.nick.indexOf('!'));
+	var nick = pureNick && '<'+pureNick+'>';
+	switch (json.cmd) {
+	case 'join':
+		putLog(timestamp(), '-->', pureNick, 'event');
+		break;
+	case 'part':
+		putLog(timestamp(), '<--', pureNick, 'event');
+		break;
+	case 'quit':
+		putLog(timestamp(), '<--', pureNick, 'event');
+		break;
+	case 'chat':
+		putLog(timestamp(), nick, json.msg);
+		break;
+	}
+}
+function putLog(time, nick, msg, style) {
+	var row;
+	log.add(
+	  row = (new Element("div")).class('row')
+	    .add(etime=(new Element("div").text(time).class('time')))
+	    .add(enick=(new Element("div").text(nick).class('nick')))
+	    .add(emsg=(new Element("div").text(msg).class('msg')))
+	);
+	if (style) row.class(style);
 }
 function putLine(msg) {
-	var text = document.createTextNode(msg);
-	var p = document.createElement("div");
-	p.appendChild(text);
-	log.appendChild(p);
+	log.add(
+	  (new Element("div")).text(msg)
+	);
 }
 function init() {
-	input = document.getElementById('input');
-	log = document.getElementById('log');
-	input.onkeydown = function(e) {
+	input = new Element('#input');
+	log = new Element('#log');
+	input.get().onkeydown = function(e) {
 		if (e.keyCode == 13 && !e.shiftKey) {
 			e.preventDefault();
-			var msg = input.value;
-			input.value = '';
+			var msg = input.val('');
 			sendMessage(msg);
-			putLine(msg);
+			putLog(timestamp(), 'iirc', msg);
 		}
 	};
-	input.focus();
+	input.get().focus();
 	startChat();
 }
