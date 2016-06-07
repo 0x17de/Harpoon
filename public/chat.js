@@ -106,7 +106,6 @@ function init() {
 			e.preventDefault();
 			var msg = input.val('');
 			sendMessage(msg);
-			putLog(timestamp(), '<iirc>', msg);
 		}
 	};
 	input.get().focus();
