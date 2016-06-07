@@ -2,6 +2,7 @@ var username = "testuser";
 var password = "testpassword";
 var ws, ping;
 
+var activeNick = 'iirc';
 var activeServer = 1;
 var activeChannel = '#test';
 
@@ -66,8 +67,14 @@ function timestamp() {
 	return twoDigit(d.getHours()) + ":" + twoDigit(d.getMinutes()) + ":" + twoDigit(d.getSeconds());
 }
 function onIrcMessage(json) {
-	var pureNick = json.nick && json.nick.substr(0, json.nick.indexOf('!'));
-	var nick = pureNick && '<'+pureNick+'>';
+	console.log(json.nick);
+	var pureNick, nick;
+	if (json.nick !== void 0) {
+		pureNick = (json.nick === '')
+			? activeNick
+			: json.nick.substr(0, json.nick.indexOf('!'));
+		var nick = pureNick && '<'+pureNick+'>';
+	}
 	switch (json.cmd) {
 	case 'join':
 		putLog(timestamp(), '-->', pureNick, 'event');
