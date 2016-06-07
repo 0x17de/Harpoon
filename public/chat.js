@@ -1,6 +1,6 @@
 var username = "testuser";
 var password = "testpassword";
-var ws;
+var ws, ping;
 
 var activeServer = 1;
 var activeChannel = '#test';
@@ -15,17 +15,24 @@ function sendInput() {
 function sendMessage(msg) {
 	send({cmd:"chat", server:activeServer, channel:activeChannel, msg:msg});
 }
+function sendPing() {
+	send({cmd:'ping'});
+}
 function send(json) {
 	ws.send(JSON.stringify(json));
 }
 function startChat() {
 	var proto = document.location.protocol.replace(/^http/, "ws");
 	ws = new WebSocket(proto+"//"+document.domain+":8080/ws");
+	if (ping) clearInterval(ping);
+	ping = setInterval(sendPing, 60000);
 	ws.onopen = function() {
 		putLog(timestamp(), "--", "Connected", 'event');
 		ws.send("LOGIN "+username+" "+password+"\n");
 	};
 	ws.onclose = function() {
+		clearInterval(ping);
+		ping = void 0;
 		putLine("Disconnected");
 		setTimeout(startChat, 1000);
 	};
