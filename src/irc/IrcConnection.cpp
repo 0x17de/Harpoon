@@ -5,6 +5,7 @@
 #include "event/irc/EventIrcJoinChannel.hpp"
 #include "event/irc/EventIrcPartChannel.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"
+#include "event/irc/EventIrcMessage.hpp"
 #include <iostream>
 #include <map>
 #include <thread>
@@ -172,7 +173,9 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
 		}
 	} else if (type == EventIrcSendMessage::uuid) {
 		auto message = event->as<EventIrcSendMessage>();
-		irc_cmd_msg(ircSession, message->getChannel().c_str(), message->getMessage().c_str());
+		if (!irc_cmd_msg(ircSession, message->getChannel().c_str(), message->getMessage().c_str())) {
+			appQueue->sendEvent(make_shared<EventIrcMessage>(message->getUserId(), message->getServerId(), "", message->getChannel(), message->getMessage()));
+		}
 	}
 	return true;
 }
