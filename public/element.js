@@ -26,6 +26,6 @@ Element.prototype.class = function(c) {
 };
 Element.prototype.val = function(t) {
 	var val = this.e.value;
-	if (t) this.e.value = t;
+	if (t !== void 0) this.e.value = t;
 	return val;
 };
