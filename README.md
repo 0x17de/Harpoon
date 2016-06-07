@@ -19,3 +19,23 @@ This programm is still work in progress. It will require a server.
    - Steam
    - Jabber
    - ...
+
+## Setup
+### Dependencies
+ - Core
+   - Protobuf
+   - OpenSSL
+   - LibIrcClient
+ - WebChat (optional via USE_WEBSOCKET_SERVER)
+   - Seasocks
+   - JsonCpp
+
+### Generate Makefiles
+For building the source CMake is required. Run the following in the project's build folder:
+```
+cmake .. -DCMAKE_BUILD_TYPE=Debug -DUSE_WEBSOCKET_SERVER=1 -DUSE_WEBSOCKET_SERVER_VERBOSE=1
+```
+Run ```make``` afterwards.
+
+### Run the binary
+To start the service run ```build/iirc``` from the project root.
