@@ -13,6 +13,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/event/IEvent.hpp src/event/IClientEvent.hpp
 	src/ini/IniReader.cpp src/ini/IniReader.hpp
 	src/irc/IrcConnection.cpp src/irc/IrcConnection.hpp
+	src/irc/IrcChannelStore.cpp src/irc/IrcChannelStore.hpp
 	src/irc/IrcConnection_Impl.hpp src/irc/IrcEvents.cpp
 	src/main.cpp src/queue/EventQueue.cpp src/queue/EventQueue.hpp
 	src/queue/EventQueue_Impl.hpp src/tcp/TcpClient.cpp

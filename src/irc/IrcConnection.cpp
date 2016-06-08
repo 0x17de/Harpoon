@@ -9,6 +9,7 @@
 #include "event/irc/EventIrcNumeric.hpp"
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 #include <map>
 #include <thread>
 #include <chrono>
@@ -23,12 +24,12 @@ template <void (IrcConnection_Impl::*F)(irc_session_t*, const char*, const char*
 void onIrcEvent(irc_session_t* session,
 	const char* event,
 	const char* origin,
-	const char** params,
+	const char** inparameters,
 	unsigned int count)
 {
 	vector<string> parameters;
 	for (unsigned int i = 0; i < count; ++i)
-		parameters.push_back(string(params[i]));
+		parameters.push_back(string(inparameters[i]));
 
 	IrcConnection_Impl* cxn = activeIrcConnections.at(session);
 	shared_ptr<IEvent> resultEvent;
@@ -42,12 +43,12 @@ template <void (IrcConnection_Impl::*F)(irc_session_t*, unsigned int, const char
 void onIrcNumeric(irc_session_t* session,
 	unsigned int eventCode,
 	const char* origin,
-	const char** params,
+	const char** inparameters,
 	unsigned int count)
 {
 	vector<string> parameters;
 	for (unsigned int i = 0; i < count; ++i)
-		parameters.push_back(string(params[i]));
+		parameters.push_back(string(inparameters[i]));
 
 	IrcConnection_Impl* cxn = activeIrcConnections.at(session);
 	shared_ptr<IEvent> resultEvent;
@@ -195,6 +196,62 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
 			inUseNicks.emplace(nick);
 			if (findUnusedNick(nick))
 				irc_cmd_nick(ircSession, nick.c_str());
+		} else if (code == LIBIRC_RFC_RPL_NAMREPLY) {
+			lock_guard<mutex> lock(channelLoginDataMutex);
+			auto num = event->as<EventIrcNumeric>();
+			auto& parameters = num->getParameters();
+
+			string channelName = parameters.at(1);
+			if (channelName.size() > 0) {
+				char channelMode = parameters.at(0).at(0);
+				if (channelMode == '='
+				 || channelMode == '*'
+				 || channelMode == '@') {
+#pragma warning channel mode stub
+				}
+	
+				auto it = channelUsers.find(channelName);
+				IrcChannelStore* channelStore;
+				// find userdata
+				if (it == channelUsers.end()) {
+					auto insertResult = channelUsers.emplace(piecewise_construct,
+						forward_as_tuple(channelName),
+						forward_as_tuple());
+					channelStore = &insertResult.first->second;
+				} else {
+					channelStore = &it->second;
+				}
+				// assign users from parameter
+				channelStore->clear();
+				istringstream users(parameters.at(2));
+				string user;
+				while (getline(users, user, ' ')) {
+					if (user.size() == 0) continue;
+					char userMode = user.at(0);
+					string mode = "";
+					if (userMode == '@'
+					 || userMode == '+') {
+#pragma warning user mode stub
+						mode = "";
+						user = user.substr(1);
+					}
+					channelStore->addUser(user, "");
+				}
+			}
+		} else if (code == LIBIRC_RFC_RPL_ENDOFNAMES) {
+			lock_guard<mutex> lock(channelLoginDataMutex);
+			auto num = event->as<EventIrcNumeric>();
+			auto& parameters = num->getParameters();
+			string channelName = parameters.at(0);
+			auto it = channelUsers.find(channelName);
+			if (it != channelUsers.end()) {
+				auto& channelStore = it->second;
+				auto& users = channelStore.getUsers();
+				for (auto userStorePair : users) {
+					auto& userStore = userStorePair.second;
+#pragma warning submit userlist stub
+				}
+			}
 		}
 	} else if (type == EventIrcPartChannel::uuid) {
 		lock_guard<mutex> lock(channelLoginDataMutex);

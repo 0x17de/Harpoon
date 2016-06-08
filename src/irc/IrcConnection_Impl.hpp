@@ -2,6 +2,7 @@
 #define IRCCONNECTION_IMPL_h
 
 #include "event/irc/EventIrcActivateService.hpp"
+#include "IrcChannelStore.hpp"
 #include <libircclient.h>
 #include <list>
 #include <vector>
@@ -34,6 +35,7 @@ public:
 	std::map<std::string, IrcChannelLoginData> channelLoginData;
 	std::string nick;
 	std::set<std::string> inUseNicks;
+	std::map<std::string, IrcChannelStore> channelUsers;
 
 	bool onEvent(std::shared_ptr<IEvent> event);
 	bool findUnusedNick(std::string& nick);
