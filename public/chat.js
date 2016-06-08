@@ -88,6 +88,9 @@ function onIrcMessage(json) {
 	case 'chat':
 		putLog(timestamp(), nick, json.msg);
 		break;
+	case 'action':
+		putLog(timestamp(), '*', pureNick+' '+json.msg, 'action');
+		break;
 	case 'nickchange':
 		putLog(timestamp(), '<->', pureNick+' is now known as '+json.newNick, 'event');
 		break;
