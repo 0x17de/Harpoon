@@ -52,6 +52,9 @@ h2 {
 	width:100%;
 	word-break: break-all;
 }
+#log .action {
+	color:#0c8399; /* blue */
+}
 #log .event {
 	color:#73446d; /* purple */
 }

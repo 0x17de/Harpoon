@@ -10,6 +10,7 @@
 #include "event/irc/EventIrcKicked.hpp"
 #include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcTopic.hpp"
+#include "event/irc/EventIrcAction.hpp"
 #include "event/irc/EventIrcMessage.hpp"
 #include "event/irc/EventIrcNoticed.hpp"
 #include "event/irc/EventIrcChannelNoticed.hpp"
@@ -225,7 +226,12 @@ void IrcConnection_Impl::onCtcpAction(irc_session_t* session,
         const std::vector<std::string>& params,
 	std::shared_ptr<IEvent>& resultEvent)
 {
-#warning stub onAction
+	if (params.size() < 1) return;
+	string who(origin);
+	string target(params.at(0));
+	string message = params.size() < 2 ? "" : params.at(1);
+	resultEvent = make_shared<EventIrcAction>(userId, configuration.serverId, who, target, message);
+	cout << "Action<" << who << ">: " << target << ": " << message << endl;
 }
 void IrcConnection_Impl::onNumeric(irc_session_t* session,
 	unsigned int event,
