@@ -6,17 +6,20 @@
 #include "event/irc/EventIrcPartChannel.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"
 #include "event/irc/EventIrcMessage.hpp"
+#include "event/irc/EventIrcNumeric.hpp"
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <thread>
 #include <chrono>
+#include <libirc_rfcnumeric.h>
 
 using namespace std;
 
 
 static map<irc_session_t*, IrcConnection_Impl*> activeIrcConnections;
 
-template <void (IrcConnection_Impl::*F)(irc_session_t*, const char*, const char*, const vector<string>&)>
+template <void (IrcConnection_Impl::*F)(irc_session_t*, const char*, const char*, const vector<string>&, std::shared_ptr<IEvent>&)>
 void onIrcEvent(irc_session_t* session,
 	const char* event,
 	const char* origin,
@@ -28,9 +31,14 @@ void onIrcEvent(irc_session_t* session,
 		parameters.push_back(string(params[i]));
 
 	IrcConnection_Impl* cxn = activeIrcConnections.at(session);
-	(cxn->*F)(session, event, origin, parameters);
+	shared_ptr<IEvent> resultEvent;
+	(cxn->*F)(session, event, origin, parameters, resultEvent);
+	if (resultEvent) {
+		cxn->queue->sendEvent(resultEvent);
+		cxn->appQueue->sendEvent(resultEvent);
+	}
 }
-template <void (IrcConnection_Impl::*F)(irc_session_t*, unsigned int, const char*, const vector<string>&)>
+template <void (IrcConnection_Impl::*F)(irc_session_t*, unsigned int, const char*, const vector<string>&, std::shared_ptr<IEvent>&)>
 void onIrcNumeric(irc_session_t* session,
 	unsigned int eventCode,
 	const char* origin,
@@ -42,12 +50,28 @@ void onIrcNumeric(irc_session_t* session,
 		parameters.push_back(string(params[i]));
 
 	IrcConnection_Impl* cxn = activeIrcConnections.at(session);
-	(cxn->*F)(session, eventCode, origin, parameters);
+	shared_ptr<IEvent> resultEvent;
+	(cxn->*F)(session, eventCode, origin, parameters, resultEvent);
+	if (resultEvent) {
+		cxn->queue->sendEvent(resultEvent);
+		cxn->appQueue->sendEvent(resultEvent);
+	}
 }
 
-IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, const IrcServerConfiguration& configuration)
+bool IrcConnection_Impl::findUnusedNick(std::string& nick) {
+	auto& nicks = this->configuration.nicks;
+	auto nickIt = find_if(nicks.begin(), nicks.end(), [this](std::string& foundNick) {
+		return inUseNicks.find(foundNick) == inUseNicks.end(); // not used
+	});
+	bool success = nickIt != nicks.end();
+	if (success) nick = *nickIt; // assign nick
+	return success;
+}
+
+IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, EventQueue* queue, size_t userId, const IrcServerConfiguration& configuration)
 :
 	appQueue{appQueue},
+	queue{queue},
 	userId{userId},
 	configuration{configuration},
 	running{true}
@@ -83,12 +107,13 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, cons
 		activeIrcConnections.emplace(ircSession, this);
 
 		while (ircSession != 0 && running) {
-
 			{
 				lock_guard<mutex> lock(channelLoginDataMutex);
 				// copy channels to login
 				for (auto& channel : this->configuration.channels)
 					channelLoginData.emplace(channel.getChannelName(), channel);
+
+				if (!findUnusedNick(nick)) break; // give up
 			}
 
 			// connect to server
@@ -96,7 +121,7 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, size_t userId, cons
 				this->configuration.hostname.c_str(),
 				this->configuration.port,
 				this->configuration.password.empty() ? 0 : this->configuration.password.c_str(),
-				this->configuration.nicks.front().c_str(),
+				nick.c_str(),
 				0 /* username */,
 				0 /* realname */);
 			cout << "[IC] Connect" << endl;
@@ -126,7 +151,7 @@ IrcConnection_Impl::~IrcConnection_Impl() {
 
 IrcConnection::IrcConnection(EventQueue* appQueue, size_t userId, const IrcServerConfiguration& configuration)
 :
-	impl{new IrcConnection_Impl(appQueue, userId, configuration)},
+	impl{new IrcConnection_Impl(appQueue, getEventQueue(), userId, configuration)},
 	EventLoop({
 		EventQuit::uuid,
 		EventIrcJoinChannel::uuid,
@@ -160,6 +185,16 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
 				loginData.getChannelName().c_str(),
 				loginData.getChannelPassword().c_str());
 			channelLoginData.emplace(entry.getChannelName(), entry);
+		}
+	} else if (type == EventIrcNumeric::uuid) {
+		auto num = event->as<EventIrcNumeric>();
+		unsigned int code = num->getEventCode();
+       		if (code == LIBIRC_RFC_ERR_NICKNAMEINUSE) {
+			lock_guard<mutex> lock(channelLoginDataMutex);
+			cout << "Nick in use: " << nick << endl;
+			inUseNicks.emplace(nick);
+			if (findUnusedNick(nick))
+				irc_cmd_nick(ircSession, nick.c_str());
 		}
 	} else if (type == EventIrcPartChannel::uuid) {
 		lock_guard<mutex> lock(channelLoginDataMutex);

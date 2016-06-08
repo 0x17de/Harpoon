@@ -6,6 +6,7 @@
 #include <list>
 #include <vector>
 #include <map>
+#include <set>
 #include <string>
 #include <mutex>
 #include <memory>
@@ -17,12 +18,13 @@ class EventQueue;
 class IrcChannelLoginData;
 class IrcConnection_Impl {
 public:
-	IrcConnection_Impl(EventQueue* appQueue, size_t userId, const IrcServerConfiguration& configuration);
+	IrcConnection_Impl(EventQueue* appQueue, EventQueue* queue, size_t userId, const IrcServerConfiguration& configuration);
 	~IrcConnection_Impl();
 
 	bool running;
 	irc_session_t* ircSession;
 	EventQueue* appQueue;
+	EventQueue* queue;
 	size_t userId;
 	IrcServerConfiguration configuration;
 
@@ -30,18 +32,23 @@ public:
 
 	std::mutex channelLoginDataMutex;
 	std::map<std::string, IrcChannelLoginData> channelLoginData;
+	std::string nick;
+	std::set<std::string> inUseNicks;
 
 	bool onEvent(std::shared_ptr<IEvent> event);
+	bool findUnusedNick(std::string& nick);
 
 	// event callback typedef
 	typedef void (ircEventCallback_t)(irc_session_t* session,
 		const char* event,
 		const char* origin,
-		const std::vector<std::string>& parameters);
+		const std::vector<std::string>& parameters,
+		std::shared_ptr<IEvent>& resultEvent);
 	typedef void (ircEventCodeCallback_t)(irc_session_t* session,
 		unsigned int event,
 		const char* origin,
-		const std::vector<std::string>& parameters);
+		const std::vector<std::string>& parameters,
+		std::shared_ptr<IEvent>& resultEvent);
 	typedef void (ircEventDccChat_t)(irc_session_t* session,
 		const char* nick,
 		const char* addr,
