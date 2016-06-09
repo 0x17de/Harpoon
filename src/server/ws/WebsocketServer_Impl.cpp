@@ -5,6 +5,7 @@
 #include "event/irc/EventIrcMessage.hpp"
 #include "event/irc/EventIrcAction.hpp"
 #include "event/irc/EventIrcJoined.hpp"
+#include "event/irc/EventIrcKicked.hpp"
 #include "event/irc/EventIrcParted.hpp"
 #include "event/irc/EventIrcChatListing.hpp"
 #include "event/irc/EventIrcQuit.hpp"
@@ -183,6 +184,16 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
 		root["nick"] = action->getUsername();
 		root["msg"] = action->getMessage();
 		root["channel"] = action->getChannel();
+	} else if (eventType == EventIrcKicked::uuid) {
+		cout << "eventToJson => IrcKicked" << endl;
+		auto kick = event->as<EventIrcKicked>();
+		root["cmd"] = "kick";
+		root["type"] = "irc";
+		root["server"] = to_string(kick->getServerId());
+		root["nick"] = kick->getUsername();
+		root["target"] = kick->getTarget();
+		root["msg"] = kick->getReason();
+		root["channel"] = kick->getChannel();
 	}
 
 	return Json::FastWriter{}.write(root);

@@ -27,6 +27,49 @@ h2 {
 	-moz-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
 	box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
 }
+.bar ul:first-child {
+	margin-top:1em;
+}
+.bar ul {
+	list-style-type:none; list-style-image:none;
+	margin:0; padding:0;
+}
+.bar li {
+	margin:0; padding:0;
+}
+.bar > ul > li {
+	margin:0; padding:0;
+	background:#111;
+	-webkit-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.25);
+	-moz-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.25);
+	box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.25);
+}
+.bar > ul > li > div {
+	z-index:20;
+	position:relative;
+	padding:0.6em 1em;
+	background:#ccc;
+	border:1px solid #bbb;
+	box-sizing:border-box;
+	-webkit-box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.25);
+	-moz-box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.25);
+	box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.25);
+}
+.bar > ul > li > ul > li {
+	margin:0; padding:0.1em 0 0.1em 1.5em;
+	background:#ecf2f0;
+}
+.bar > ul > li > ul > li:nth-child(2n) {
+	background:#e1e7e5;
+}
+.bar > ul > li > ul > .selected {
+	background:#f16745 !important;
+	position:relative;
+	z-index:19;
+	-webkit-box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.12);
+	-moz-box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.12);
+	box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.12);
+}
 .area {
 	z-index:120;
 	position:absolute;

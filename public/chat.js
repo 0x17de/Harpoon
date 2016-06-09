@@ -28,13 +28,13 @@ function startChat() {
 	if (ping) clearInterval(ping);
 	ping = setInterval(sendPing, 60000);
 	ws.onopen = function() {
-		putLog(timestamp(), "--", "Connected", 'event');
+		putLog(timestamp(), "--", "Connection established", 'event');
 		ws.send("LOGIN "+username+" "+password+"\n");
 	};
 	ws.onclose = function() {
 		clearInterval(ping);
 		ping = void 0;
-		putLine("Disconnected");
+		putLog(timestamp(), "--", "Connection lost", 'event');
 		setTimeout(startChat, 1000);
 	};
 	ws.onmessage = function(msg) {
@@ -77,19 +77,22 @@ function onIrcMessage(json) {
 	}
 	switch (json.cmd) {
 	case 'join':
-		putLog(timestamp(), '-->', pureNick, 'event');
+		putLog(timestamp(), '-->', pureNick+' joined the channel', 'event');
 		break;
 	case 'part':
-		putLog(timestamp(), '<--', pureNick, 'event');
+		putLog(timestamp(), '<--', pureNick+' left the channel', 'event');
 		break;
 	case 'quit':
-		putLog(timestamp(), '<--', pureNick, 'event');
+		putLog(timestamp(), '<--', pureNick+' has quit'+(json.msg?' ('+json.msg+')':''), 'event');
 		break;
 	case 'chat':
 		putLog(timestamp(), nick, json.msg);
 		break;
 	case 'action':
 		putLog(timestamp(), '*', pureNick+' '+json.msg, 'action');
+		break;
+	case 'kick':
+		putLog(timestamp(), '<--', pureNick+' was kicked', 'event');
 		break;
 	case 'nickchange':
 		putLog(timestamp(), '<->', pureNick+' is now known as '+json.newNick, 'event');
