@@ -6,7 +6,7 @@ var activeNick = 'iirc';
 var activeServer = 1;
 var activeChannel = '#test';
 
-var input, log, logscroll;
+var input, log, logscroll, connected;
 
 function sendInput() {
 	var input = document.getElementById('input');
@@ -29,12 +29,15 @@ function startChat() {
 	ping = setInterval(sendPing, 60000);
 	ws.onopen = function() {
 		putLog(timestamp(), "--", "Connection established", 'event');
+		connected = true;
 		ws.send("LOGIN "+username+" "+password+"\n");
 	};
 	ws.onclose = function() {
 		clearInterval(ping);
 		ping = void 0;
-		putLog(timestamp(), "--", "Connection lost", 'event');
+		if (connected)
+			putLog(timestamp(), "--", "Connection lost", 'event');
+		connected = false;
 		setTimeout(startChat, 1000);
 	};
 	ws.onmessage = function(msg) {
