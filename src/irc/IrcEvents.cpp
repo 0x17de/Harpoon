@@ -13,7 +13,6 @@
 #include "event/irc/EventIrcAction.hpp"
 #include "event/irc/EventIrcMessage.hpp"
 #include "event/irc/EventIrcNoticed.hpp"
-#include "event/irc/EventIrcChannelNoticed.hpp"
 #include "event/irc/EventIrcInvited.hpp"
 #include "event/irc/EventIrcNumeric.hpp"
 #include <iostream>
@@ -188,7 +187,7 @@ void IrcConnection_Impl::onChannelNotice(irc_session_t* session,
 	string who(origin);
 	string channel(params.at(0));
 	string message = params.size() < 2 ? "" : params.at(1);
-	resultEvent = make_shared<EventIrcChannelNoticed>(userId, configuration.serverId, who, channel, message);
+	resultEvent = make_shared<EventIrcNoticed>(userId, configuration.serverId, who, channel, message);
 	cout << "CN<" << who << "|" << channel << ">: " << message << endl;
 }
 void IrcConnection_Impl::onInvite(irc_session_t* session,

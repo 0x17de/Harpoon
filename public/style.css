@@ -101,6 +101,9 @@ h2 {
 #log .event {
 	color:#73446d; /* purple */
 }
+#log .notice {
+	color:#cf962d; /* yellow */
+}
 #log .row {
 	display:table-row;
 }
