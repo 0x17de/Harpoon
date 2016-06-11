@@ -70,7 +70,7 @@ function timestamp() {
 	return twoDigit(d.getHours()) + ":" + twoDigit(d.getMinutes()) + ":" + twoDigit(d.getSeconds());
 }
 function onIrcMessage(json) {
-	console.log(json.nick);
+	console.log(JSON.stringify(json));
 	var pureNick, nick;
 	if (json.nick !== void 0) {
 		pureNick = (json.nick === '')
@@ -99,6 +99,9 @@ function onIrcMessage(json) {
 		break;
 	case 'nickchange':
 		putLog(timestamp(), '<->', pureNick+' is now known as '+json.newNick, 'event');
+		break;
+	case 'notice':
+		putLog(timestamp(), '*'+pureNick+'*', json.msg, 'notice');
 		break;
 	default:
 		console.warning("Unknown command: "+json.cmd);

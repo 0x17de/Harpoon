@@ -11,6 +11,7 @@
 #include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcTopic.hpp"
 #include "event/irc/EventIrcNickChanged.hpp"
+#include "event/irc/EventIrcNoticed.hpp"
 #include "event/EventLoginResult.hpp"
 #include "event/EventLogout.hpp"
 #include "event/EventQueryChats.hpp"
@@ -56,12 +57,10 @@ bool WebsocketServer_Impl::onEvent(std::shared_ptr<IEvent> event) {
 		seasocks::WebSocket* socket = (seasocks::WebSocket*)loginResult->getData();
 		if (loginResult->getSuccess()) {
 			addClient(loginResult->getUserId(), socket);
-#warning send current status to client (servers/channels/...)
 		} else {
 			socket->close();
 		}
 	} else if (eventType == EventLogout::uuid) {
-#warning handle EventLogout
 		auto logout = event->as<EventLogout>();
 		removeClient((seasocks::WebSocket*)logout->getData());
 	}
@@ -194,6 +193,15 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
 		root["target"] = kick->getTarget();
 		root["msg"] = kick->getReason();
 		root["channel"] = kick->getChannel();
+	} else if (eventType == EventIrcNoticed::uuid) {
+		cout << "eventToJson => IrcNoticed" << endl;
+		auto notice = event->as<EventIrcNoticed>();
+		root["cmd"] = "notice";
+		root["type"] = "irc";
+		root["server"] = to_string(notice->getServerId());
+		root["channel"] = notice->getTarget();
+		root["nick"] = notice->getUsername();
+		root["msg"] = notice->getMessage();		
 	}
 
 	return Json::FastWriter{}.write(root);

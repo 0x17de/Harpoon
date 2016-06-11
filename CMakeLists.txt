@@ -34,7 +34,6 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/event/irc/EventIrcSendMessage.cpp src/event/irc/EventIrcSendMessage.hpp
 	src/event/irc/EventIrcConnected.cpp src/event/irc/EventIrcConnected.hpp
 	src/event/irc/EventIrcTopic.cpp src/event/irc/EventIrcTopic.hpp
-	src/event/irc/EventIrcChannelNoticed.cpp src/event/irc/EventIrcChannelNoticed.hpp
 	src/event/irc/EventIrcNoticed.cpp src/event/irc/EventIrcNoticed.hpp
 	src/event/irc/EventIrcInvited.cpp src/event/irc/EventIrcInvited.hpp
 	src/event/irc/EventIrcModeChanged.cpp src/event/irc/EventIrcModeChanged.hpp
