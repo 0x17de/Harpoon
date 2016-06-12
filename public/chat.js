@@ -1,5 +1,5 @@
-var username = "testuser";
-var password = "testpassword";
+var username = "user";
+var password = "password";
 var ws, ping;
 
 var activeNick = 'iirc';
