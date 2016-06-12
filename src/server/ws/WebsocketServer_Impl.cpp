@@ -58,7 +58,9 @@ bool WebsocketServer_Impl::onEvent(std::shared_ptr<IEvent> event) {
 		if (loginResult->getSuccess()) {
 			addClient(loginResult->getUserId(), socket);
 		} else {
-			socket->close();
+			server.execute([=] {
+				socket->close();
+			});
 		}
 	} else if (eventType == EventLogout::uuid) {
 		auto logout = event->as<EventLogout>();
