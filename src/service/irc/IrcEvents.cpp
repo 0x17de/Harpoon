@@ -27,13 +27,14 @@ void IrcConnection_Impl::onConnect(irc_session_t* session,
 	std::shared_ptr<IEvent>& resultEvent)
 {
 	lock_guard<mutex> lock(channelLoginDataMutex);
-	for (auto joinDataPair : channelLoginData) {
-		auto& joinData = joinDataPair.second;
+	for (auto& joinDataPair : channelStores) {
+		string channelName = joinDataPair.first;
+		string channelPassword = joinDataPair.second.getChannelPassword();
 		irc_cmd_join(ircSession,
-			joinData.getChannelName().c_str(),
-			joinData.getChannelPassword().empty()
+			channelName.c_str(),
+			channelPassword.empty()
 			? 0
-			: joinData.getChannelPassword().c_str());
+			: channelPassword.c_str());
 	}
 	resultEvent = make_shared<EventIrcConnected>(userId, configuration.serverId);
 }

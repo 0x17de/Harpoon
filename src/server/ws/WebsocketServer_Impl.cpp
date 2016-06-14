@@ -131,8 +131,11 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
 			server["name"] = serverData.getServerName();
 			Json::Value& channelList = server["channels"];
 			for (auto& channelData : serverData.getChannels()) {
-				Json::Value& channel = channelList[channelData.getChannelName()];
-				channel = true;
+				Json::Value& channel = channelList[channelData.getChannelName()] = Json::objectValue;
+				Json::Value& users = channel["users"] = Json::objectValue;
+				for (auto& user : channelData.getUsers()) {
+					users[user.getNick()] = user.getMode();
+				}
 			}
 		}
 	} else if (eventType == EventIrcJoined::uuid) {

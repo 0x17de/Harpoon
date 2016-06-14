@@ -25,6 +25,12 @@ std::string IrcUserStore::getMode() const {
 	return mode;
 }
 
+IrcChannelStore::IrcChannelStore(const std::string& channelPassword)
+:
+	channelPassword{channelPassword}
+{
+}
+
 void IrcChannelStore::clear() {
 	users.clear();
 }
@@ -35,6 +41,11 @@ void IrcChannelStore::addUser(std::string name, std::string mode) {
 		forward_as_tuple(name, mode));
 }
 
-std::map<std::string, IrcUserStore>& IrcChannelStore::getUsers() {
+const std::map<std::string, IrcUserStore>& IrcChannelStore::getUsers() const {
 	return users;
 }
+
+std::string IrcChannelStore::getChannelPassword() const {
+	return channelPassword;
+}
+

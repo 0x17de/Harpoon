@@ -7,11 +7,35 @@ UUID EventIrcChatListing::getEventUuid() const {
 	return this->uuid;
 }
 
+IrcChannelUser::IrcChannelUser(const std::string& nick, const std::string& mode)
+:
+	nick{nick},
+	mode{mode}
+{
+}
+
+std::string IrcChannelUser::getNick() const {
+	return nick;
+}
+
+std::string IrcChannelUser::getMode() const {
+	return mode;
+}
+
 IrcChannelListing::IrcChannelListing(const std::string& channelName)
 :
 	channelName{channelName}
 {
 }
+
+void IrcChannelListing::addUser(const std::string& nick, const std::string& mode) {
+	users.emplace_back(nick, mode);
+}
+
+const std::list<IrcChannelUser>& IrcChannelListing::getUsers() const {
+	return users;
+}
+
 
 std::string IrcChannelListing::getChannelName() const {
 	return channelName;

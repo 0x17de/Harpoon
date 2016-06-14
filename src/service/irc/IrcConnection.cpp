@@ -111,8 +111,11 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue, EventQueue* queue, 
 			{
 				lock_guard<mutex> lock(channelLoginDataMutex);
 				// copy channels to login
-				for (auto& channel : this->configuration.channels)
-					channelLoginData.emplace(channel.getChannelName(), channel);
+				for (auto& channel : this->configuration.channels) {
+					string channelLower = channel.getChannelName();
+					transform(channelLower.begin(), channelLower.end(), channelLower.begin(), ::tolower);
+					channelStores.emplace(channelLower, channel.getChannelPassword());
+				}
 
 				if (!findUnusedNick(nick)) break; // give up
 			}
@@ -178,14 +181,18 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
 		lock_guard<mutex> lock(channelLoginDataMutex);
 		auto joinCommand = event->as<EventIrcJoinChannel>();
 		for (auto& entry : joinCommand->getLoginData()) {
-			auto it = channelLoginData.find(entry.getChannelName());
-			if (it != channelLoginData.end())
+			string channelName = entry.getChannelName();
+			string channelLower = channelName;
+			transform(channelLower.begin(), channelLower.end(), channelLower.begin(), ::tolower);
+
+			auto it = channelStores.find(channelLower);
+			if (it != channelStores.end())
 				continue;
-			IrcChannelLoginData& loginData = it->second;
+			string channelPassword = it->second.getChannelPassword();
 			irc_cmd_join(ircSession,
-				loginData.getChannelName().c_str(),
-				loginData.getChannelPassword().c_str());
-			channelLoginData.emplace(entry.getChannelName(), entry);
+				channelLower.c_str(),
+				channelPassword.c_str());
+			channelStores.emplace(channelLower, channelPassword);
 		}
 	} else if (type == EventIrcNumeric::uuid) {
 		auto num = event->as<EventIrcNumeric>();
@@ -201,29 +208,30 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
 			auto num = event->as<EventIrcNumeric>();
 			auto& parameters = num->getParameters();
 
-			string channelName = parameters.at(1);
+			string channelName = parameters.at(2);
+
 			if (channelName.size() > 0) {
-				char channelMode = parameters.at(0).at(0);
+				char channelMode = parameters.at(0).at(1);
 				if (channelMode == '='
 				 || channelMode == '*'
 				 || channelMode == '@') {
 #pragma warning channel mode stub
 				}
 	
-				auto it = channelUsers.find(channelName);
+				auto it = channelStores.find(channelName);
 				IrcChannelStore* channelStore;
 				// find userdata
-				if (it == channelUsers.end()) {
-					auto insertResult = channelUsers.emplace(piecewise_construct,
+				if (it == channelStores.end()) {
+					auto insertResult = channelStores.emplace(piecewise_construct,
 						forward_as_tuple(channelName),
-						forward_as_tuple());
+						forward_as_tuple(""));
 					channelStore = &insertResult.first->second;
 				} else {
 					channelStore = &it->second;
 				}
 				// assign users from parameter
 				channelStore->clear();
-				istringstream users(parameters.at(2));
+				istringstream users(parameters.at(3));
 				string user;
 				while (getline(users, user, ' ')) {
 					if (user.size() == 0) continue;
@@ -243,8 +251,8 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
 			auto num = event->as<EventIrcNumeric>();
 			auto& parameters = num->getParameters();
 			string channelName = parameters.at(0);
-			auto it = channelUsers.find(channelName);
-			if (it != channelUsers.end()) {
+			auto it = channelStores.find(channelName);
+			if (it != channelStores.end()) {
 				auto& channelStore = it->second;
 				auto& users = channelStore.getUsers();
 				for (auto userStorePair : users) {
@@ -256,12 +264,14 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
 	} else if (type == EventIrcPartChannel::uuid) {
 		lock_guard<mutex> lock(channelLoginDataMutex);
 		auto partCommand = event->as<EventIrcPartChannel>();
-		for (string channel : partCommand->getChannels()) {
-			auto it = channelLoginData.find(channel);
-			if (it == channelLoginData.end())
+		for (string channelName : partCommand->getChannels()) {
+			string channelLower = channelName;
+			transform(channelLower.begin(), channelLower.end(), channelLower.begin(), ::tolower);
+			auto it = channelStores.find(channelLower);
+			if (it == channelStores.end())
 				continue;
-			irc_cmd_part(ircSession, it->second.getChannelName().c_str());
-			channelLoginData.erase(it);
+			irc_cmd_part(ircSession, channelLower.c_str());
+			channelStores.erase(it);
 		}
 	} else if (type == EventIrcSendMessage::uuid) {
 		auto message = event->as<EventIrcSendMessage>();
@@ -284,8 +294,13 @@ std::mutex& IrcConnection::getChannelLoginDataMutex() const {
 	return impl->channelLoginDataMutex;
 }
 
-const std::map<std::string, IrcChannelLoginData>& IrcConnection::getChannelLoginData() const {
-	return impl->channelLoginData;
+const std::map<std::string, IrcChannelStore>& IrcConnection::getChannelStore() const {
+	return impl->channelStores;
+}
+
+const IrcChannelStore* IrcConnection::getChannelStore(const std::string& channelName) const {
+	auto it = impl->channelStores.find(channelName);
+	return it == impl->channelStores.end() ? 0 : &it->second;
 }
 
 

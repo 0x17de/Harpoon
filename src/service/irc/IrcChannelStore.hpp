@@ -17,11 +17,15 @@ public:
 };
 
 class IrcChannelStore {
+	std::string channelPassword;
 	std::map<std::string, IrcUserStore> users;
 public:
+	IrcChannelStore(const std::string& channelPassword);
+
 	void clear();
 	void addUser(std::string nick, std::string mode);
-	std::map<std::string, IrcUserStore>& getUsers();
+	const std::map<std::string, IrcUserStore>& getUsers() const;
+	std::string getChannelPassword() const;
 };
 
 #endif
