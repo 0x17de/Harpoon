@@ -13,6 +13,7 @@ function sendInput() {
 }
 function sendMessage(msg) {
 	if (!Channel.active) return;
+	if (Channel.active.bServerChannel) return;
 	send({cmd:"chat", server:Channel.active.serverId, channel:Channel.active.channelName, msg:msg});
 }
 function sendPing() {
