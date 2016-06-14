@@ -1,7 +1,7 @@
 #include "EventIrcActivateService.hpp"
 #include "utils/uuidGen.hpp"
 #include "EventIrcJoinChannel.hpp"
-#include "irc/IrcService.hpp"
+#include "service/irc/IrcService.hpp"
 
 using namespace std;
 
