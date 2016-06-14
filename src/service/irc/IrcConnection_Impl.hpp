@@ -32,10 +32,10 @@ public:
 	std::thread ircLoop;
 
 	std::mutex channelLoginDataMutex;
-	std::map<std::string, IrcChannelLoginData> channelLoginData;
+
 	std::string nick;
 	std::set<std::string> inUseNicks;
-	std::map<std::string, IrcChannelStore> channelUsers;
+	std::map<std::string, IrcChannelStore> channelStores;
 
 	bool onEvent(std::shared_ptr<IEvent> event);
 	bool findUnusedNick(std::string& nick);

@@ -7,6 +7,7 @@
 #include "event/irc/EventIrcJoinChannel.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"
 #include "event/irc/EventIrcChatListing.hpp"
+#include "service/irc/IrcChannelStore.hpp"
 #include <iostream>
 #include <mutex>
 
@@ -69,9 +70,14 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
 			IrcServerListing& server = listing->addServer(
 				connection.getServerId(),
 				connection.getServerName());
-			for (auto& channelPair : connection.getChannelLoginData()) {
-				auto& channelData = channelPair.second;
-				server.addChannel(channelData.getChannelName());
+			for (auto& channelPair : connection.getChannelStore()) {
+				string channelName = channelPair.first;
+				const IrcChannelStore& channelStore = channelPair.second;
+				IrcChannelListing& channel = server.addChannel(channelName);
+				for (auto& userPair : channelStore.getUsers()) {
+					string username = userPair.first;
+					channel.addUser(username, "");
+				}
 			}
 		}
 

@@ -17,34 +17,60 @@ h2 {
 	-moz-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.25);
 	box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.25);
 }
-#bar {
+.hchat, .varea, .vchatbar, .vuserlist {
+	display:table;
+}
+.hchat, .varea, .vchatbar, .vuserlist {
+	width:100%;
+	height:100%;
+}
+.vhandle {
+	width:2px;
+	background:#000;
+	cursor:w-resize;
+}
+#userbar {
+	width:15em;
+}
+#chatbar {
+	width:15em;
+}
+.area, .top, .bottom, .chatbar, .vhandle, .hhandle {
+	display:table-cell;
+}
+#channellist, #userlist {
 	z-index:50;
-	position:absolute;
-	left:0; top:24pt;
-	width:15em; height:calc(100% - 24pt);
+	width:100%; height:100%;
 	background:#eee;
+}
+#channellist {
 	-webkit-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
 	-moz-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
 	box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
 }
-#bar ul:first-child {
+#userlist {
+	-webkit-box-shadow: -1px 1px 2px 0px rgba(0,0,0,0.5);
+	-moz-box-shadow: -1px 1px 2px 0px rgba(0,0,0,0.5);
+	box-shadow: -1px 1px 2px 0px rgba(0,0,0,0.5);
+}
+#channellist ul:first-child {
 	margin-top:1em;
 }
-#bar ul {
+#channellist ul {
 	list-style-type:none; list-style-image:none;
 	margin:0; padding:0;
 }
-#bar li {
+#channellist li {
 	margin:0; padding:0;
 }
-#bar > ul > li {
-	margin:0; padding:0;
+#channellist > ul > li {
+	margin:0 0 0.5em 0; padding:0;
 	background:#111;
 	-webkit-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.25);
 	-moz-box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.25);
 	box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.25);
 }
-#bar > ul > li > div {
+#channellist > ul > li > div {
 	z-index:20;
 	position:relative;
 	padding:0.6em 1em;
@@ -55,14 +81,14 @@ h2 {
 	-moz-box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.25);
 	box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.25);
 }
-#bar > ul > li > ul > li {
+#channellist > ul > li > ul > li {
 	margin:0; padding:0.1em 0 0.1em 1.5em;
 	background:#ecf2f0;
 }
-#bar > ul > li > ul > li:nth-child(2n) {
+#channellist > ul > li > ul > li:nth-child(2n) {
 	background:#e1e7e5;
 }
-#bar > ul > li > ul > .selected {
+#channellist > ul > li > ul > .selected {
 	background:#f16745 !important;
 	position:relative;
 	z-index:19;
@@ -71,24 +97,21 @@ h2 {
 	box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.12);
 }
 .area {
-	z-index:120;
-	position:absolute;
-	top:0; right:0;
-	width:calc(100% - 15em);
 	height:100%;
 }
 .top {
+	z-index:120;
+	position:relative;
 	width:100%;
-	height:calc(100% - 22pt - 4px);
 }
 .topscroll {
-	height:calc(100% - 22pt - 4px);
+	height:calc(100vh - 24pt - 22pt - 6px);
+	box-sizing:border-box;
 	overflow:auto;
 }
 .topmargin {
 	border:1em solid transparent;
 	box-sizing:border-box;
-	width:100%; height:calc(100% - 22pt - 4px);
 }
 #log {
 	display:table;
@@ -121,15 +144,13 @@ h2 {
 	text-align:right;
 }
 .bottom {
-	position:absolute;
-	left:0px; bottom:0px;
 	border:1px solid #444;
 	width:calc(100% - 2px);
 }
 #input {
-	height:calc(22pt + 4px); width:calc(100% - 1.5em);
+	height:calc(22pt + 4px); width:100%;
 	display:table;
-	margin:0 auto; padding:0;
+	margin:0 auto; padding:0 0.5em;
 	font-size:12pt;
 	border:0;
 }

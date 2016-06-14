@@ -126,7 +126,7 @@ function onIrcMessage(json) {
 	}
 }
 function putLog(time, nick, msg, style) {
-	var doScroll = logscroll.scrollHeight - logscroll.clientHeight <= logscroll.scrollTop + 5 /*tolerance*/;
+	var doScroll = logscroll.scrollHeight - logscroll.clientHeight <= logscroll.scrollTop + 10 /*tolerance*/;
 	var row;
 	log.add(
 	  row = (new Element("div")).class('row')
@@ -135,7 +135,7 @@ function putLog(time, nick, msg, style) {
 	    .add(emsg=(new Element("div").text(msg).class('msg')))
 	);
 	if (style) row.class(style);
-	if (doScroll) log.get().scrollIntoView(false);
+	if (doScroll) logscroll.scrollTop = logscroll.scrollHeight - logscroll.clientHeight;
 }
 function putLine(msg) {
 	log.add(
@@ -144,7 +144,7 @@ function putLine(msg) {
 }
 function init() {
 	input = new Element('#input');
-	bar = new Element('#bar');
+	bar = new Element('#channellist');
 	log = new Element('#log');
 
 	serverList = new ServerList(bar);

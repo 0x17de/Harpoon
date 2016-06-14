@@ -6,15 +6,28 @@
 #include <list>
 
 
-struct IrcChannelListing {
+class IrcChannelUser {
+	std::string nick;
+	std::string mode;
+public:
+	IrcChannelUser(const std::string& nick, const std::string& mode);
+
+	std::string getNick() const;
+	std::string getMode() const;
+};
+
+class IrcChannelListing {
 	std::string channelName;
+	std::list<IrcChannelUser> users;
 public:
 	IrcChannelListing(const std::string& channelName);
 
+	void addUser(const std::string& nick, const std::string& mode);
+	const std::list<IrcChannelUser>& getUsers() const;
 	std::string getChannelName() const;
 };
 
-struct IrcServerListing {
+class IrcServerListing {
 	size_t serverId;
 	std::string serverName;
 	std::list<IrcChannelListing> channels;
