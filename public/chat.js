@@ -3,10 +3,8 @@ var password = "password";
 var ws, ping;
 
 var activeNick = 'iirc';
-var activeServer = null;
-var activeChannel = null;
 
-var input, log, logscroll, connected, serverList;
+var input, backlog, logscroll, connected, serverList, userlist;
 
 function sendInput() {
 	var input = document.getElementById('input');
@@ -14,7 +12,8 @@ function sendInput() {
 	input.value = '';
 }
 function sendMessage(msg) {
-	send({cmd:"chat", server:activeServer, channel:activeChannel, msg:msg});
+	if (!Channel.active) return;
+	send({cmd:"chat", server:Channel.active.serverId, channel:Channel.active.channelName, msg:msg});
 }
 function sendPing() {
 	send({cmd:'ping'});
@@ -28,15 +27,15 @@ function startChat() {
 	if (ping) clearInterval(ping);
 	ping = setInterval(sendPing, 60000);
 	ws.onopen = function() {
-		putLog(timestamp(), "--", "Connection established", 'event');
+		//putLog(json.type, json.server, null, timestamp(), "--", "Connection established", 'event');
 		connected = true;
 		ws.send("LOGIN "+username+" "+password+"\n");
 	};
 	ws.onclose = function() {
 		clearInterval(ping);
 		ping = void 0;
-		if (connected)
-			putLog(timestamp(), "--", "Connection lost", 'event');
+		//if (connected)
+			//putLog(json.type, json.server, null, timestamp(), "--", "Connection lost", 'event');
 		connected = false;
 		setTimeout(startChat, 1000);
 	};
@@ -85,71 +84,82 @@ function onIrcMessage(json) {
 		for(var serverId in servers) {
 			var serverData = servers[serverId];
 			var server = serverList.add('irc', serverId, serverData.name);
-			if (!activeServer) activeServer = serverId;
 			var channels = serverData.channels;
 			for (var channelName in channels) {
 				var channelData = channels[channelName];
 				var channel = server.add(channelName);
-				if (!activeChannel) {
-					activeChannel = channelName;
-					channel.select(true);
+				if (!Channel.active) channel.link(); // set new channel to active
+				var users = channelData.users;
+				for (userName in users) {
+					var userData = users[userName];
+					channel.addUser(userName, userData);
 				}
 			}
 		}
 		break;
 	case 'join':
-		putLog(timestamp(), '-->', pureNick+' joined the channel', 'event');
+		putLog(json.type, json.server, json.channel, timestamp(), '-->', pureNick+' joined the channel', 'event');
 		break;
 	case 'part':
-		putLog(timestamp(), '<--', pureNick+' left the channel', 'event');
+		putLog(json.type, json.server, json.channel, timestamp(), '<--', pureNick+' left the channel', 'event');
 		break;
 	case 'quit':
-		putLog(timestamp(), '<--', pureNick+' has quit'+(json.msg?' ('+json.msg+')':''), 'event');
+		putLog(json.type, json.server, json.channel, timestamp(), '<--', pureNick+' has quit'+(json.msg?' ('+json.msg+')':''), 'event');
 		break;
 	case 'chat':
-		putLog(timestamp(), nick, json.msg);
+		putLog(json.type, json.server, json.channel, timestamp(), nick, json.msg);
 		break;
 	case 'action':
-		putLog(timestamp(), '*', pureNick+' '+json.msg, 'action');
+		putLog(json.type, json.server, json.channel, timestamp(), '*', pureNick+' '+json.msg, 'action');
 		break;
 	case 'kick':
-		putLog(timestamp(), '<--', pureNick+' was kicked', 'event');
+		putLog(json.type, json.server, json.channel, timestamp(), '<--', pureNick+' was kicked', 'event');
 		break;
 	case 'nickchange':
-		putLog(timestamp(), '<->', pureNick+' is now known as '+json.newNick, 'event');
+		putLog(json.type, json.server, json.channel, timestamp(), '<->', pureNick+' is now known as '+json.newNick, 'event');
 		break;
 	case 'notice':
-		putLog(timestamp(), '*'+pureNick+'*', json.msg, 'notice');
+		putLog(json.type, json.server, json.channel, timestamp(), '*'+pureNick+'*', json.msg, 'notice');
 		break;
 	default:
 		console.warning("Unknown command: "+json.cmd);
 	}
 }
-function putLog(time, nick, msg, style) {
+function putLog(type, serverId, channelName, time, nick, msg, style) {
+	var channel;
+
+	if (channelName === null) {
+		channel = serverList.get(type, serverId).getServerLog();
+	} else {
+		channel = serverList.get(type, serverId).get(channelName);
+	}
+	if (!channel) return;
+
 	var doScroll = logscroll.scrollHeight - logscroll.clientHeight <= logscroll.scrollTop + 10 /*tolerance*/;
 	var row;
-	log.add(
+	channel.backlogRoot.add(
 	  row = (new Element("div")).class('row')
 	    .add(etime=(new Element("div").text(time).class('time')))
 	    .add(enick=(new Element("div").text(nick).class('nick')))
 	    .add(emsg=(new Element("div").text(msg).class('msg')))
 	);
+
 	if (style) row.class(style);
 	if (doScroll) logscroll.scrollTop = logscroll.scrollHeight - logscroll.clientHeight;
 }
 function putLine(msg) {
-	log.add(
+	backlog.add(
 	  (new Element("div")).text(msg)
 	);
 }
 function init() {
 	input = new Element('#input');
 	bar = new Element('#channellist');
-	log = new Element('#log');
+	backlog = new Element('#backlog');
 
 	serverList = new ServerList(bar);
 
-	logscroll = log.get().parentNode.parentNode;
+	logscroll = backlog.get().parentNode.parentNode;
 	input.get().onkeydown = function(e) {
 		if (e.keyCode == 13 && !e.shiftKey) {
 			e.preventDefault();

@@ -81,6 +81,9 @@ h2 {
 	-moz-box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.25);
 	box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.25);
 }
+#channellist > ul > li > .selected {
+	background:#f16745 !important;
+}
 #channellist > ul > li > ul > li {
 	margin:0; padding:0.1em 0 0.1em 1.5em;
 	background:#ecf2f0;
@@ -113,33 +116,33 @@ h2 {
 	border:1em solid transparent;
 	box-sizing:border-box;
 }
-#log {
+#backlog {
 	display:table;
 	width:100%;
 	word-break: break-all;
 }
-#log .action {
+#backlog .action {
 	color:#0c8399; /* blue */
 }
-#log .event {
+#backlog .event {
 	color:#73446d; /* purple */
 }
-#log .notice {
+#backlog .notice {
 	color:#cf962d; /* yellow */
 }
-#log .row {
+#backlog .row {
 	display:table-row;
 }
-#log .row .time,
-#log .row .nick,
-#log .row .msg {
+#backlog .row .time,
+#backlog .row .nick,
+#backlog .row .msg {
 	display:table-cell;
 	padding:0.1em 0.3em;
 }
-#log .row .time {
+#backlog .row .time {
 	width:6em;
 }
-#log .row .nick {
+#backlog .row .nick {
 	width:8em;
 	text-align:right;
 }
