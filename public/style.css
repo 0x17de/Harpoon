@@ -148,7 +148,7 @@ h2 {
 	width:calc(100% - 2px);
 }
 #input {
-	height:calc(22pt + 4px); width:100%;
+	height:calc(22pt + 4px); width:calc(100% - 1em);
 	display:table;
 	margin:0 auto; padding:0 0.5em;
 	font-size:12pt;
