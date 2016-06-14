@@ -3,10 +3,10 @@ var password = "password";
 var ws, ping;
 
 var activeNick = 'iirc';
-var activeServer = 1;
-var activeChannel = '#test';
+var activeServer = null;
+var activeChannel = null;
 
-var input, log, logscroll, connected;
+var input, log, logscroll, connected, serverList;
 
 function sendInput() {
 	var input = document.getElementById('input');
@@ -79,6 +79,24 @@ function onIrcMessage(json) {
 		var nick = pureNick && '<'+pureNick+'>';
 	}
 	switch (json.cmd) {
+	case 'chatlist':
+		serverList.clear('irc');
+		var servers = json.servers;
+		for(var serverId in servers) {
+			var serverData = servers[serverId];
+			var server = serverList.add('irc', serverId, serverData.name);
+			if (!activeServer) activeServer = serverId;
+			var channels = serverData.channels;
+			for (var channelName in channels) {
+				var channelData = channels[channelName];
+				var channel = server.add(channelName);
+				if (!activeChannel) {
+					activeChannel = channelName;
+					channel.select(true);
+				}
+			}
+		}
+		break;
 	case 'join':
 		putLog(timestamp(), '-->', pureNick+' joined the channel', 'event');
 		break;
@@ -126,7 +144,11 @@ function putLine(msg) {
 }
 function init() {
 	input = new Element('#input');
+	bar = new Element('#bar');
 	log = new Element('#log');
+
+	serverList = new ServerList(bar);
+
 	logscroll = log.get().parentNode.parentNode;
 	input.get().onkeydown = function(e) {
 		if (e.keyCode == 13 && !e.shiftKey) {
