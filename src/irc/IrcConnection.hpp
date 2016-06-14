@@ -23,6 +23,7 @@ public:
 	std::string getServerName() const;
 	std::mutex& getChannelLoginDataMutex() const;
 	const std::map<std::string, IrcChannelLoginData>& getChannelLoginData() const;
+	std::list<std::string> getUserlist();
 };
 
 #endif

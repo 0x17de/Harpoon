@@ -9,11 +9,21 @@ Element = function(tagOrElement) {
 		this.e = tagOrElement;
 	}
 };
+Element.prototype.remove = function() {
+	this.e.parentNode.removeChild(this.e);
+	this.e = null;
+}
 Element.prototype.get = function() {
 	return this.e;
 }
 Element.prototype.text = function(text) {
 	this.add(document.createTextNode(text));
+	return this;
+};
+Element.prototype.attr = function(attr, value) {
+	if (value === void 0)
+		return this.e.getAttribute(attr);
+	this.e.setAttribute(attr, value);
 	return this;
 };
 Element.prototype.add = function(e) {
