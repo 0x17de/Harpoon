@@ -1,5 +1,5 @@
 #include "IrcService.hpp"
-#include "irc/IrcConnection.hpp"
+#include "service/irc/IrcConnection.hpp"
 #include "queue/EventQueue.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventQueryChats.hpp"
