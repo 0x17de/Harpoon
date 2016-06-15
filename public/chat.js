@@ -4,7 +4,7 @@ var ws, ping;
 
 var activeNick = 'iirc';
 
-var input, backlog, logscroll, connected, serverList, userlist;
+var input, backlog, logscroll, connected, serverList, userlist, channeltitle;
 
 function sendInput() {
 	var input = document.getElementById('input');
@@ -71,6 +71,11 @@ function timestamp() {
 }
 function onIrcMessage(json) {
 	console.log(JSON.stringify(json));
+
+	var target;
+	if (json.server && json.channel)
+		target = serverList.get('irc', json.server).get(json.channel);
+
 	var pureNick, nick;
 	if (json.nick !== void 0) {
 		pureNick = (json.nick === '')
@@ -157,6 +162,8 @@ function init() {
 	input = new Element('#input');
 	bar = new Element('#channellist');
 	backlog = new Element('#backlog');
+	userlist = new Element('#userlist');
+	channeltitle = new Element('#channeltitle');
 
 	serverList = new ServerList(bar);
 
