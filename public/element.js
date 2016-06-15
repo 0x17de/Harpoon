@@ -17,7 +17,12 @@ Element.prototype.get = function() {
 	return this.e;
 }
 Element.prototype.text = function(text) {
-	this.add(document.createTextNode(text));
+	if (this.textElement) {
+		this.textElement.data = text;
+	} else {
+		this.textElement = document.createTextNode(text);
+		this.add(this.textElement);
+	}
 	return this;
 };
 Element.prototype.attr = function(attr, value) {

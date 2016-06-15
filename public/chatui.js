@@ -21,15 +21,21 @@ Channel.prototype.unlink = function() {
 	if (this.root)
 		this.root.get().classList.remove('selected');
 	if (this.bServerChannel) return;
-	var parent = this.backlogRoot.get().parentNode;
-	if (parent) parent.removeChild(this.backlogRoot.get());
+
+	var backlogParent = this.backlogRoot.get().parentNode;
+	if (backlogParent) backlogParent.removeChild(this.backlogRoot.get());
+
+	var userlistParent = this.userlistRoot.get().parentNode;
+	if (userlistParent) userlistParent.removeChild(this.userlistRoot.get());	
 }
 Channel.prototype.link = function() {
 	if (Channel.active)
 		Channel.active.unlink();
 	Channel.active = this;
 	this.root.get().classList.add('selected');
+	channeltitle.text(this.channelName.toUpperCase()); 
 	backlog.add(this.backlogRoot);
+	userlist.add(this.userlistRoot);
 	input.get().focus();
 }
 Channel.prototype.addUser = function(userName, userData) {
@@ -37,6 +43,16 @@ Channel.prototype.addUser = function(userName, userData) {
 	var userRoot = userData.root = new Element('div');
 	userRoot.text(userName);
 	this.userlistRoot.add(userRoot);
+}
+Channel.prototype.renameUser = function(userName, newName) {
+	var user = this.users[newName] = this.users[userName];
+	user.root.text(newName);
+	delete this.users[userName];
+}
+Channel.prototype.removeUser = function(userName) {
+	var user = this.users[userName];
+	this.userlistRoot.get().removeChild(user.root);
+	delete this.users[userName];	
 }
 
 function Server(parent, serverId, serverName) {
