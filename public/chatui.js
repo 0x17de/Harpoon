@@ -39,20 +39,31 @@ Channel.prototype.link = function() {
 	input.get().focus();
 }
 Channel.prototype.addUser = function(userName, userData) {
-	this.users[userName] = userData;
+	if (!userData) userData = {};
+	var userNameLower = userName.toLowerCase();
+	this.removeUser(userName);
+	this.users[userNameLower] = userData;
+	userData.name = userName;
 	var userRoot = userData.root = new Element('div');
 	userRoot.text(userName);
 	this.userlistRoot.add(userRoot);
 }
 Channel.prototype.renameUser = function(userName, newName) {
-	var user = this.users[newName] = this.users[userName];
+	var newNameLower = newName.toLowerCase();
+	var userNameLower = userName.toLowerCase();
+	this.removeUser(newName);
+	var user = this.users[userNameLower];
+	delete this.users[userNameLower];
+	this.users[newNameLower] = user;
+	user.name = newName;
 	user.root.text(newName);
-	delete this.users[userName];
 }
 Channel.prototype.removeUser = function(userName) {
-	var user = this.users[userName];
-	this.userlistRoot.get().removeChild(user.root);
-	delete this.users[userName];	
+	var userNameLower = userName.toLowerCase();
+	var user = this.users[userNameLower];
+	if (!user) return;
+	user.root.purge();
+	delete this.users[userNameLower];
 }
 
 function Server(parent, serverId, serverName) {

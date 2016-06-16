@@ -11,6 +11,9 @@ Element = function(tagOrElement) {
 };
 Element.prototype.remove = function() {
 	this.e.parentNode.removeChild(this.e);
+}
+Element.prototype.purge = function() {
+	this.remove();
 	this.e = null;
 }
 Element.prototype.get = function() {
