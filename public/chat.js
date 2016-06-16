@@ -105,12 +105,17 @@ function onIrcMessage(json) {
 		break;
 	case 'join':
 		putLog(json.type, json.server, json.channel, timestamp(), '-->', pureNick+' joined the channel', 'event');
+		target.addUser(pureNick);
 		break;
 	case 'part':
 		putLog(json.type, json.server, json.channel, timestamp(), '<--', pureNick+' left the channel', 'event');
+		target.removeUser(pureNick);
 		break;
 	case 'quit':
 		putLog(json.type, json.server, json.channel, timestamp(), '<--', pureNick+' has quit'+(json.msg?' ('+json.msg+')':''), 'event');
+		var channels = serverList.get('irc', json.server).channels;
+		for (var channelName in channels)
+			channels[channelName].removeUser(pureNick);
 		break;
 	case 'chat':
 		putLog(json.type, json.server, json.channel, timestamp(), nick, json.msg);
@@ -120,9 +125,11 @@ function onIrcMessage(json) {
 		break;
 	case 'kick':
 		putLog(json.type, json.server, json.channel, timestamp(), '<--', pureNick+' was kicked', 'event');
+		target.removeUser(pureNick);
 		break;
 	case 'nickchange':
 		putLog(json.type, json.server, json.channel, timestamp(), '<->', pureNick+' is now known as '+json.newNick, 'event');
+		target.renameUser(pureNick, json.newNick);
 		break;
 	case 'notice':
 		putLog(json.type, json.server, json.channel, timestamp(), '*'+pureNick+'*', json.msg, 'notice');
