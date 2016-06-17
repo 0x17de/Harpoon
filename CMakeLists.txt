@@ -11,7 +11,8 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/db/LoginDatabase_Dummy.cpp src/db/LoginDatabase_Dummy.hpp
 	src/db/IrcDatabase_Dummy.cpp src/db/IrcDatabase_Dummy.hpp
 	src/event/IEvent.hpp src/event/IClientEvent.hpp
-	src/service/irc/IrcConnection.cpp src/service/irc/IrcConnection.hpp
+	src/service/irc/IrcConnection.cpp src/service/irc/IrcConnection_Impl.cpp
+	src/service/irc/IrcConnection.hpp
 	src/service/irc/IrcChannelStore.cpp src/service/irc/IrcChannelStore.hpp
 	src/service/irc/IrcConnection_Impl.hpp src/service/irc/IrcEvents.cpp
 	src/main.cpp src/queue/EventQueue.cpp src/queue/EventQueue.hpp

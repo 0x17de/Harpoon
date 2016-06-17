@@ -75,7 +75,7 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
 				const IrcChannelStore& channelStore = channelPair.second;
 				IrcChannelListing& channel = server.addChannel(channelName);
 				for (auto& userPair : channelStore.getUsers()) {
-					string username = userPair.first;
+					string username = userPair.second.getNick();
 					channel.addUser(username, "");
 				}
 			}

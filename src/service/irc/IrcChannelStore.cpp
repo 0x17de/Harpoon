@@ -1,4 +1,5 @@
 #include "IrcChannelStore.hpp"
+#include <algorithm>
 
 using namespace std;
 
@@ -35,10 +36,38 @@ void IrcChannelStore::clear() {
 	users.clear();
 }
 
-void IrcChannelStore::addUser(std::string name, std::string mode) {
+void IrcChannelStore::addUser(const std::string& nick, const std::string& mode) {
+	string nickLower = nick;
+	transform(nickLower.begin(), nickLower.end(), nickLower.begin(), ::tolower);
 	users.emplace(piecewise_construct,
-		forward_as_tuple(name),
-		forward_as_tuple(name, mode));
+		forward_as_tuple(nickLower),
+		forward_as_tuple(nick, mode));
+}
+
+void IrcChannelStore::removeUser(const std::string& nick) {
+	string nickLower = nick;
+	transform(nickLower.begin(), nickLower.end(), nickLower.begin(), ::tolower);
+	auto it = users.find(nickLower);
+	if (it != users.end())
+		users.erase(it);
+}
+
+void IrcChannelStore::renameUser(const std::string& nick, const std::string& newNick) {
+	string nickLower = nick;
+	transform(nickLower.begin(), nickLower.end(), nickLower.begin(), ::tolower);
+	auto it = users.find(nickLower);
+	if (it == users.end()) return;
+
+	string newNickLower = newNick;
+	transform(newNickLower.begin(), newNickLower.end(), newNickLower.begin(), ::tolower);
+	IrcUserStore& userStore = it->second;
+	userStore.setNick(newNick);
+	if (nickLower != newNickLower) {
+		users.emplace(piecewise_construct,
+			forward_as_tuple(newNickLower),
+			forward_as_tuple(userStore));
+		users.erase(it);
+	}
 }
 
 const std::map<std::string, IrcUserStore>& IrcChannelStore::getUsers() const {
