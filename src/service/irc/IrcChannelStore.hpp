@@ -23,7 +23,9 @@ public:
 	IrcChannelStore(const std::string& channelPassword);
 
 	void clear();
-	void addUser(std::string nick, std::string mode);
+	void addUser(const std::string& nick, const std::string& mode);
+	void removeUser(const std::string& nick);
+	void renameUser(const std::string& nick, const std::string& newNick);
 	const std::map<std::string, IrcUserStore>& getUsers() const;
 	std::string getChannelPassword() const;
 };

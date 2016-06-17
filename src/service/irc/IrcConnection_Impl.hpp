@@ -18,6 +18,7 @@ class IEvent;
 class EventQueue;
 class IrcChannelLoginData;
 class IrcConnection_Impl {
+	static std::string getPureNick(const std::string& nick);
 public:
 	IrcConnection_Impl(EventQueue* appQueue, EventQueue* queue, size_t userId, const IrcServerConfiguration& configuration);
 	~IrcConnection_Impl();
