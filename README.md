@@ -3,6 +3,8 @@ Connect to various services through this bouncer. Initially meant for IRC
 
 This programm is still work in progress. It will require a server.
 
+![Screenshot](https://www.0x17.de/proj/harpoonClient4.png)
+
 ## Features
  - Multiple users can use this service at once (e.g. family)
  - Multiple clients at the same time possible for the same user
