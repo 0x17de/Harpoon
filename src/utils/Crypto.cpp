@@ -59,4 +59,3 @@ std::string Crypto::hashPassword(const std::string& salt, const std::string& pas
 	vector<char> encodedLength(b.encodedLength(keyLength), 0);
 	return b.encode(key);
 }
-
