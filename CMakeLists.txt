@@ -17,6 +17,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/service/irc/IrcConnection_Impl.hpp src/service/irc/IrcEvents.cpp
 	src/main.cpp src/queue/EventQueue.cpp src/queue/EventQueue.hpp
 	src/queue/EventQueue_Impl.hpp src/utils/uuid.hpp
+	src/utils/Ini.cpp src/utils/Ini.hpp
 	src/service/irc/IrcService.cpp src/service/irc/IrcService.hpp
 	src/user/UserManager.cpp src/user/UserManager.hpp
 	src/utils/Base64.cpp src/utils/Base64.hpp
