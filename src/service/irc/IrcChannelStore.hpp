@@ -9,9 +9,9 @@ class IrcUserStore {
 	std::string nick;
 	std::string mode;
 public:
-	IrcUserStore(std::string nick, std::string mode);
-	void setNick(std::string nick);
-	void setMode(std::string mode);
+	IrcUserStore(const std::string& nick, const std::string& mode);
+	void setNick(const std::string& nick);
+	void setMode(const std::string& mode);
 	std::string getNick() const;
 	std::string getMode() const;
 };

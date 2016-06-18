@@ -4,18 +4,18 @@
 using namespace std;
 
 
-IrcUserStore::IrcUserStore(std::string nick, std::string mode)
+IrcUserStore::IrcUserStore(const std::string& nick, const std::string& mode)
 :
 	nick{nick},
 	mode{mode}
 {
 }
 
-void IrcUserStore::setNick(std::string nick) {
-	nick = nick;
+void IrcUserStore::setNick(const std::string& lnick) {
+	nick = lnick;
 }
-void IrcUserStore::setMode(std::string mode) {
-	mode = mode;
+void IrcUserStore::setMode(const std::string& lmode) {
+	mode = lmode;
 }
 
 std::string IrcUserStore::getNick() const {
@@ -55,13 +55,16 @@ void IrcChannelStore::removeUser(const std::string& nick) {
 void IrcChannelStore::renameUser(const std::string& nick, const std::string& newNick) {
 	string nickLower = nick;
 	transform(nickLower.begin(), nickLower.end(), nickLower.begin(), ::tolower);
+
 	auto it = users.find(nickLower);
 	if (it == users.end()) return;
 
 	string newNickLower = newNick;
 	transform(newNickLower.begin(), newNickLower.end(), newNickLower.begin(), ::tolower);
+
 	IrcUserStore& userStore = it->second;
 	userStore.setNick(newNick);
+
 	if (nickLower != newNickLower) {
 		users.emplace(piecewise_construct,
 			forward_as_tuple(newNickLower),
