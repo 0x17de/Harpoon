@@ -112,10 +112,11 @@ function onIrcMessage(json) {
 		target.removeUser(pureNick);
 		break;
 	case 'quit':
-		putLog(json.type, json.server, json.channel, timestamp(), '<--', pureNick+' has quit'+(json.msg?' ('+json.msg+')':''), 'event');
 		var channels = serverList.get('irc', json.server).channels;
-		for (var channelName in channels)
-			channels[channelName].removeUser(pureNick);
+		for (var channelName in channels) {
+			if (channels[channelName].removeUser(pureNick))
+				putLog(json.type, json.server, channelName, timestamp(), '<--', pureNick+' has quit'+(json.msg?' ('+json.msg+')':''), 'event');
+		}
 		break;
 	case 'chat':
 		putLog(json.type, json.server, json.channel, timestamp(), nick, json.msg);
