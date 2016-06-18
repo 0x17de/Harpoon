@@ -51,19 +51,21 @@ Channel.prototype.addUser = function(userName, userData) {
 Channel.prototype.renameUser = function(userName, newName) {
 	var newNameLower = newName.toLowerCase();
 	var userNameLower = userName.toLowerCase();
-	this.removeUser(newName);
-	var user = this.users[userNameLower];
+	var userData = this.users[userNameLower];
+	if (!userData) return false;
 	delete this.users[userNameLower];
-	this.users[newNameLower] = user;
-	user.name = newName;
-	user.root.text(newName);
+	this.users[newNameLower] = userData;
+	userData.name = newName;
+	userData.root.text(newName);
+	return true;
 }
 Channel.prototype.removeUser = function(userName) {
 	var userNameLower = userName.toLowerCase();
 	var user = this.users[userNameLower];
-	if (!user) return;
+	if (!user) return false;
 	user.root.purge();
 	delete this.users[userNameLower];
+	return true;
 }
 
 function Server(parent, serverId, serverName) {

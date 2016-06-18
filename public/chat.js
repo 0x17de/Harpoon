@@ -128,8 +128,11 @@ function onIrcMessage(json) {
 		target.removeUser(pureNick);
 		break;
 	case 'nickchange':
-		putLog(json.type, json.server, json.channel, timestamp(), '<->', pureNick+' is now known as '+json.newNick, 'event');
-		target.renameUser(pureNick, json.newNick);
+		var channels = serverList.get('irc', json.server).channels;
+		for (var channelName in channels) {
+			if (channels[channelName].renameUser(pureNick, json.newNick))
+				putLog(json.type, json.server, channelName, timestamp(), '<->', pureNick+' is now known as '+json.newNick, 'event');
+		}
 		break;
 	case 'notice':
 		putLog(json.type, json.server, json.channel, timestamp(), '*'+pureNick+'*', json.msg, 'notice');
