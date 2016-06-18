@@ -12,6 +12,7 @@ class Ini {
 
 	std::string filename;
 	bool modified;
+	bool newFile;
 public:
 	Ini(const std::string& filename);
 	~Ini();
@@ -19,8 +20,14 @@ public:
 	void load();
 	void write();
 
+	bool isNew() const;
+
+	Entries* getEntry(const std::string& category);
+	Entries& expectCategory(const std::string& category);
 	bool getEntry(const std::string& category, const std::string& entry, std::string& data);
-	bool setEntry(const std::string& category, const std::string& entry, const std::string& data);
+	bool getEntry(Entries& entries, const std::string& entry, std::string& data);
+	void setEntry(const std::string& category, const std::string& entry, const std::string& data);
+	void setEntry(Entries& entries, const std::string& entry, const std::string& data);
 };
 
 #endif
