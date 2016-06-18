@@ -6,7 +6,8 @@ using namespace std;
 
 Ini::Ini(const std::string& filename)
 :
-	filename{filename}
+	filename{filename},
+	newFile{false}
 {
 	load();
 }
@@ -21,7 +22,10 @@ void Ini::load() {
 	categories.clear();
 
 	ifstream f(filename);
-	if (!f) return;
+	if (!f) {
+		newFile = true;
+		return;
+	}
 
 	Entries* currentCategory;
 	string line;
@@ -49,6 +53,10 @@ void Ini::load() {
 	}
 }
 
+bool Ini::isNew() const {
+	return newFile;
+}
+
 void Ini::write() {
 	ofstream f(filename);
 
@@ -69,33 +77,47 @@ void Ini::write() {
 	modified = false;
 }
 
-bool Ini::getEntry(const std::string& category, const std::string& entry, std::string& data) {
+Ini::Entries& Ini::expectCategory(const std::string& category) {
 	auto it = categories.find(category);
-	if (it == categories.end()) return false;
-	auto& entries = it->second;
-	auto it2 = entries.find(entry);
-	if (it2 == entries.end()) return false;
-	data = it2->second;
+	if (it != categories.end())
+		return it->second;
+	auto res = categories.emplace(piecewise_construct,
+		forward_as_tuple(category),
+		forward_as_tuple());
+	return res.first->second;	
+}
+
+Ini::Entries* Ini::getEntry(const std::string& category) {
+	auto it = categories.find(category);
+	if (it == categories.end()) return nullptr;
+	return &it->second;
+}
+
+bool Ini::getEntry(Entries& entries, const std::string& entry, std::string& data) {
+	auto it = entries.find(entry);
+	if (it == entries.end()) return false;
+	data = it->second;
 	return true;
 }
 
-bool Ini::setEntry(const std::string& category, const std::string& entry, const std::string& data) {
-	auto it = categories.find(category);
-	Entries* entries;
-	if (it == categories.end()) {
-		auto res = categories.emplace(piecewise_construct,
-			forward_as_tuple(category),
-			forward_as_tuple());
-		entries = &res.first->second;
-	} else {
-		entries = &it->second;
-	}
-	auto it2 = entries->find(entry);
-	if (it2 == entries->end()) {
-		entries->emplace(piecewise_construct,
+bool Ini::getEntry(const std::string& category, const std::string& entry, std::string& data) {
+	Entries* entries = getEntry(category);
+	if (entries == nullptr) return false;
+	return getEntry(*entries, entry, data);
+}
+
+void Ini::setEntry(const std::string& category, const std::string& entry, const std::string& data) {
+	setEntry(expectCategory(category), entry, data);
+}
+
+void Ini::setEntry(Entries& entries, const std::string& entry, const std::string& data) {
+	auto it = entries.find(entry);
+	if (it == entries.end()) {
+		entries.emplace(piecewise_construct,
 			forward_as_tuple(entry),
 			forward_as_tuple(data));
 	} else {
-		it2->second = data;
+		it->second = data;
 	}
+	modified = true;
 }
