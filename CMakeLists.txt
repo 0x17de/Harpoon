@@ -53,9 +53,9 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	)
 
 
-find_package(Protobuf REQUIRED)
-include_directories(${PROTOBUF_INCLUDE_DIRS})
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+#find_package(Protobuf REQUIRED)
+#include_directories(${PROTOBUF_INCLUDE_DIRS})
+#include_directories(${CMAKE_CURRENT_BINARY_DIR})
 #PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS
 #		src/commands/common.proto
 #		src/commands/server.proto
@@ -81,10 +81,11 @@ if(${USE_WEBSOCKET_SERVER})
 endif()
 
 
-add_executable(iirc ${SOURCE_FILES} ${PROTO_SRCS} ${PROTO_HDRS})
+add_executable(iirc ${SOURCE_FILES})
+	#${PROTO_SRCS} ${PROTO_HDRS})
 
 
-target_link_libraries(iirc ${PROTOBUF_LIBRARIES})
+#target_link_libraries(iirc ${PROTOBUF_LIBRARIES})
 
 if(${USE_WEBSOCKET_SERVER})
   if(${Seasocks_FOUND})
