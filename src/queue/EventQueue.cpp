@@ -3,15 +3,17 @@
 
 #include <chrono>
 
+using namespace std;
+
 
 EventQueue::EventQueue() :
-	impl{new EventQueue_Impl()}
+	impl{make_shared<EventQueue_Impl>()}
 {
 }
 
 EventQueue::EventQueue(std::set<UUID> eventsToBeProcessed, std::list<bool(*)(IEvent*)> eventGuards)
 :
-	impl{new EventQueue_Impl()},
+	impl{make_shared<EventQueue_Impl>()},
 	eventsToBeProcessed{eventsToBeProcessed},
 	eventGuards{eventGuards}
 {

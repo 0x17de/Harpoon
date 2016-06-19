@@ -10,7 +10,7 @@
 class IEvent;
 class EventQueue_Impl;
 class EventQueue {
-	std::unique_ptr<EventQueue_Impl> impl;
+	std::shared_ptr<EventQueue_Impl> impl;
 	std::set<UUID> eventsToBeProcessed;
 	std::list<bool(*)(IEvent*)> eventGuards;
 public:

@@ -7,7 +7,7 @@ using namespace std;
 
 IrcConnection::IrcConnection(EventQueue* appQueue, size_t userId, const IrcServerConfiguration& configuration)
 :
-	impl{new IrcConnection_Impl(appQueue, getEventQueue(), userId, configuration)},
+	impl{make_shared<IrcConnection_Impl>(appQueue, getEventQueue(), userId, configuration)},
 	EventLoop({
 		EventQuit::uuid
 	}, {

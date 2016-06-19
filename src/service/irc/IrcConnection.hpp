@@ -14,7 +14,7 @@ class IrcChannelStore;
 class EventQueue;
 class IrcConnection_Impl;
 class IrcConnection : public EventLoop {
-	std::unique_ptr<IrcConnection_Impl> impl;
+	std::shared_ptr<IrcConnection_Impl> impl;
 public:
 	IrcConnection(EventQueue* appQueue, size_t userId, const IrcServerConfiguration& configuration);
 	virtual ~IrcConnection();

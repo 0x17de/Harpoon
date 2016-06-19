@@ -14,7 +14,7 @@ WebsocketClientData::WebsocketClientData(size_t userId, seasocks::WebSocket* soc
 
 WebsocketServer::WebsocketServer(EventQueue* appQueue)
 :
-	impl{new WebsocketServer_Impl(getEventQueue(), appQueue)}
+	impl{make_shared<WebsocketServer_Impl>(getEventQueue(), appQueue)}
 {
 }
 
