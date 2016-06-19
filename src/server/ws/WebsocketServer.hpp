@@ -9,7 +9,7 @@
 class EventQueue;
 class WebsocketServer_Impl;
 class WebsocketServer : public ManagingEventLoop {
-	std::unique_ptr<WebsocketServer_Impl> impl;
+	std::shared_ptr<WebsocketServer_Impl> impl;
 public:
 	WebsocketServer(EventQueue* appQueue);
 	virtual ~WebsocketServer();
