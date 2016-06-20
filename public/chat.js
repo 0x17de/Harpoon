@@ -28,15 +28,15 @@ function startChat() {
 	if (ping) clearInterval(ping);
 	ping = setInterval(sendPing, 60000);
 	ws.onopen = function() {
-		//putLog(json.type, json.server, null, timestamp(), "--", "Connection established", 'event');
+		putLog('', null, null, timestamp(), "--", "Connection established", 'event');
 		connected = true;
 		ws.send("LOGIN "+username+" "+password+"\n");
 	};
 	ws.onclose = function() {
 		clearInterval(ping);
 		ping = void 0;
-		//if (connected)
-			//putLog(json.type, json.server, null, timestamp(), "--", "Connection lost", 'event');
+		if (connected)
+			putLog('', null, null, timestamp(), "--", "Connection lost", 'event');
 		connected = false;
 		setTimeout(startChat, 1000);
 	};
@@ -145,10 +145,14 @@ function onIrcMessage(json) {
 function putLog(type, serverId, channelName, time, nick, msg, style) {
 	var channel;
 
-	if (channelName === null) {
-		channel = serverList.get(type, serverId).getServerLog();
+	if (type === '') {
+		channel = serverList.log;
 	} else {
-		channel = serverList.get(type, serverId).get(channelName);
+		if (channelName === null) {
+			channel = serverList.get(type, serverId).getServerLog();
+		} else {
+			channel = serverList.get(type, serverId).get(channelName);
+		}
 	}
 	if (!channel) return;
 

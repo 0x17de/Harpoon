@@ -1,13 +1,15 @@
-function Channel(serverId, parent, channelName, bServerChannel) {
+function Channel(serverId, parent, channelName, bServerChannel, bAppLog) {
 	var self = this;
 	this.serverId = serverId;
 	this.channelName = channelName;
 	this.bServerChannel = bServerChannel;
 
 	this.root = bServerChannel ? parent : (new Element('li')).text(channelName);
-	this.root.get().onclick = function() {
-		self.link();
-	};
+	if (!bAppLog) {
+		this.root.get().onclick = function() {
+			self.link();
+		};
+	}
 	this.backlogRoot = new Element('div');
 	this.userlistRoot = new Element('div');
 	this.users = {};
@@ -20,10 +22,11 @@ Channel.prototype.remove = function() {
 Channel.prototype.unlink = function() {
 	if (this.root)
 		this.root.get().classList.remove('selected');
-	if (this.bServerChannel) return;
 
 	var backlogParent = this.backlogRoot.get().parentNode;
 	if (backlogParent) backlogParent.removeChild(this.backlogRoot.get());
+
+	if (this.bServerChannel) return;
 
 	var userlistParent = this.userlistRoot.get().parentNode;
 	if (userlistParent) userlistParent.removeChild(this.userlistRoot.get());	
@@ -32,7 +35,8 @@ Channel.prototype.link = function() {
 	if (Channel.active)
 		Channel.active.unlink();
 	Channel.active = this;
-	this.root.get().classList.add('selected');
+	if (this.root)
+		this.root.get().classList.add('selected');
 	channeltitle.text(this.channelName.toUpperCase()); 
 	backlog.add(this.backlogRoot);
 	userlist.add(this.userlistRoot);
@@ -100,6 +104,11 @@ Server.prototype.getServerLog = function() {
 function ServerList(root) {
 	this.root = root;
 	this.byType = {};
+	this.log = new Channel('', null, '*LOG*', true, true);
+	this.showLog();
+}
+ServerList.prototype.showLog = function() {
+	this.log.link();
 }
 ServerList.prototype.clear = function(type) {
 	var serverData = this.byType[type];
