@@ -4,7 +4,7 @@ var ws, ping;
 
 var activeNick = 'iirc';
 
-var input, backlog, logscroll, connected, serverList, userlist, channeltitle;
+var input, backlog, logscroll, connected, serverList, userlist, channeltitle, tryingToConnect = false;
 
 function sendInput() {
 	var input = document.getElementById('input');
@@ -23,6 +23,10 @@ function send(json) {
 	ws.send(JSON.stringify(json));
 }
 function startChat() {
+	if (!tryingToConnect)
+		putLog('', null, null, timestamp(), "--", "Trying to connect ...", 'event');
+	tryingToConnect = true;
+
 	var proto = document.location.protocol.replace(/^http/, "ws");
 	ws = new WebSocket(proto+"//"+document.domain+":8080/ws");
 	if (ping) clearInterval(ping);
@@ -37,6 +41,7 @@ function startChat() {
 		ping = void 0;
 		if (connected)
 			putLog('', null, null, timestamp(), "--", "Connection lost", 'event');
+		tryingToConnect = false;
 		connected = false;
 		setTimeout(startChat, 1000);
 	};
@@ -85,6 +90,7 @@ function onIrcMessage(json) {
 	}
 	switch (json.cmd) {
 	case 'chatlist':
+		var chooseFirstChannel = true;
 		serverList.clear('irc');
 		var servers = json.servers;
 		for(var serverId in servers) {
@@ -94,7 +100,10 @@ function onIrcMessage(json) {
 			for (var channelName in channels) {
 				var channelData = channels[channelName];
 				var channel = server.add(channelName);
-				if (!Channel.active) channel.link(); // set new channel to active
+				if (chooseFirstChannel) {
+					channel.link(); // set new channel to active
+					chooseFirstChannel = false;
+				}
 				var users = channelData.users;
 				for (userName in users) {
 					var userData = users[userName];
