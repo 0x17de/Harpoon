@@ -2,6 +2,7 @@
 #include "app/Application.hpp"
 #include "utils/Password.hpp"
 #include "utils/Ini.hpp"
+#include "utils/IdProvider.hpp"
 
 using namespace std;
 
@@ -39,6 +40,12 @@ bool checkArgs(int argc, char** argv) {
 		if (save) {
 			Ini users("config/users.ini");
 			auto& user = users.expectCategory(username);
+
+			string userIdString;
+			users.getEntry(user, "id", userIdString);
+			if (userIdString.size() == 0)
+				users.setEntry(user, "id", to_string(IdProvider::getInstance().generateNewId("user")));
+
 			users.setEntry(user, "salt", p.getSaltBase64());
 			users.setEntry(user, "password", p.getHashBase64());
 			cout << "users.ini updated." << endl;

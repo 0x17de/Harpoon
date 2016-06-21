@@ -6,8 +6,10 @@
 
 
 class Ini {
+public:
 	typedef std::map<std::string, std::string> Entries;
 	typedef std::map<std::string, Entries> Categories;
+private:
 	Categories categories;
 
 	std::string filename;
@@ -18,7 +20,7 @@ public:
 	~Ini();
 
 	void load();
-	void write();
+	void write(bool bForce = false);
 
 	bool isNew() const;
 
