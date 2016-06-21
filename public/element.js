@@ -16,6 +16,12 @@ Element.prototype.purge = function() {
 	this.remove();
 	this.e = null;
 }
+Element.prototype.hide = function() {
+	this.e.style.display = 'none';
+}
+Element.prototype.show = function() {
+	this.e.style.display = 'block';
+}
 Element.prototype.get = function() {
 	return this.e;
 }
