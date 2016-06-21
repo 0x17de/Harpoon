@@ -9,6 +9,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/app/ApplicationGuard.cpp src/app/ApplicationGuard.hpp
 	src/queue/EventLoop.cpp src/queue/EventLoop.hpp
 	src/db/LoginDatabase_Dummy.cpp src/db/LoginDatabase_Dummy.hpp
+	src/db/LoginDatabase_Ini.cpp src/db/LoginDatabase_Ini.hpp
 	src/db/IrcDatabase_Dummy.cpp src/db/IrcDatabase_Dummy.hpp
 	src/db/IrcDatabase_Ini.cpp src/db/IrcDatabase_Ini.hpp
 	src/event/IEvent.hpp src/event/IClientEvent.hpp
