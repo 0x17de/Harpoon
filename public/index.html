@@ -5,64 +5,98 @@
 <link rel="stylesheet" href="style.css" />
 <script type="text/javascript" src="element.js"></script>
 <script type="text/javascript" src="chatui.js"></script>
+<script type="text/javascript" src="pages.js"></script>
 <script type="text/javascript" src="chat.js"></script>
 </head>
 <body onload="init()">
-<div class="topbar">&nbsp;</div>
-<div class="hchat">
-	<div style="display:table-row;height:100%">
+  <div class="page" id="page-chat">
+	<div class="topbar">&nbsp;</div>
+	<div class="hchat">
+	  <div style="display:table-row;height:100%">
 		<div id="chatbar">
-			<div class="vchatbar">
-				<div style="display:table-row;height:24pt">
-					<div class="top">
-						<h2>CHATS</h2>
-					</div>
-				</div>
-				<div style="display:table-row">
-					<div style="display:table-cell" style="width:100%">
-						<div class="topscroll" id="channellist" style="width:100%;height:calc(100vh - 24pt)"></div>
-					</div>
-				</div>
+		  <div class="vchatbar">
+			<div class="manageservers" onclick="showpage('manageservers')"">
+			  <div class="top">
+				<h2>CHATS</h2>
+			  </div>
 			</div>
+			<div style="display:table-row">
+			  <div style="display:table-cell" style="width:100%">
+				<div class="topscroll" id="channellist" style="width:100%;height:calc(100vh - 24pt)"></div>
+			  </div>
+			</div>
+		  </div>
 		</div>
 		<div class="area">
-			<div class="varea" style="table-layout:fixed">
-				<div style="display:table-row;height:24pt">
-					<div class="top">
-						<h2 id="channeltitle"></h2>
-					</div>
-				</div>
-				<div style="display:table-row">
-					<div style="display:table-cell">
-						<div class="topscroll">
-							<div class="topmargin">
-								<div id="backlog"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div style="display:table-row;height:calc(22pt + 4px)">
-					<div class="bottom">
-						<input id="input" type="text" />
-					</div>
-				</div>
+		  <div class="varea" style="table-layout:fixed">
+			<div style="display:table-row;height:24pt">
+			  <div class="top">
+				<h2 id="channeltitle"></h2>
+			  </div>
 			</div>
+			<div style="display:table-row">
+			  <div style="display:table-cell">
+				<div class="topscroll">
+				  <div class="topmargin">
+					<div id="backlog"></div>
+				  </div>
+				</div>
+			  </div>
+			</div>
+			<div style="display:table-row;height:calc(22pt + 4px)">
+			  <div class="bottom">
+				<input id="input" type="text" />
+			  </div>
+			</div>
+		  </div>
 		</div>
 		<div id="userbar">
-			<div class="vuserlist">
-				<div style="display:table-row;height:24pt">
-					<div class="top">
-						<h2>USERS</h2>
-					</div>
-				</div>
-				<div style="display:table-row;height:24pt">
-					<div style="display:table-cell" style="width:100%">
-						<div class="topscroll" id="userlist" style="width:100%;height:calc(100vh - 24pt)"></div>
-					</div>
-				</div>
+		  <div class="vuserlist">
+			<div style="display:table-row;height:24pt">
+			  <div class="top">
+				<h2>USERS</h2>
+			  </div>
 			</div>
+			<div style="display:table-row;height:24pt">
+			  <div style="display:table-cell" style="width:100%">
+				<div class="topscroll" id="userlist" style="width:100%;height:calc(100vh - 24pt)"></div>
+			  </div>
+			</div>
+		  </div>
 		</div>
+	  </div>
 	</div>
-</div>
+  </div>
+  <div id="page-transparent"></div>
+  <div class="page" id="page-manageservers" onclick="closepage_(arguments)">
+	<div class="dialog" style="width:40%;height:70%;">
+	  <button class="dialog-close" onclick="closepage(this)">X</button>
+	  <h1>Manage Networks</h1>
+	  <div class="dialog-margin">
+		<div style="display:table;width:100%">
+		  <div style="display:table-row">
+			<div style="display:table-cell;width:100%">
+			  <ul class="dialog-list" style="height:8em;overflow:auto" id="networklist">
+				<li class="selected">TestServer</li>
+				<li>Other</li>
+				<li>Next</li>
+				<li>Other</li>
+				<li>Next</li>
+				<li>Other</li>
+				<li>Next</li>
+				<li>Other</li>
+				<li>Next</li>
+			  </ul>
+			</div>
+			<div style="display:table-cell" class="rightaligned">
+			  <button>Rename</button>
+			  <button>Add</button>
+			  <button>Delete</button>
+			</div>
+		  </div>
+		</ul>
+	  </div>
+	</div>
+  </div>
 </body>
 </html>

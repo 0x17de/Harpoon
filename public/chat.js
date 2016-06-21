@@ -4,7 +4,15 @@ var ws, ping;
 
 var activeNick = 'iirc';
 
-var input, backlog, logscroll, connected, serverList, userlist, channeltitle, tryingToConnect = false;
+var input,
+	backlog,
+	logscroll,
+	connected,
+	serverList,
+	userlist,
+	channeltitle,
+	tryingToConnect = false,
+	pageTransparent;
 
 function sendInput() {
 	var input = document.getElementById('input');
@@ -188,6 +196,7 @@ function init() {
 	backlog = new Element('#backlog');
 	userlist = new Element('#userlist');
 	channeltitle = new Element('#channeltitle');
+	pageTransparent = new Element('#page-transparent');
 
 	serverList = new ServerList(bar);
 
