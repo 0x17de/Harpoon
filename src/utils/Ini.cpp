@@ -13,8 +13,7 @@ Ini::Ini(const std::string& filename)
 }
 
 Ini::~Ini() {
-	if (modified)
-		write();
+	write();
 }
 
 void Ini::load() {
@@ -32,7 +31,7 @@ void Ini::load() {
 	while(getline(f, line)) {
 		if (line.size() > 0 && line.at(line.size()-1) == '\r')
 			line = line.substr(0, line.size() - 2);
-		if (line.size() == 0) return;
+		if (line.size() == 0) continue;
 
 		bool isCategory = line.at(0) == '[';
 		if (isCategory) {
@@ -40,7 +39,6 @@ void Ini::load() {
 			auto it = categories.emplace(piecewise_construct,
 				forward_as_tuple(line),
 				forward_as_tuple());
-
 			currentCategory = &it.first->second;
 		} else {
 			if (!currentCategory) continue;
@@ -57,7 +55,8 @@ bool Ini::isNew() const {
 	return newFile;
 }
 
-void Ini::write() {
+void Ini::write(bool bForce) {
+	if (!modified && !bForce) return;
 	ofstream f(filename);
 
 	bool firstCategory = true;
@@ -84,7 +83,7 @@ Ini::Entries& Ini::expectCategory(const std::string& category) {
 	auto res = categories.emplace(piecewise_construct,
 		forward_as_tuple(category),
 		forward_as_tuple());
-	return res.first->second;	
+	return res.first->second;
 }
 
 Ini::Entries* Ini::getEntry(const std::string& category) {

@@ -24,6 +24,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/utils/Base64.cpp src/utils/Base64.hpp
 	src/utils/Crypto.cpp src/utils/Crypto.hpp
 	src/utils/Password.cpp src/utils/Password.hpp
+	src/utils/IdProvider.cpp src/utils/IdProvider.hpp
 	src/event/EventInit.cpp src/event/EventInit.hpp
 	src/event/IActivateServiceEvent.hpp
 	src/event/irc/EventIrcActivateService.cpp src/event/irc/EventIrcActivateService.hpp
