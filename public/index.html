@@ -73,6 +73,7 @@
 	  <button class="dialog-close" onclick="closepage(this)">X</button>
 	  <h1>Manage Networks</h1>
 	  <div class="dialog-margin" style="overflow:auto;height:calc(100% - 7em)">
+		<h2>Server Configurations</h2>
 		<div style="display:table;width:100%">
 		  <div style="display:table-row">
 			<div style="display:table-cell;width:100%">
@@ -92,6 +93,47 @@
 			  <button>Rename</button>
 			  <button>Add</button>
 			  <button>Delete</button>
+			</div>
+		  </div>
+		</div>
+		<br/>
+		<h3>Server Details</h3>
+		<div style="display:table;width:100%">
+		  <div style="display:table-row">
+			<div style="display:table-cell;width:100%">
+			  <ul class="dialog-list" style="height:8em;overflow:auto" id="hostlist">
+				<li class="selected">127.0.0.1:6667</li>
+			  </ul>
+			</div>
+			<div style="display:table-cell" class="rightaligned">
+			  <button>Edit</button>
+			  <button>Add</button>
+			  <button>Delete</button>
+			  <div style="text-align:center">
+				<button style="width:2.3em">&uarr;</button>
+				<button style="width:2.3em">&darr;</button>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<br/>
+		<h3>Nicks</h3>
+		<div style="display:table;width:100%">
+		  <div style="display:table-row">
+			<div style="display:table-cell;width:100%">
+			  <ul class="dialog-list dialog-editlist" style="height:8em;overflow:auto" id="hostlist">
+				<li><input value="iirc" /></li>
+				<li><input value="iirc_" /></li>
+				<li><input value="iirc__" /></li>
+			  </ul>
+			</div>
+			<div style="display:table-cell" class="rightaligned">
+			  <button>Add</button>
+			  <button>Delete</button>
+			  <div style="text-align:center">
+				<button style="width:2.3em">&uarr;</button>
+				<button style="width:2.3em">&darr;</button>
+			  </div>
 			</div>
 		  </div>
 		</div>
