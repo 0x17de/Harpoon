@@ -8,9 +8,11 @@ function closepage(e) {
 		if (currentPage)
 			currentPage.hide();
 	}
+	pageChat.get().classList.remove('blur');
 	pageTransparent.hide();
 }
 function showpage(pagename) {
+	pageChat.get().classList.add('blur');
 	pageTransparent.show();
 	(currentPage = new Element('#page-'+pagename)).show();
 }

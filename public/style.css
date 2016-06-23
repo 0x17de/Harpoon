@@ -7,14 +7,17 @@ html, body {
 h2 {
 	margin:0; padding:1pt 7pt;
 }
-.dialog h2, .dialog h3 {
-	margin:0; padding:0;
+.dialog h2, .dialog h3, .dialog h4 {
+	margin:0.5em 0 0 0; padding:0;
 }
 .page, #page-transparent {
 	position:absolute;
 	left:0; top:0;
 	width:100vw; height:100vh;
 	display:none;
+}
+.page.blur {
+	filter: blur(0.05em);
 }
 #page-chat {
 	display:block;
@@ -42,7 +45,7 @@ h2 {
 	min-width:768px;
 	background-color:#f5f5f5;
 	border-radius:0.1em;
-	border-top-left-radius:0.2em; border-top-right-radius:0.2em;
+	border-top-left-radius:1em; border-top-right-radius:1em;
 }
 .dialog-close {
 	position:absolute;
@@ -72,7 +75,7 @@ h2 {
 .dialog h1 {
 	/*font-family:Verdana, Geneva, sans-serif;*/
 	font-family:Arial, Helvetica, sans-serif;
-	padding:0.3em 0.6em;
+	padding:0.3em 0.6em; margin:0 0 0.2em 0;
 	background-color:#f16745;
 	border-top-left-radius:0.1em; border-top-right-radius:0.1em;
 }
@@ -83,8 +86,19 @@ h2 {
 	border:1px solid #444; border-radius:0.1em;
 	margin:0.2em 0.6em;
 }
+.dialog select {
+	width:100%;
+	background-color:#fff;
+	border:1px solid #444; border-radius:0.1em;
+}
+.dialog select option {
+	padding:0.4em 0.6em;
+}
 .dialog .rightaligned button {
 	margin-right:0;
+}
+.dialog button.selected {
+	background-color:#f16745;
 }
 .dialog button:hover {
 	background-color:#f16745;
@@ -96,7 +110,7 @@ h2 {
 	background-color:#fff;
 	margin:0; padding:0;
 	list-style-type:none; list-style-image:none;
-	border:1px inset #000; border-radius:0.1em;
+	border:1px inset #444; border-radius:0.1em;
 }
 .dialog-list > li {
 	margin:0; padding:0.1em 0.3em;
