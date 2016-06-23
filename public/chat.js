@@ -12,7 +12,8 @@ var input,
 	userlist,
 	channeltitle,
 	tryingToConnect = false,
-	pageTransparent;
+	pageTransparent,
+	pageChat;
 
 function sendInput() {
 	var input = document.getElementById('input');
@@ -196,6 +197,7 @@ function init() {
 	backlog = new Element('#backlog');
 	userlist = new Element('#userlist');
 	channeltitle = new Element('#channeltitle');
+	pageChat = new Element('#page-chat');
 	pageTransparent = new Element('#page-transparent');
 
 	serverList = new ServerList(bar);

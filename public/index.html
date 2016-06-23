@@ -73,7 +73,13 @@
 	  <button class="dialog-close" onclick="closepage(this)">X</button>
 	  <h1>Manage Networks</h1>
 	  <div class="dialog-margin" style="overflow:auto;height:calc(100% - 7em)">
-		<h2>Server Configurations</h2>
+		<h2>Service</h2>
+		<select class="service-selector">
+		  <option class="selected">IRC</option>
+		  <option>Jabber</option>
+		  <option>ICQ</option>
+		</select>
+		<h3>Server Configurations</h3>
 		<div style="display:table;width:100%">
 		  <div style="display:table-row">
 			<div style="display:table-cell;width:100%">
@@ -96,8 +102,7 @@
 			</div>
 		  </div>
 		</div>
-		<br/>
-		<h3>Server Details</h3>
+		<h4>Server Details</h4>
 		<div style="display:table;width:100%">
 		  <div style="display:table-row">
 			<div style="display:table-cell;width:100%">
@@ -116,8 +121,7 @@
 			</div>
 		  </div>
 		</div>
-		<br/>
-		<h3>Nicks</h3>
+		<h4>Nicks</h4>
 		<div style="display:table;width:100%">
 		  <div style="display:table-row">
 			<div style="display:table-cell;width:100%">
