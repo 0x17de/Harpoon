@@ -13,7 +13,8 @@ var input,
 	channeltitle,
 	tryingToConnect = false,
 	pageTransparent,
-	pageChat;
+	pageChat,
+	serviceSelector;
 
 function sendInput() {
 	var input = document.getElementById('input');
@@ -199,6 +200,12 @@ function init() {
 	channeltitle = new Element('#channeltitle');
 	pageChat = new Element('#page-chat');
 	pageTransparent = new Element('#page-transparent');
+	serviceSelector = new Element('#service-selector');
+
+	// TODO: Server tells active services
+	Service.add(new ServiceIrc());
+	// select first service
+	Service.select(serviceSelector.get());
 
 	serverList = new ServerList(bar);
 

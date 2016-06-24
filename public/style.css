@@ -280,3 +280,6 @@ h2 {
 	font-size:12pt;
 	border:0;
 }
+#serviceviews > div {
+	display:none;
+}
