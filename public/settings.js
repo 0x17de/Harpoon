@@ -25,10 +25,24 @@ Service.prototype.hide = function() {
 
 function ServiceIrc() {
 	Service.call(this, 'IRC', 'irc');
+	this.networklist = new Element('#serviceconfig-irc-networklist');
+	this.hostlist = new Element('#serviceconfig-irc-hostlist');
+	this.nicklist = new Element('#serviceconfig-irc-nicklist');
+	this.networklist.clear();
+	this.hostlist.clear();
+	this.nicklist.clear();
 }
 ServiceIrc.prototype = Object.create(Service.prototype);
 ServiceIrc.prototype.constructor = ServiceIrc;
+ServiceIrc.prototype.load = function(json) {
+	this.data = json;
+	// TODO
+};
+ServiceIrc.prototype.addServer = function(servername) {
+	var server = (new Element('li')).text(servername);
+	this.networklist.add(server);
+};
 ServiceIrc.prototype.save = function() {
-	
+	// TODO
 };
 

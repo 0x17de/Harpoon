@@ -109,19 +109,18 @@ h2 {
 .dialog-list {
 	background-color:#fff;
 	margin:0; padding:0;
-	list-style-type:none; list-style-image:none;
 	border:1px inset #444; border-radius:0.1em;
 }
-.dialog-list > li {
+.dialog-list > div {
 	margin:0; padding:0.1em 0.3em;
 }
-.dialog-editlist > li {
+.dialog-editlist > div {
 	padding:0 !important;
 }
-.dialog-list > li:hover, .dialog-list > li:hover > input {
+.dialog-list > div:hover, .dialog-list > div:hover > input {
 	background-color:#ffe68d;
 }
-.dialog-list > li.selected, .dialog-list > li > input:focus {
+.dialog-list > div.selected, .dialog-list > div > input:focus {
 	background-color:#ffc65d;
 }
 .topbar {
