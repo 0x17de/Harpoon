@@ -87,7 +87,7 @@ void WebsocketServer_Impl::addClient(size_t userId, seasocks::WebSocket* socket)
 	dataList->emplace_back(userId, socket);
 	clients.emplace(socket, (++dataList->rbegin()).base()); // iterator to last element
 
-	appQueue->sendEvent(make_shared<EventQueryChats>(userId, queue, socket));
+	appQueue->sendEvent(make_shared<EventQueryChats>(userId, socket));
 }
 
 void WebsocketServer_Impl::removeClient(seasocks::WebSocket* socket) {

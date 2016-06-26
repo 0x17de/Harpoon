@@ -1,12 +1,12 @@
-#ifndef EVENTQUERYCHATS_H
-#define EVENTQUERYCHATS_H
+#ifndef EVENTQUERYSETTINGS_H
+#define EVENTQUERYSETTINGS_H
 
 #include "IUserEvent.hpp"
 #include <cstdlib>
 
 
 class EventQueue;
-class EventQueryChats : public IUserEvent {
+class EventQuerySettings : public IUserEvent {
 	size_t userId;
 	EventQueue* target;
 	void* data;
@@ -14,7 +14,7 @@ public:
 	static UUID uuid;
 	virtual UUID getEventUuid() const override;
 
-	EventQueryChats(size_t userId, void* data);
+	EventQuerySettings(size_t userId, void* data);
 
 	size_t getUserId() const;
 	void* getData() const;
