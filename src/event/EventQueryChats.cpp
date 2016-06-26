@@ -7,7 +7,7 @@ UUID EventQueryChats::getEventUuid() const {
 	return this->uuid;
 }
 
-EventQueryChats::EventQueryChats(size_t userId, EventQueue* target, void* data)
+EventQueryChats::EventQueryChats(size_t userId, void* data)
 :
 	userId{userId},
 	target{target},
@@ -17,10 +17,6 @@ EventQueryChats::EventQueryChats(size_t userId, EventQueue* target, void* data)
 
 size_t EventQueryChats::getUserId() const {
 	return userId;
-}
-
-EventQueue* EventQueryChats::getTarget() const {
-	return target;
 }
 
 void* EventQueryChats::getData() const {
