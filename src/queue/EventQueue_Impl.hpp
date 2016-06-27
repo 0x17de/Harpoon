@@ -10,10 +10,10 @@
 
 class EventQueue_Impl {
 public:
-	std::timed_mutex queueMutex;
-	std::mutex emptyQueueMutex;
-	std::list<std::shared_ptr<IEvent>> events;
-	std::condition_variable eventCondition;
+    std::timed_mutex queueMutex;
+    std::mutex emptyQueueMutex;
+    std::list<std::shared_ptr<IEvent>> events;
+    std::condition_variable eventCondition;
 };
 
 #endif

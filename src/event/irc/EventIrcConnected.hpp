@@ -6,15 +6,15 @@
 
 
 class EventIrcConnected : public IClientEvent {
-	size_t userId;
-	size_t serverId;
+    size_t userId;
+    size_t serverId;
 public:
-	static UUID uuid;
-	virtual UUID getEventUuid() const override;
+    static UUID uuid;
+    virtual UUID getEventUuid() const override;
 
-	EventIrcConnected(size_t userId, size_t serverId);
-	size_t getUserId() const;
-	size_t getServerId() const;
+    EventIrcConnected(size_t userId, size_t serverId);
+    size_t getUserId() const;
+    size_t getServerId() const;
 };
 
 #endif

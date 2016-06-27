@@ -4,6 +4,6 @@
 
 UUID EventQuit::uuid = ::uuid.get();
 UUID EventQuit::getEventUuid() const {
-	return this->uuid;
+    return this->uuid;
 }
 

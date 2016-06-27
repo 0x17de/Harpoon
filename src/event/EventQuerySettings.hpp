@@ -7,17 +7,17 @@
 
 class EventQueue;
 class EventQuerySettings : public IUserEvent {
-	size_t userId;
-	EventQueue* target;
-	void* data;
+    size_t userId;
+    EventQueue* target;
+    void* data;
 public:
-	static UUID uuid;
-	virtual UUID getEventUuid() const override;
+    static UUID uuid;
+    virtual UUID getEventUuid() const override;
 
-	EventQuerySettings(size_t userId, void* data);
+    EventQuerySettings(size_t userId, void* data);
 
-	size_t getUserId() const;
-	void* getData() const;
+    size_t getUserId() const;
+    void* getData() const;
 };
 
 #endif

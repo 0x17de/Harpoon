@@ -4,88 +4,85 @@
 
 UUID EventIrcChatListing::uuid = ::uuid.get();
 UUID EventIrcChatListing::getEventUuid() const {
-	return this->uuid;
+    return this->uuid;
 }
 
-IrcChannelUser::IrcChannelUser(const std::string& nick, const std::string& mode)
-:
-	nick{nick},
-	mode{mode}
+IrcChannelUser::IrcChannelUser(const std::string& nick,
+                               const std::string& mode)
+    : nick{nick}
+    , mode{mode}
 {
 }
 
 std::string IrcChannelUser::getNick() const {
-	return nick;
+    return nick;
 }
 
 std::string IrcChannelUser::getMode() const {
-	return mode;
+    return mode;
 }
 
 IrcChannelListing::IrcChannelListing(const std::string& channelName)
-:
-	channelName{channelName}
+    : channelName{channelName}
 {
 }
 
 void IrcChannelListing::addUser(const std::string& nick, const std::string& mode) {
-	users.emplace_back(nick, mode);
+    users.emplace_back(nick, mode);
 }
 
 const std::list<IrcChannelUser>& IrcChannelListing::getUsers() const {
-	return users;
+    return users;
 }
 
 
 std::string IrcChannelListing::getChannelName() const {
-	return channelName;
+    return channelName;
 }
 
 IrcServerListing::IrcServerListing(size_t serverId, const std::string& serverName)
-:
-	serverId{serverId},
-	serverName{serverName}
+    : serverId{serverId}
+    , serverName{serverName}
 {
 }
 
 IrcChannelListing& IrcServerListing::addChannel(std::string channelName) {
-	channels.emplace_back(channelName);
-	return channels.back();
+    channels.emplace_back(channelName);
+    return channels.back();
 }
 
 size_t IrcServerListing::getServerId() const {
-	return serverId;
+    return serverId;
 }
 
 std::string IrcServerListing::getServerName() const {
-	return serverName;
+    return serverName;
 }
 
 const std::list<IrcChannelListing>& IrcServerListing::getChannels() const {
-	return channels;
+    return channels;
 }
 
 EventIrcChatListing::EventIrcChatListing(size_t userId, void* data)
-:
-	userId{userId},
-	data{data}
+    : userId{userId}
+    , data{data}
 {
 }
 
 IrcServerListing& EventIrcChatListing::addServer(size_t serverId, std::string serverName) {
-	servers.emplace_back(serverId, serverName);
-	return servers.back();
+    servers.emplace_back(serverId, serverName);
+    return servers.back();
 }
 
 size_t EventIrcChatListing::getUserId() const {
-	return userId;
+    return userId;
 }
 
 const std::list<IrcServerListing>& EventIrcChatListing::getServerList() const {
-	return servers;
+    return servers;
 }
 
 void* EventIrcChatListing::getData() const {
-	return data;
+    return data;
 }
 

@@ -5,9 +5,9 @@
 
 
 static struct {
-  inline constexpr UUID get() const {
-    return (UUID)this;
-  }
+    inline constexpr UUID get() const {
+        return (UUID)this;
+    }
 } uuid;
 
 #endif

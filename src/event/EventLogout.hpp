@@ -6,13 +6,13 @@
 
 
 class EventLogout : public IEvent {
-	void* data;
+    void* data;
 public:
-	static UUID uuid;
-	virtual UUID getEventUuid() const override;
+    static UUID uuid;
+    virtual UUID getEventUuid() const override;
 
-	EventLogout(void* data);
-	void* getData() const;
+    EventLogout(void* data);
+    void* getData() const;
 };
 
 #endif

@@ -9,7 +9,7 @@ class EventQueue;
 class EventLoop;
 class IActivateServiceEvent : public IUserEvent {
 public:
-	virtual std::shared_ptr<EventLoop> instantiateService(size_t userId, EventQueue* appQueue) const = 0;
+    virtual std::shared_ptr<EventLoop> instantiateService(size_t userId, EventQueue* appQueue) const = 0;
 };
 
 #endif

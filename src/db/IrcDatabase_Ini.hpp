@@ -6,10 +6,10 @@
 
 
 class IrcDatabase_Ini : public EventLoop {
-	EventQueue* appQueue;
+    EventQueue* appQueue;
 public:
-	IrcDatabase_Ini(EventQueue* appQueue);
-	virtual bool onEvent(std::shared_ptr<IEvent> event) override;
+    IrcDatabase_Ini(EventQueue* appQueue);
+    virtual bool onEvent(std::shared_ptr<IEvent> event) override;
 };
 
 #endif

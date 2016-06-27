@@ -4,30 +4,29 @@
 
 UUID EventLogin::uuid = ::uuid.get();
 UUID EventLogin::getEventUuid() const {
-	return this->uuid;
+    return this->uuid;
 }
 
 EventLogin::EventLogin(EventQueue* target, void* data, std::string username, std::string password)
-:
-	target{target},
-	data{data},
-	username{username},
-	password{password}
+    : target{target}
+    , data{data}
+    , username{username}
+    , password{password}
 {
 }
 
 EventQueue* EventLogin::getTarget() const {
-	return target;
+    return target;
 }
 
 void* EventLogin::getData() const {
-	return data;
+    return data;
 }
 
 std::string EventLogin::getUsername() const {
-	return username;
+    return username;
 }
 
 std::string EventLogin::getPassword() const {
-	return password;
+    return password;
 }

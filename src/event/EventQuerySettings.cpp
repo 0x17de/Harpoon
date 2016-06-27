@@ -4,21 +4,20 @@
 
 UUID EventQuerySettings::uuid = ::uuid.get();
 UUID EventQuerySettings::getEventUuid() const {
-	return this->uuid;
+    return this->uuid;
 }
 
 EventQuerySettings::EventQuerySettings(size_t userId, void* data)
-:
-	userId{userId},
-	data{data}
+    : userId{userId}
+    , data{data}
 {
 }
 
 size_t EventQuerySettings::getUserId() const {
-	return userId;
+    return userId;
 }
 
 void* EventQuerySettings::getData() const {
-	return data;
+    return data;
 }
 

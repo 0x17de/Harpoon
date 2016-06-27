@@ -7,20 +7,20 @@
 
 class EventQueue;
 class EventLogin : public IEvent {
-	EventQueue* target;
-	void* data;
-	std::string username;
-	std::string password;
+    EventQueue* target;
+    void* data;
+    std::string username;
+    std::string password;
 public:
-	EventLogin(EventQueue* target, void* data, std::string username, std::string password);
+    EventLogin(EventQueue* target, void* data, std::string username, std::string password);
 
-	static UUID uuid;
-	virtual UUID getEventUuid() const override;
+    static UUID uuid;
+    virtual UUID getEventUuid() const override;
 
-	EventQueue* getTarget() const;
-	void* getData() const;
-	std::string getUsername() const;
-	std::string getPassword() const;
+    EventQueue* getTarget() const;
+    void* getData() const;
+    std::string getUsername() const;
+    std::string getPassword() const;
 };
 
 #endif

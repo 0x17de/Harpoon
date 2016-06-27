@@ -4,16 +4,15 @@
 
 UUID EventLogout::uuid = ::uuid.get();
 UUID EventLogout::getEventUuid() const {
-	return this->uuid;
+    return this->uuid;
 }
 
 EventLogout::EventLogout(void* data)
-:
-	data{data}
+    : data{data}
 {
 }
 
 void* EventLogout::getData() const {
-	return data;
+    return data;
 }
 
