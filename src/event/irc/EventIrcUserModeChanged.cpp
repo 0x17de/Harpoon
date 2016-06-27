@@ -4,39 +4,38 @@
 
 UUID EventIrcUserModeChanged::uuid = ::uuid.get();
 UUID EventIrcUserModeChanged::getEventUuid() const {
-	return this->uuid;
+    return this->uuid;
 }
 
 EventIrcUserModeChanged::EventIrcUserModeChanged(size_t userId, size_t serverId,
-	const std::string& username,
-	const std::string& channel,
-	const std::string& mode)
-:
-	userId{userId},
-	serverId{serverId},
-	username{username},
-	channel{channel},
-	mode{mode}
+                                                 const std::string& username,
+                                                 const std::string& channel,
+                                                 const std::string& mode)
+    : userId{userId}
+    , serverId{serverId}
+    , username{username}
+    , channel{channel}
+    , mode{mode}
 {
 }
 
 size_t EventIrcUserModeChanged::getUserId() const {
-	return userId;
+    return userId;
 }
 
 size_t EventIrcUserModeChanged::getServerId() const {
-	return serverId;
+    return serverId;
 }
 
 std::string EventIrcUserModeChanged::getUsername() const {
-	return username;
+    return username;
 }
 
 std::string EventIrcUserModeChanged::getChannel() const {
-	return channel;
+    return channel;
 }
 
 std::string EventIrcUserModeChanged::getUserMode() const {
-	return mode;
+    return mode;
 }
 

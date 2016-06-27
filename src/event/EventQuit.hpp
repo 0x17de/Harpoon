@@ -6,8 +6,8 @@
 
 class EventQuit : public IEvent {
 public:
-	static UUID uuid;
-	virtual UUID getEventUuid() const override;
+    static UUID uuid;
+    virtual UUID getEventUuid() const override;
 };
 
 #endif

@@ -7,10 +7,10 @@
 class Application;
 class ApplicationGuard {
 public:
-	static std::list<Application*> apps;
-	Application* app;
-	ApplicationGuard(Application* app);
-	~ApplicationGuard();
+    static std::list<Application*> apps;
+    Application* app;
+    ApplicationGuard(Application* app);
+    ~ApplicationGuard();
 };
 
 #endif

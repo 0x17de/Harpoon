@@ -5,14 +5,14 @@
 
 
 class IdProvider {
-	Ini idIni;
-	Ini::Entries& idMap;
-	bool modified;
-	IdProvider();
+    Ini idIni;
+    Ini::Entries& idMap;
+    bool modified;
+    IdProvider();
 public:
-	static IdProvider& getInstance();
-	size_t generateNewId(const std::string& key);
-	void save();
+    static IdProvider& getInstance();
+    size_t generateNewId(const std::string& key);
+    void save();
 };
 
 #endif

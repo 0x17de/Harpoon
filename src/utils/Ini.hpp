@@ -7,29 +7,29 @@
 
 class Ini {
 public:
-	typedef std::map<std::string, std::string> Entries;
-	typedef std::map<std::string, Entries> Categories;
+    typedef std::map<std::string, std::string> Entries;
+    typedef std::map<std::string, Entries> Categories;
 private:
-	Categories categories;
+    Categories categories;
 
-	std::string filename;
-	bool modified;
-	bool newFile;
+    std::string filename;
+    bool modified;
+    bool newFile;
 public:
-	Ini(const std::string& filename);
-	~Ini();
+    Ini(const std::string& filename);
+    ~Ini();
 
-	void load();
-	void write(bool bForce = false);
+    void load();
+    void write(bool bForce = false);
 
-	bool isNew() const;
+    bool isNew() const;
 
-	Entries* getEntry(const std::string& category);
-	Entries& expectCategory(const std::string& category);
-	bool getEntry(const std::string& category, const std::string& entry, std::string& data);
-	bool getEntry(Entries& entries, const std::string& entry, std::string& data);
-	void setEntry(const std::string& category, const std::string& entry, const std::string& data);
-	void setEntry(Entries& entries, const std::string& entry, const std::string& data);
+    Entries* getEntry(const std::string& category);
+    Entries& expectCategory(const std::string& category);
+    bool getEntry(const std::string& category, const std::string& entry, std::string& data);
+    bool getEntry(Entries& entries, const std::string& entry, std::string& data);
+    void setEntry(const std::string& category, const std::string& entry, const std::string& data);
+    void setEntry(Entries& entries, const std::string& entry, const std::string& data);
 };
 
 #endif

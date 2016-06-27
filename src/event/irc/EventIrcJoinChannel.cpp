@@ -2,11 +2,12 @@
 #include "utils/uuidGen.hpp"
 
 
-IrcChannelLoginData::IrcChannelLoginData(size_t channelId, const std::string& channelName, const std::string& channelPassword)
-:
-	channelId{channelId},
-	channelName{channelName},
-	channelPassword{channelPassword}
+IrcChannelLoginData::IrcChannelLoginData(size_t channelId,
+										 const std::string& channelName,
+										 const std::string& channelPassword)
+	: channelId{channelId}
+	, channelName{channelName}
+	, channelPassword{channelPassword}
 {
 }
 

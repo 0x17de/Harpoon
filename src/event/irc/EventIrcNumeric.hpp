@@ -7,24 +7,24 @@
 
 
 class EventIrcNumeric : public IClientEvent {
-	size_t userId;
-	size_t serverId;
-	unsigned int eventCode;
-	std::string from;
-	std::vector<std::string> parameters;
+    size_t userId;
+    size_t serverId;
+    unsigned int eventCode;
+    std::string from;
+    std::vector<std::string> parameters;
 public:
-	static UUID uuid;
-	virtual UUID getEventUuid() const override;
+    static UUID uuid;
+    virtual UUID getEventUuid() const override;
 
-	EventIrcNumeric(size_t userId, size_t serverId,
-		unsigned int eventCode,
-		std::string from,
-		std::vector<std::string> parameters);
-	size_t getUserId() const override;
-	size_t getServerId() const;
-	unsigned int getEventCode() const;
-	std::string getFrom() const;
-	const std::vector<std::string>& getParameters() const;
+    EventIrcNumeric(size_t userId, size_t serverId,
+                    unsigned int eventCode,
+                    std::string from,
+                    std::vector<std::string> parameters);
+    size_t getUserId() const override;
+    size_t getServerId() const;
+    unsigned int getEventCode() const;
+    std::string getFrom() const;
+    const std::vector<std::string>& getParameters() const;
 };
 
 #endif

@@ -16,50 +16,50 @@
 using namespace std;
 
 
-Application::Application() :
-    guard{this},
-    EventLoop()
+Application::Application()
+    : guard{this}
+    , EventLoop()
 {
-    Ini coreIni("config/core.ini");
-    if (coreIni.isNew()) {
+	Ini coreIni("config/core.ini");
+	if (coreIni.isNew()) {
 		cerr << "No configuration exists. See --help for setup." << endl;
 		stop();
 		return;
 	}
-    auto& modules = coreIni.expectCategory("modules");
-    auto& services = coreIni.expectCategory("services");
+	auto& modules = coreIni.expectCategory("modules");
+	auto& services = coreIni.expectCategory("services");
 
-    EventQueue* queue = getEventQueue();
-    userManager = make_shared<UserManager>(queue);
-    eventHandlers.push_back(userManager);
+	EventQueue* queue = getEventQueue();
+	userManager = make_shared<UserManager>(queue);
+	eventHandlers.push_back(userManager);
 
-    string loginDatabaseType,
-           enableWebChat,
-           enableIrcService;
+	string loginDatabaseType,
+		enableWebChat,
+		enableIrcService;
 
-    coreIni.getEntry(modules, "login", loginDatabaseType);
-    coreIni.getEntry(modules, "webchat", enableWebChat);
-    coreIni.getEntry(services, "irc", enableIrcService);
+	coreIni.getEntry(modules, "login", loginDatabaseType);
+	coreIni.getEntry(modules, "webchat", enableWebChat);
+	coreIni.getEntry(services, "irc", enableIrcService);
 
-    if (loginDatabaseType == "dummy") {
-        eventHandlers.push_back(make_shared<LoginDatabase_Dummy>(queue));
-    } else if (loginDatabaseType == "ini") {
-        eventHandlers.push_back(make_shared<LoginDatabase_Ini>(queue));
-    }
+	if (loginDatabaseType == "dummy") {
+		eventHandlers.push_back(make_shared<LoginDatabase_Dummy>(queue));
+	} else if (loginDatabaseType == "ini") {
+		eventHandlers.push_back(make_shared<LoginDatabase_Ini>(queue));
+	}
 
-    eventHandlers.push_back(make_shared<IrcDatabase_Dummy>(queue));
+	eventHandlers.push_back(make_shared<IrcDatabase_Dummy>(queue));
 
 #ifdef USE_WEBSOCKET_SERVER
 	if (enableWebChat == "y")
 		eventHandlers.push_back(make_shared<WebsocketServer>(queue));
 #endif
 
-    for (auto& eventHandler : eventHandlers)
-        eventHandler->getEventQueue()->sendEvent(make_shared<EventInit>());
+	for (auto& eventHandler : eventHandlers)
+		eventHandler->getEventQueue()->sendEvent(make_shared<EventInit>());
 }
 
 void Application::stop() {
-	getEventQueue()->sendEvent(make_shared<EventQuit>());
+    getEventQueue()->sendEvent(make_shared<EventQuit>());
 }
 
 bool Application::onEvent(std::shared_ptr<IEvent> event) {

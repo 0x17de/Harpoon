@@ -39,68 +39,68 @@ bool doGenUser(bool save) {
 }
 
 bool doSetup(bool save) {
-	bool usersIniExists;
-	{
-		Ini users("config/users.ini");
-		usersIniExists = !users.isNew();
-	}
+    bool usersIniExists;
+    {
+        Ini users("config/users.ini");
+        usersIniExists = !users.isNew();
+    }
 
-	string loginDatabaseType,
-		   enableWebChat,
-		   enableIrcService;
-	static const array<string, 2> validLoginDatabaseTypes{"dummy", "ini"};
-	static const array<string, 2> validYesNoAnswers{"y", "n"};
+    string loginDatabaseType,
+		enableWebChat,
+		enableIrcService;
+    static const array<string, 2> validLoginDatabaseTypes{"dummy", "ini"};
+    static const array<string, 2> validYesNoAnswers{"y", "n"};
 
-	do {
-		cout << "Login database type (dummy/ini) [ini]: ";
-		getline(cin, loginDatabaseType);
-		if (loginDatabaseType.size() == 0) // auto value
-			loginDatabaseType = "ini";
-	} while (find(validLoginDatabaseTypes.begin(), validLoginDatabaseTypes.end(), loginDatabaseType) == validLoginDatabaseTypes.end());
+    do {
+        cout << "Login database type (dummy/ini) [ini]: ";
+        getline(cin, loginDatabaseType);
+        if (loginDatabaseType.size() == 0) // auto value
+            loginDatabaseType = "ini";
+    } while (find(validLoginDatabaseTypes.begin(), validLoginDatabaseTypes.end(), loginDatabaseType) == validLoginDatabaseTypes.end());
 
-	do {
-		cout << "Enable IRC service (y/n) [y]: ";
-		getline(cin, enableIrcService);
-		if (enableIrcService.size() == 0) // auto value
-			enableIrcService = "y";
-	} while (find(validYesNoAnswers.begin(), validYesNoAnswers.end(), enableIrcService) == validYesNoAnswers.end());
+    do {
+        cout << "Enable IRC service (y/n) [y]: ";
+        getline(cin, enableIrcService);
+        if (enableIrcService.size() == 0) // auto value
+            enableIrcService = "y";
+    } while (find(validYesNoAnswers.begin(), validYesNoAnswers.end(), enableIrcService) == validYesNoAnswers.end());
 
-	do {
-		cout << "Enable WebChat (y/n) [y]: ";
-		getline(cin, enableWebChat);
-		if (enableWebChat.size() == 0) // auto value
-			enableWebChat = "y";
-	} while (find(validYesNoAnswers.begin(), validYesNoAnswers.end(), enableWebChat) == validYesNoAnswers.end());
+    do {
+        cout << "Enable WebChat (y/n) [y]: ";
+        getline(cin, enableWebChat);
+        if (enableWebChat.size() == 0) // auto value
+            enableWebChat = "y";
+    } while (find(validYesNoAnswers.begin(), validYesNoAnswers.end(), enableWebChat) == validYesNoAnswers.end());
 
-	// write core configuration
-	{
-		Ini core("config/core.ini");
+    // write core configuration
+    {
+        Ini core("config/core.ini");
 
-		auto& modules = core.expectCategory("modules");
-		core.setEntry(modules, "login", loginDatabaseType);
-		core.setEntry(modules, "webchat", enableWebChat);
+        auto& modules = core.expectCategory("modules");
+        core.setEntry(modules, "login", loginDatabaseType);
+        core.setEntry(modules, "webchat", enableWebChat);
 
-		auto& services = core.expectCategory("services");
-		core.setEntry(services, "irc", enableIrcService);
-	}
+        auto& services = core.expectCategory("services");
+        core.setEntry(services, "irc", enableIrcService);
+    }
 
-	// create first user if no users.ini exists
-	if (!usersIniExists) {
-		cout << endl << "The first can now be created" << endl;
-		doGenUser(save);
-	}
+    // create first user if no users.ini exists
+    if (!usersIniExists) {
+        cout << endl << "The first can now be created" << endl;
+        doGenUser(save);
+    }
 }
 
 bool checkArgs(int argc, char** argv) {
     bool help = false,
-         setup = false,
-         genUser = false,
-         save = false;
+		setup = false,
+		genUser = false,
+		save = false;
 
     // check parameters
     for (int currentArgI = 1; currentArgI < argc; ++currentArgI) {
         string arg(argv[currentArgI]);
-		if (arg == "--setup") setup = true;
+        if (arg == "--setup") setup = true;
         if (arg == "--genuser") genUser = true;
         if (arg == "-h" || arg == "--help") help = true;
         if (arg == "--save") save = true;
@@ -115,11 +115,11 @@ bool checkArgs(int argc, char** argv) {
         return false;
     }
     if (setup) {
-		doSetup(save);
+        doSetup(save);
         return false;
     }
     if (genUser) {
-		doGenUser(save);
+        doGenUser(save);
         return false;
     }
     return true;
@@ -129,12 +129,12 @@ int main(int argc, char** argv) {
     if (!checkArgs(argc, argv))
         return 0;
 
-	try {
-		Application app;
-		app.join();
-	} catch(runtime_error& run) {
-		cout << run.what() << endl;
-	}
+    try {
+        Application app;
+        app.join();
+    } catch(runtime_error& run) {
+        cout << run.what() << endl;
+    }
 
     std::cout << "Application stopped" << std::endl;
     return 0;

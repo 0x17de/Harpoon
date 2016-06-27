@@ -6,10 +6,10 @@
 
 
 class LoginDatabase_Dummy : public EventLoop {
-	EventQueue* appQueue;
+    EventQueue* appQueue;
 public:
-	LoginDatabase_Dummy(EventQueue* appQueue);
-	virtual bool onEvent(std::shared_ptr<IEvent> event) override;
+    LoginDatabase_Dummy(EventQueue* appQueue);
+    virtual bool onEvent(std::shared_ptr<IEvent> event) override;
 };
 
 #endif
