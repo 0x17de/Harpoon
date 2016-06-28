@@ -4,7 +4,6 @@
 #include "event/irc/EventIrcModeChanged.hpp"
 #include "event/irc/EventIrcUserModeChanged.hpp"
 #include "event/irc/EventIrcNickChanged.hpp"
-#include "event/irc/EventIrcJoinChannel.hpp"
 #include "event/irc/EventIrcJoined.hpp"
 #include "event/irc/EventIrcParted.hpp"
 #include "event/irc/EventIrcKicked.hpp"
@@ -36,7 +35,7 @@ void IrcConnection_Impl::onConnect(irc_session_t* session,
                      ? 0
                      : channelPassword.c_str());
     }
-    resultEvent = make_shared<EventIrcConnected>(userId, configuration.serverId);
+    resultEvent = make_shared<EventIrcConnected>(userId, configuration.getServerId());
 }
 
 void IrcConnection_Impl::onNick(irc_session_t* session,
@@ -49,7 +48,7 @@ void IrcConnection_Impl::onNick(irc_session_t* session,
     string who(origin);
     string newNick(params.at(0));
     cout << "Nickchange<" << who << ">: " << newNick << endl;
-    resultEvent = make_shared<EventIrcNickChanged>(userId, configuration.serverId, who, newNick);
+    resultEvent = make_shared<EventIrcNickChanged>(userId, configuration.getServerId(), who, newNick);
 }
 
 void IrcConnection_Impl::onQuit(irc_session_t* session,
@@ -61,7 +60,7 @@ void IrcConnection_Impl::onQuit(irc_session_t* session,
     string who(origin);
     string reason = params.size() < 1 ? "" : params.at(0);
     cout << "Q<" << origin << ">: " << reason << endl;
-    resultEvent = make_shared<EventIrcQuit>(userId, configuration.serverId, who, reason);
+    resultEvent = make_shared<EventIrcQuit>(userId, configuration.getServerId(), who, reason);
 }
 
 void IrcConnection_Impl::onJoin(irc_session_t* session,
@@ -73,7 +72,7 @@ void IrcConnection_Impl::onJoin(irc_session_t* session,
     if (params.size() < 1) return;
     string who(origin);
     string channel(params.at(0));
-    resultEvent = make_shared<EventIrcJoined>(userId, configuration.serverId, who, channel);
+    resultEvent = make_shared<EventIrcJoined>(userId, configuration.getServerId(), who, channel);
     cout << "JOIN<" << who << ">: " << channel << endl;
 }
 
@@ -87,7 +86,7 @@ void IrcConnection_Impl::onPart(irc_session_t* session,
     string who(origin);
     string channel(params.at(0));
     string reason = params.size() < 2 ? "" : params.at(1);
-    resultEvent = make_shared<EventIrcParted>(userId, configuration.serverId, who, channel);
+    resultEvent = make_shared<EventIrcParted>(userId, configuration.getServerId(), who, channel);
     cout << "PART<" << who << ">: " << channel << ": " << reason << endl;
 }
 
@@ -102,7 +101,7 @@ void IrcConnection_Impl::onMode(irc_session_t* session,
     string channel(params.at(0));
     string mode(params.at(1));
     string arg = params.size() < 3 ? "" : params.at(2);
-    resultEvent = make_shared<EventIrcModeChanged>(userId, configuration.serverId, who, channel, mode, arg);
+    resultEvent = make_shared<EventIrcModeChanged>(userId, configuration.getServerId(), who, channel, mode, arg);
     cout << "MODE<" << who << ">: " << channel << " " << mode << ": " << arg << endl;
 }
 
@@ -116,7 +115,7 @@ void IrcConnection_Impl::onUmode(irc_session_t* session,
     string who(origin);
     string channel(params.at(0));
     string mode(params.at(1));
-    resultEvent = make_shared<EventIrcUserModeChanged>(userId, configuration.serverId, who, channel, mode);
+    resultEvent = make_shared<EventIrcUserModeChanged>(userId, configuration.getServerId(), who, channel, mode);
     cout << "UMODE<" << who << ">: " << channel << " " << mode << endl;
 }
 
@@ -131,7 +130,7 @@ void IrcConnection_Impl::onTopic(irc_session_t* session,
     string channel(params.at(0));
     string topic = params.size() < 2 ? "" : (params.at(1));
     cout << "TOPIC<" << who << ">: " << channel << ": " << topic << endl;
-    resultEvent = make_shared<EventIrcTopic>(userId, configuration.serverId, who, channel, topic);
+    resultEvent = make_shared<EventIrcTopic>(userId, configuration.getServerId(), who, channel, topic);
 }
 
 void IrcConnection_Impl::onKick(irc_session_t* session,
@@ -145,7 +144,7 @@ void IrcConnection_Impl::onKick(irc_session_t* session,
     string channel(params.at(0));
     string target = params.size() < 2 ? "" : params.at(1);
     string reason = params.size() < 3 ? "" : params.at(2);
-    resultEvent = make_shared<EventIrcKicked>(userId, configuration.serverId, who, channel, target, reason);
+    resultEvent = make_shared<EventIrcKicked>(userId, configuration.getServerId(), who, channel, target, reason);
 }
 
 void IrcConnection_Impl::onChannel(irc_session_t* session,
@@ -159,7 +158,7 @@ void IrcConnection_Impl::onChannel(irc_session_t* session,
     string channel(params.at(0));
     string message(params.at(1));
     cout << "<" << channel << ":" << who << ">: " << message << endl;
-    resultEvent = make_shared<EventIrcMessage>(userId, configuration.serverId, who, channel, message);
+    resultEvent = make_shared<EventIrcMessage>(userId, configuration.getServerId(), who, channel, message);
 }
 
 void IrcConnection_Impl::onPrivmsg(irc_session_t* session,
@@ -173,7 +172,7 @@ void IrcConnection_Impl::onPrivmsg(irc_session_t* session,
     string self(params.at(0));
     string message(params.at(1));
     cout << "<" << who << "|" << self << ">: " << message << endl;
-    resultEvent = make_shared<EventIrcMessage>(userId, configuration.serverId, who, who, message);
+    resultEvent = make_shared<EventIrcMessage>(userId, configuration.getServerId(), who, who, message);
 }
 
 void IrcConnection_Impl::onNotice(irc_session_t* session,
@@ -186,7 +185,7 @@ void IrcConnection_Impl::onNotice(irc_session_t* session,
     string who(origin);
     string target(params.at(0));
     string message = params.size() < 2 ? "" : params.at(1);
-    resultEvent = make_shared<EventIrcNoticed>(userId, configuration.serverId, who, target, message);
+    resultEvent = make_shared<EventIrcNoticed>(userId, configuration.getServerId(), who, target, message);
     cout << "N<" << who << "|" << target << ">: " << message << endl;
 }
 
@@ -200,7 +199,7 @@ void IrcConnection_Impl::onChannelNotice(irc_session_t* session,
     string who(origin);
     string channel(params.at(0));
     string message = params.size() < 2 ? "" : params.at(1);
-    resultEvent = make_shared<EventIrcNoticed>(userId, configuration.serverId, who, channel, message);
+    resultEvent = make_shared<EventIrcNoticed>(userId, configuration.getServerId(), who, channel, message);
     cout << "CN<" << who << "|" << channel << ">: " << message << endl;
 }
 
@@ -214,7 +213,7 @@ void IrcConnection_Impl::onInvite(irc_session_t* session,
     string who(origin);
     string target(params.at(0));
     string channel = params.size() < 2 ? "" : params.at(1);
-    resultEvent = make_shared<EventIrcInvited>(userId, configuration.serverId, who, target, channel);
+    resultEvent = make_shared<EventIrcInvited>(userId, configuration.getServerId(), who, target, channel);
     cout << "Invite<" << who << ">: " << channel << ": " << target << endl;
 }
 
@@ -246,7 +245,7 @@ void IrcConnection_Impl::onCtcpAction(irc_session_t* session,
     string who(origin);
     string target(params.at(0));
     string message = params.size() < 2 ? "" : params.at(1);
-    resultEvent = make_shared<EventIrcAction>(userId, configuration.serverId, who, target, message);
+    resultEvent = make_shared<EventIrcAction>(userId, configuration.getServerId(), who, target, message);
     cout << "Action<" << who << ">: " << target << ": " << message << endl;
 }
 
@@ -257,7 +256,7 @@ void IrcConnection_Impl::onNumeric(irc_session_t* session,
                                    std::shared_ptr<IEvent>& resultEvent)
 {
     string who = origin == 0 ? "" : origin;
-    resultEvent = make_shared<EventIrcNumeric>(userId, configuration.serverId, event, who, parameters);
+    resultEvent = make_shared<EventIrcNumeric>(userId, configuration.getServerId(), event, who, parameters);
     cout << "Numeric<" << who << ">: " << event;
     for (string s : parameters)
         cout << " | " << s;

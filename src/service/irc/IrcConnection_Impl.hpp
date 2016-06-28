@@ -2,7 +2,10 @@
 #define IRCCONNECTION_IMPL_h
 
 #include "event/irc/EventIrcActivateService.hpp"
+#include "IrcConnection.hpp"
 #include "IrcChannelStore.hpp"
+#include "IrcServerConfiguration.hpp"
+#include "IrcServerHostConfiguration.hpp"
 #include <libircclient.h>
 #include <list>
 #include <vector>

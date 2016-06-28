@@ -25,11 +25,11 @@ bool IrcConnection::onEvent(std::shared_ptr<IEvent> event) {
 }
 
 size_t IrcConnection::getServerId() const {
-    return impl->configuration.serverId;
+    return impl->configuration.getServerId();
 }
 
 std::string IrcConnection::getServerName() const {
-    return impl->configuration.serverName;
+    return impl->configuration.getServerName();
 }
 
 std::mutex& IrcConnection::getChannelLoginDataMutex() const {

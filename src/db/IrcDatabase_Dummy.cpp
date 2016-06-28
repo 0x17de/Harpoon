@@ -3,8 +3,10 @@
 #include "event/EventInit.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventLoginResult.hpp"
+#include "service/irc/IrcChannelLoginData.hpp"
+#include "service/irc/IrcServerHostConfiguration.hpp"
+#include "service/irc/IrcServerConfiguration.hpp"
 #include "event/irc/EventIrcActivateService.hpp"
-#include "event/irc/EventIrcJoinChannel.hpp" // IrcChannelLoginData
 
 using namespace std;
 
@@ -32,12 +34,12 @@ bool IrcDatabase_Dummy::onEvent(std::shared_ptr<IEvent> event) {
 
         size_t serverId = 1;
         auto& loginConfiguration = login->addLoginConfiguration(serverId,
-                                                                "TestServer",
-                                                                "127.0.0.1",
-                                                                6667,
-                                                                "wealllikedebian",
-                                                                false,
-                                                                false);
+                                                                "TestServer");
+		loginConfiguration.addHostConfiguration("127.0.0.1",
+												6667,
+												"wealllikedebian",
+												false,
+												false);
 
         loginConfiguration.addNick("iirc");
         loginConfiguration.addNick("iirc2");

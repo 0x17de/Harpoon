@@ -9,7 +9,6 @@
 
 
 class IrcServerConfiguration;
-class IrcChannelLoginData;
 class IrcChannelStore;
 class EventQueue;
 class IrcConnection_Impl;

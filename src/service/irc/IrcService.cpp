@@ -1,10 +1,13 @@
 #include "IrcService.hpp"
-#include "service/irc/IrcConnection.hpp"
+#include "IrcChannelLoginData.hpp"
+#include "IrcServerHostConfiguration.hpp"
+#include "IrcServerConfiguration.hpp"
+#include "IrcConnection.hpp"
 #include "queue/EventQueue.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventQueryChats.hpp"
+#include "event/EventQuerySettings.hpp"
 #include "event/irc/EventIrcActivateService.hpp"
-#include "event/irc/EventIrcJoinChannel.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"
 #include "event/irc/EventIrcChatListing.hpp"
 #include "service/irc/IrcChannelStore.hpp"
@@ -18,7 +21,7 @@ IrcService::IrcService(size_t userId, EventQueue* appQueue)
 	: EventLoop({
 		            EventQuit::uuid,
 				    EventQueryChats::uuid,
-				    EventIrcJoinChannel::uuid,
+				    EventQuerySettings::uuid,
 				    EventIrcSendMessage::uuid
 			    }, {
 			        &EventGuard<IActivateServiceEvent>
@@ -40,9 +43,9 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
         auto& loginConfiguration = activateUser->getLoginConfiguration();
         for (auto entry : loginConfiguration) {
             auto& ircConfiguration = entry.second;
-            cout << "[US] CONFIG: " << ircConfiguration.serverId << endl;
+            cout << "[US] CONFIG: " << ircConfiguration.getServerId() << endl;
             ircConnections.emplace(piecewise_construct,
-								   forward_as_tuple(ircConfiguration.serverId),
+								   forward_as_tuple(ircConfiguration.getServerId()),
 								   forward_as_tuple(appQueue, userId, ircConfiguration));
         }
     }
@@ -81,8 +84,9 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
 
         cout << "[US] Sending chat listing" << endl;
         appQueue->sendEvent(listing);
-    } else if (type == EventIrcJoinChannel::uuid) {
-        cout << "[US] Received JOIN" << endl;
+	} else if (type == EventQuerySettings::uuid) {
+        auto query = event->as<EventQuerySettings>();
+#pragma warning QuerySettings stub
     } else if (type == EventIrcSendMessage::uuid) {
         auto message = event->as<EventIrcSendMessage>();
         auto it = ircConnections.find(message->getServerId());

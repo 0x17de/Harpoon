@@ -2,8 +2,10 @@
 #include "event/EventInit.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventLoginResult.hpp"
+#include "service/irc/IrcChannelLoginData.hpp"
+#include "service/irc/IrcServerHostConfiguration.hpp"
+#include "service/irc/IrcServerConfiguration.hpp"
 #include "event/irc/EventIrcActivateService.hpp"
-#include "event/irc/EventIrcJoinChannel.hpp" // IrcChannelLoginData
 #include <iostream>
 #include <sstream>
 
