@@ -4,7 +4,6 @@
 #include "event/EventQuit.hpp"
 #include "event/EventLogin.hpp"
 #include "event/EventLoginResult.hpp"
-#include "event/irc/EventIrcJoinChannel.hpp"
 #include "utils/Password.hpp"
 
 using namespace std;
