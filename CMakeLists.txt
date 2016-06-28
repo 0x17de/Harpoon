@@ -38,6 +38,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/event/EventQueryChats.cpp src/event/EventQueryChats.hpp
 	src/event/EventQuerySettings.cpp src/event/EventQuerySettings.hpp
 	src/event/irc/EventIrcChatListing.cpp src/event/irc/EventIrcChatListing.hpp
+	src/event/irc/EventIrcSettingsListing.cpp src/event/irc/EventIrcSettingsListing.hpp
 	src/event/irc/EventIrcAction.cpp src/event/irc/EventIrcAction.hpp
 	src/event/irc/EventIrcSendMessage.cpp src/event/irc/EventIrcSendMessage.hpp
 	src/event/irc/EventIrcConnected.cpp src/event/irc/EventIrcConnected.hpp
