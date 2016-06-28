@@ -10,6 +10,7 @@
 #include "event/irc/EventIrcActivateService.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"
 #include "event/irc/EventIrcChatListing.hpp"
+#include "event/irc/EventIrcSettingsListing.hpp"
 #include "service/irc/IrcChannelStore.hpp"
 #include <iostream>
 #include <mutex>
@@ -18,14 +19,14 @@ using namespace std;
 
 
 IrcService::IrcService(size_t userId, EventQueue* appQueue)
-	: EventLoop({
-		            EventQuit::uuid,
-				    EventQueryChats::uuid,
-				    EventQuerySettings::uuid,
-				    EventIrcSendMessage::uuid
-			    }, {
-			        &EventGuard<IActivateServiceEvent>
-			    })
+    : EventLoop({
+                    EventQuit::uuid,
+                    EventQueryChats::uuid,
+                    EventQuerySettings::uuid,
+                    EventIrcSendMessage::uuid
+                }, {
+                    &EventGuard<IActivateServiceEvent>
+                })
     , userId{userId}
     , appQueue{appQueue}
 {
@@ -45,8 +46,8 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
             auto& ircConfiguration = entry.second;
             cout << "[US] CONFIG: " << ircConfiguration.getServerId() << endl;
             ircConnections.emplace(piecewise_construct,
-								   forward_as_tuple(ircConfiguration.getServerId()),
-								   forward_as_tuple(appQueue, userId, ircConfiguration));
+                                   forward_as_tuple(ircConfiguration.getServerId()),
+                                   forward_as_tuple(appQueue, userId, ircConfiguration));
         }
     }
 
@@ -62,7 +63,7 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
 
         auto listing = make_shared<EventIrcChatListing>(userId, query->getData());
         std::list<lock_guard<mutex>> locks;
-        // lock all to assure a correct results
+        // lock all to assure correct results
         for (auto& cxnPair : ircConnections) {
             auto& connection = cxnPair.second;
             locks.emplace_back(connection.getChannelLoginDataMutex());
@@ -70,7 +71,7 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
         for (auto& cxnPair : ircConnections) {
             auto& connection = cxnPair.second;
             IrcServerListing& server = listing->addServer(connection.getServerId(),
-														  connection.getServerName());
+                                                          connection.getServerName());
             for (auto& channelPair : connection.getChannelStore()) {
                 string channelName = channelPair.first;
                 const IrcChannelStore& channelStore = channelPair.second;
@@ -84,8 +85,17 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
 
         cout << "[US] Sending chat listing" << endl;
         appQueue->sendEvent(listing);
-	} else if (type == EventQuerySettings::uuid) {
+    } else if (type == EventQuerySettings::uuid) {
         auto query = event->as<EventQuerySettings>();
+
+        auto listing = make_shared<EventIrcSettingsListing>(userId, query->getData());
+        std::list<lock_guard<mutex>> locks;
+        // lock all to assure correct results
+        for (auto& cxnPair : ircConnections) {
+            auto& connection = cxnPair.second;
+            locks.emplace_back(connection.getChannelLoginDataMutex());
+        }
+
 #pragma warning QuerySettings stub
     } else if (type == EventIrcSendMessage::uuid) {
         auto message = event->as<EventIrcSendMessage>();
@@ -95,4 +105,3 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
     }
     return true;
 }
-
