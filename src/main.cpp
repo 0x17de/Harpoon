@@ -1,10 +1,12 @@
 #include <iostream>
 #include <algorithm>
 #include <array>
+#include <sstream>
 #include "app/Application.hpp"
 #include "utils/Password.hpp"
 #include "utils/Ini.hpp"
 #include "utils/IdProvider.hpp"
+#include "utils/Filesystem.hpp"
 
 using namespace std;
 
@@ -25,8 +27,14 @@ bool doGenUser(bool save) {
 
         string userIdString;
         users.getEntry(user, "id", userIdString);
-        if (userIdString.size() == 0)
-            users.setEntry(user, "id", to_string(IdProvider::getInstance().generateNewId("user")));
+        if (userIdString.size() == 0) {
+            userIdString = to_string(IdProvider::getInstance().generateNewId("user"));
+            users.setEntry(user, "id", userIdString);
+        }
+
+        stringstream userDirectory;
+        userDirectory << "config/user" << userIdString;
+        Filesystem::getInstance().createPathRecursive(userDirectory.str());
 
         users.setEntry(user, "salt", p.getSaltBase64());
         users.setEntry(user, "password", p.getHashBase64());
@@ -46,8 +54,8 @@ bool doSetup(bool save) {
     }
 
     string loginDatabaseType,
-		enableWebChat,
-		enableIrcService;
+        enableWebChat,
+        enableIrcService;
     static const array<string, 2> validLoginDatabaseTypes{"dummy", "ini"};
     static const array<string, 2> validYesNoAnswers{"y", "n"};
 
@@ -93,9 +101,9 @@ bool doSetup(bool save) {
 
 bool checkArgs(int argc, char** argv) {
     bool help = false,
-		setup = false,
-		genUser = false,
-		save = false;
+        setup = false,
+        genUser = false,
+        save = false;
 
     // check parameters
     for (int currentArgI = 1; currentArgI < argc; ++currentArgI) {
