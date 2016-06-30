@@ -35,11 +35,11 @@ bool IrcDatabase_Dummy::onEvent(std::shared_ptr<IEvent> event) {
         size_t serverId = 1;
         auto& loginConfiguration = login->addLoginConfiguration(serverId,
                                                                 "TestServer");
-		loginConfiguration.addHostConfiguration("127.0.0.1",
-												6667,
-												"wealllikedebian",
-												false,
-												false);
+        loginConfiguration.addHostConfiguration("127.0.0.1",
+                                                6667,
+                                                "wealllikedebian",
+                                                false,
+                                                false);
 
         loginConfiguration.addNick("iirc");
         loginConfiguration.addNick("iirc2");

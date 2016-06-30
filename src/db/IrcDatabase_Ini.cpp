@@ -6,6 +6,8 @@
 #include "service/irc/IrcServerHostConfiguration.hpp"
 #include "service/irc/IrcServerConfiguration.hpp"
 #include "event/irc/EventIrcActivateService.hpp"
+#include "utils/Filesystem.hpp"
+#include "utils/Ini.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -30,21 +32,109 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
     } else if (eventType == EventInit::uuid) {
         std::cout << "IrcDB received INIT event" << std::endl;
 
-        size_t userId = 1;
-        auto login = make_shared<EventIrcActivateService>(userId);
+        // activate service per user
+        Ini usersConfig("config/users.ini");
+        for (auto& userCategoryPair : usersConfig) {
+            auto& userCategory = userCategoryPair.second;
+            string userName = userCategoryPair.first;
 
-        stringstream configfile;
-        configfile << "config/" << userId << "/irc.servers.ini";
-        
-        /*
-        Ini ini("{...}.ini");
-        if (!ini.isNew()) {
-            ini.getEntries()
+            // read in user configuration
+            size_t userId;
+            string userIdStr;
+            usersConfig.getEntry(userCategory, "id", userIdStr);
+            istringstream(userIdStr) >> userId;
+
+            // initialize event
+            auto login = make_shared<EventIrcActivateService>(userId);
+
+            // create user folder if it does not exist yet
+            stringstream userDirectory;
+            userDirectory << "config/user" << userId;
+            Filesystem::getInstance().createPathRecursive(userDirectory.str());
+
+            // load server settings
+            stringstream serversConfigFilename;
+            serversConfigFilename << userDirectory.str() << "/irc.servers.ini";
+            Ini serversConfig(serversConfigFilename.str());
+            // add server configuration
+            for (auto& serverCategoryPair : serversConfig) {
+                auto& serverCategory = serverCategoryPair.second;
+                string serverName = serverCategoryPair.first;
+
+                // read server settings
+                size_t serverId;
+                string serverIdStr, nicksStr;
+                serversConfig.getEntry(serverCategory, "id", serverIdStr);
+                serversConfig.getEntry(serverCategory, "nicks", nicksStr);
+                istringstream(serverIdStr) >> serverId;
+
+                // initialize event
+                auto& loginConfiguration = login->addLoginConfiguration(serverId, serverName);
+
+                // create settings folder if it does not exist yet
+                stringstream serverDirectory;
+                serverDirectory << userDirectory.str() << "/server" << serverId;
+                Filesystem::getInstance().createPathRecursive(serverDirectory.str());
+
+                // load hosts settings
+                stringstream hostsConfigFilename;
+                hostsConfigFilename << serverDirectory << "/hosts.ini";
+                Ini hostsConfig(hostsConfigFilename.str());
+                // add host configuration
+                for (auto& hostCategoryPair : hostsConfig) {
+                    auto& host = hostCategoryPair.second;
+                    string hostData = hostCategoryPair.first;
+
+                    // construct host config from name
+                    string hostName;
+                    int port;
+                    istringstream hostDataIs(hostData);
+                    getline(hostDataIs, hostName, ':');
+                    hostDataIs >> port;
+
+                    // read host settings
+                    string password, ipV6, ssl;
+                    hostsConfig.getEntry(host, "password", password);
+                    hostsConfig.getEntry(host, "ipv6", ipV6);
+                    hostsConfig.getEntry(host, "ssl", ssl);
+
+                    loginConfiguration.addHostConfiguration(hostName,
+                                                            port,
+                                                            password,
+                                                            ipV6 == "y",
+                                                            ssl == "y");
+                }
+
+                // load channel configuration
+                stringstream serverChannelsConfigFilename;
+                serverChannelsConfigFilename << serverDirectory << "/channels.ini";
+                Ini channelsConfig(serverChannelsConfigFilename.str());
+                // add channel configuration
+                for (auto& channelCategoryPair : channelsConfig) {
+                    auto& channel = channelCategoryPair.second;
+                    string channelName = channelCategoryPair.first;
+
+                    // read channel settings
+                    size_t channelId;
+                    string channelIdStr, channelPassword;
+                    channelsConfig.getEntry(channel, "id", channelIdStr);
+                    channelsConfig.getEntry(channel, "password", channelPassword);
+                    istringstream(channelIdStr) >> channelId;
+
+                    // add channel to event
+                    loginConfiguration.addChannelLoginData(channelId, channelName, channelPassword);
+                }
+
+                // add nicks
+                istringstream nickStream(nicksStr);
+                string nick;
+                while (getline(nickStream, nick, ','))
+                    loginConfiguration.addNick(nick);
+            }
+
+            // dispatch event
+            appQueue->sendEvent(login);
         }
-        */
-
-        appQueue->sendEvent(login);
     }
     return true;
 }
-

@@ -75,6 +75,14 @@ void Ini::write(bool bForce) {
     modified = false;
 }
 
+Ini::Categories::iterator Ini::begin() {
+    return ::begin(categories);
+}
+
+Ini::Categories::iterator Ini::end() {
+    return ::end(categories);
+}
+
 Ini::Entries& Ini::expectCategory(const std::string& category) {
     auto it = categories.find(category);
     if (it != categories.end())
