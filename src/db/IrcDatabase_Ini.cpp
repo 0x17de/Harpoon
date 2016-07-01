@@ -6,8 +6,10 @@
 #include "service/irc/IrcServerHostConfiguration.hpp"
 #include "service/irc/IrcServerConfiguration.hpp"
 #include "event/irc/EventIrcActivateService.hpp"
+#include "event/irc/EventIrcJoinChannel.hpp"
 #include "utils/Filesystem.hpp"
 #include "utils/Ini.hpp"
+#include "utils/IdProvider.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -29,6 +31,28 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
     if (eventType == EventQuit::uuid) {
         std::cout << "IrcDB received QUIT event" << std::endl;
         return false;
+    } else if (eventType == EventIrcJoinChannel::uuid) {
+        auto join = event->as<EventIrcJoinChannel>();
+
+        // construct channels.ini path
+        stringstream serverChannelsConfigFilename;
+        serverChannelsConfigFilename
+            << "config/user" << join->getUserId()
+            << "/server" << join->getServerId()
+            << "/channels.ini";
+
+        Ini channelsConfig(serverChannelsConfigFilename.str());
+
+        // save data from join event to ini
+        for (auto& loginData : join->getLoginData()) {
+            auto& channelEntry = channelsConfig.expectCategory(loginData.getChannelName());
+            string channelId;
+            if (!channelsConfig.getEntry(channelEntry, "id", channelId)) {
+                channelId = to_string(IdProvider::getInstance().generateNewId("channel"));
+                channelsConfig.setEntry(channelEntry, "id", channelId);
+            }
+            channelsConfig.setEntry(channelEntry, "password", loginData.getChannelPassword());
+        }
     } else if (eventType == EventInit::uuid) {
         std::cout << "IrcDB received INIT event" << std::endl;
 
