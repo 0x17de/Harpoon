@@ -7,6 +7,7 @@
 #include "service/irc/IrcServerConfiguration.hpp"
 #include "event/irc/EventIrcActivateService.hpp"
 #include "event/irc/EventIrcJoinChannel.hpp"
+#include "event/irc/EventIrcPartChannel.hpp"
 #include "utils/Filesystem.hpp"
 #include "utils/Ini.hpp"
 #include "utils/IdProvider.hpp"
@@ -56,6 +57,21 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             }
             channelsConfig.setEntry(channelEntry, "password", loginData.getChannelPassword());
         }
+    } else if (eventType == EventIrcPartChannel::uuid) {
+        auto part = event->as<EventIrcPartChannel>();
+
+        // construct channel.ini path
+        stringstream serverChannelsConfigFilename;
+        serverChannelsConfigFilename
+           << "config/user" << part->getUserId()
+            << "/server" << part->getServerId()
+            << "/channels.ini";
+
+        Ini channelsConfig(serverChannelsConfigFilename.str());
+
+        // save data from join event to ini
+        for (const auto& channelName : part->getChannels())
+            channelsConfig.deleteCategory(channelName); // no need to remember (this is no backlog)
     } else if (eventType == EventInit::uuid) {
         std::cout << "IrcDB received INIT event" << std::endl;
 

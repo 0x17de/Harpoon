@@ -93,6 +93,10 @@ Ini::Entries& Ini::expectCategory(const std::string& category) {
     return res.first->second;
 }
 
+void Ini::deleteCategory(const std::string& category) {
+    categories.erase(category);
+}
+
 Ini::Entries* Ini::getEntry(const std::string& category) {
     auto it = categories.find(category);
     if (it == categories.end()) return nullptr;

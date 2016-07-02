@@ -28,6 +28,7 @@ public:
     Categories::iterator end();
     Entries* getEntry(const std::string& category);
     Entries& expectCategory(const std::string& category);
+    void deleteCategory(const std::string& category);
     bool getEntry(const std::string& category, const std::string& entry, std::string& data);
     bool getEntry(Entries& entries, const std::string& entry, std::string& data);
     void setEntry(const std::string& category, const std::string& entry, const std::string& data);
