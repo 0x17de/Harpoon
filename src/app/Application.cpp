@@ -21,39 +21,47 @@ Application::Application()
     : guard{this}
     , EventLoop()
 {
-	Ini coreIni("config/core.ini");
-	if (coreIni.isNew()) {
-		cerr << "No configuration exists. See --help for setup." << endl;
-		stop();
-		return;
-	}
-	auto& modules = coreIni.expectCategory("modules");
-	auto& services = coreIni.expectCategory("services");
+    Ini coreIni("config/core.ini");
+    if (coreIni.isNew()) {
+        cerr << "No configuration exists. See --help for setup." << endl;
+        stop();
+        return;
+    }
+    auto& modules = coreIni.expectCategory("modules");
+    auto& services = coreIni.expectCategory("services");
 
-	EventQueue* queue = getEventQueue();
-	userManager = make_shared<UserManager>(queue);
-	eventHandlers.push_back(userManager);
+    EventQueue* queue = getEventQueue();
+    userManager = make_shared<UserManager>(queue);
+    eventHandlers.push_back(userManager);
 
-	string loginDatabaseType,
-		enableWebChat,
-		enableIrcService;
+    string loginDatabaseType,
+        enableWebChat;
 
-	coreIni.getEntry(modules, "login", loginDatabaseType);
-	coreIni.getEntry(modules, "webchat", enableWebChat);
-	coreIni.getEntry(services, "irc", enableIrcService);
+    coreIni.getEntry(modules, "login", loginDatabaseType);
+    coreIni.getEntry(modules, "webchat", enableWebChat);
 
-	auto& moduleProvider = ModuleProvider::getInstance();
-	eventHandlers.push_back(moduleProvider.initializeModule("login_database", loginDatabaseType, queue));
+    auto& moduleProvider = ModuleProvider::getInstance();
+    eventHandlers.push_back(moduleProvider.initializeModule("login_database", loginDatabaseType, queue));
 
-	eventHandlers.push_back(make_shared<IrcDatabase_Dummy>(queue));
+    // load irc settings
+    string enableIrcService;
+    coreIni.getEntry(services, "irc", enableIrcService);
+    if (enableIrcService == "y") {
+        Ini ircIni("config/irc.ini");
+        auto& modules = ircIni.expectCategory("modules");
+
+        string ircDatabaseType;
+        ircIni.getEntry(modules, "settings_database", ircDatabaseType);
+        eventHandlers.push_back(moduleProvider.initializeModule("irc_database", ircDatabaseType, queue));
+    }
 
 #ifdef USE_WEBSOCKET_SERVER
-	if (enableWebChat == "y")
-		eventHandlers.push_back(make_shared<WebsocketServer>(queue));
+    if (enableWebChat == "y")
+        eventHandlers.push_back(make_shared<WebsocketServer>(queue));
 #endif
 
-	for (auto& eventHandler : eventHandlers)
-		eventHandler->getEventQueue()->sendEvent(make_shared<EventInit>());
+    for (auto& eventHandler : eventHandlers)
+        eventHandler->getEventQueue()->sendEvent(make_shared<EventInit>());
 }
 
 void Application::stop() {
