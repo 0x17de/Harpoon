@@ -20,13 +20,13 @@ using namespace std;
 
 IrcService::IrcService(size_t userId, EventQueue* appQueue)
     : EventLoop({
-                    EventQuit::uuid,
-                    EventQueryChats::uuid,
-                    EventQuerySettings::uuid,
-                    EventIrcSendMessage::uuid
-                }, {
-                    &EventGuard<IActivateServiceEvent>
-                })
+          EventQuit::uuid,
+          EventQueryChats::uuid,
+          EventQuerySettings::uuid,
+          EventIrcSendMessage::uuid
+      }, {
+          &EventGuard<IActivateServiceEvent>
+      })
     , userId{userId}
     , appQueue{appQueue}
 {

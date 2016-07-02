@@ -4,9 +4,12 @@
 #include "event/EventQuit.hpp"
 #include "event/EventLogin.hpp"
 #include "event/EventLoginResult.hpp"
+#include "utils/ModuleProvider.hpp"
 
 using namespace std;
 
+
+PROVIDE_MODULE("login_database", "dummy", LoginDatabase_Dummy);
 
 LoginDatabase_Dummy::LoginDatabase_Dummy(EventQueue* appQueue)
     : EventLoop({

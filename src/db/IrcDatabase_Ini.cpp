@@ -10,11 +10,14 @@
 #include "utils/Filesystem.hpp"
 #include "utils/Ini.hpp"
 #include "utils/IdProvider.hpp"
+#include "utils/ModuleProvider.hpp"
 #include <iostream>
 #include <sstream>
 
 using namespace std;
 
+
+PROVIDE_MODULE("irc_database", "ini", IrcDatabase_Ini);
 
 IrcDatabase_Ini::IrcDatabase_Ini(EventQueue* appQueue) :
     EventLoop({
