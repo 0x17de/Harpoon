@@ -12,10 +12,10 @@
         ProvideModule_##className() {                                      \
             auto&& func = [](EventQueue* appQueue)->shared_ptr<EventLoop>{ \
                 return make_shared<className>(appQueue);                   \
-        };                                                                 \
-        ModuleProvider::getInstance().registerModule(category,             \
-                                                     name,                 \
-                                                     func);                \
+            };                                                             \
+            ModuleProvider::getInstance().registerModule(category,         \
+                                                         name,             \
+                                                         func);            \
         }                                                                  \
     } provideModule_##className;                                           \
     }
