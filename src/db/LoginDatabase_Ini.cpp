@@ -5,9 +5,12 @@
 #include "event/EventLogin.hpp"
 #include "event/EventLoginResult.hpp"
 #include "utils/Password.hpp"
+#include "utils/ModuleProvider.hpp"
 
 using namespace std;
 
+
+PROVIDE_MODULE("login_database", "ini", LoginDatabase_Ini);
 
 LoginDatabase_Ini::LoginDatabase_Ini(EventQueue* appQueue)
     : EventLoop({

@@ -25,6 +25,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/utils/Ini.cpp src/utils/Ini.hpp
 	src/service/irc/IrcService.cpp src/service/irc/IrcService.hpp
 	src/user/UserManager.cpp src/user/UserManager.hpp
+	src/utils/ModuleProvider.cpp src/utils/ModuleProvider.hpp
 	src/utils/Filesystem.cpp src/utils/Filesystem.hpp
 	src/utils/Base64.cpp src/utils/Base64.hpp
 	src/utils/Crypto.cpp src/utils/Crypto.hpp

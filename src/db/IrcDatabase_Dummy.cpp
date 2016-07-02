@@ -7,9 +7,12 @@
 #include "service/irc/IrcServerHostConfiguration.hpp"
 #include "service/irc/IrcServerConfiguration.hpp"
 #include "event/irc/EventIrcActivateService.hpp"
+#include "utils/ModuleProvider.hpp"
 
 using namespace std;
 
+
+PROVIDE_MODULE("irc_database", "dummy", IrcDatabase_Dummy);
 
 IrcDatabase_Dummy::IrcDatabase_Dummy(EventQueue* appQueue)
     : EventLoop({

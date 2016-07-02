@@ -12,6 +12,7 @@
 #include "db/LoginDatabase_Ini.hpp"
 #include "db/IrcDatabase_Dummy.hpp"
 #include "server/ws/WebsocketServer.hpp"
+#include "utils/ModuleProvider.hpp"
 
 using namespace std;
 
@@ -41,11 +42,8 @@ Application::Application()
 	coreIni.getEntry(modules, "webchat", enableWebChat);
 	coreIni.getEntry(services, "irc", enableIrcService);
 
-	if (loginDatabaseType == "dummy") {
-		eventHandlers.push_back(make_shared<LoginDatabase_Dummy>(queue));
-	} else if (loginDatabaseType == "ini") {
-		eventHandlers.push_back(make_shared<LoginDatabase_Ini>(queue));
-	}
+	auto& moduleProvider = ModuleProvider::getInstance();
+	eventHandlers.push_back(moduleProvider.initializeModule("login_database", loginDatabaseType, queue));
 
 	eventHandlers.push_back(make_shared<IrcDatabase_Dummy>(queue));
 
