@@ -8,10 +8,6 @@
 #include "user/UserManager.hpp"
 #include "event/EventInit.hpp"
 #include "event/EventQuit.hpp"
-#include "db/LoginDatabase_Dummy.hpp"
-#include "db/LoginDatabase_Ini.hpp"
-#include "db/IrcDatabase_Dummy.hpp"
-#include "server/ws/WebsocketServer.hpp"
 #include "utils/ModuleProvider.hpp"
 
 using namespace std;
@@ -57,7 +53,7 @@ Application::Application()
 
 #ifdef USE_WEBSOCKET_SERVER
     if (enableWebChat == "y")
-        eventHandlers.push_back(make_shared<WebsocketServer>(queue));
+        eventHandlers.push_back(moduleProvider.initializeModule("server", "websocket", queue));
 #endif
 
     for (auto& eventHandler : eventHandlers)
