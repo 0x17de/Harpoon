@@ -1,5 +1,6 @@
 #include "WebsocketServer.hpp"
 #include "WebsocketServer_Impl.hpp"
+#include "utils/ModuleProvider.hpp"
 
 using namespace std;
 
@@ -10,6 +11,8 @@ WebsocketClientData::WebsocketClientData(size_t userId, seasocks::WebSocket* soc
 {
 }
 
+
+PROVIDE_MODULE("server", "websocket", WebsocketServer);
 
 WebsocketServer::WebsocketServer(EventQueue* appQueue)
     : impl{make_shared<WebsocketServer_Impl>(getEventQueue(), appQueue)}
