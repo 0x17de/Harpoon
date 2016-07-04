@@ -58,6 +58,8 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/event/irc/EventIrcJoinChannel.cpp src/event/irc/EventIrcJoinChannel.hpp
 	src/event/irc/EventIrcMessage.cpp src/event/irc/EventIrcMessage.hpp
 	src/event/irc/EventIrcNumeric.cpp src/event/irc/EventIrcNumeric.hpp
+	src/event/irc/EventIrcAddServer.cpp src/event/irc/EventIrcAddServer.hpp
+	src/event/irc/EventIrcServerAdded.cpp src/event/irc/EventIrcServerAdded.hpp
 	src/event/EventQuit.cpp src/event/EventQuit.hpp
 	)
 
