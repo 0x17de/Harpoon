@@ -1,7 +1,6 @@
 #ifndef EVENTIRCJOINCHANNEL_H
 #define EVENTIRCJOINCHANNEL_H
 
-#include "../IEvent.hpp"
 #include "../IUserEvent.hpp"
 #include <list>
 #include <string>

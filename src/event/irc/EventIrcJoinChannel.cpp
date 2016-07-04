@@ -4,28 +4,27 @@
 
 
 EventIrcJoinChannel::EventIrcJoinChannel(size_t userId, size_t serverId)
-:
-	userId{userId},
-	serverId{serverId}
+    : userId{userId}
+    , serverId{serverId}
 {
 }
 
 UUID EventIrcJoinChannel::uuid = ::uuid.get();
 UUID EventIrcJoinChannel::getEventUuid() const {
-	return this->uuid;
+    return this->uuid;
 }
 
 size_t EventIrcJoinChannel::getUserId() const {
-	return userId;
+    return userId;
 }
 
 size_t EventIrcJoinChannel::getServerId() const {
-	return serverId;
+    return serverId;
 }
 std::list<IrcChannelLoginData> EventIrcJoinChannel::getLoginData() {
-	return loginData;
+    return loginData;
 }
 const std::list<IrcChannelLoginData> EventIrcJoinChannel::getLoginData() const {
-	return loginData;
+    return loginData;
 }
 
