@@ -15,7 +15,6 @@ public:
 
     EventIrcAddServer(size_t userId, std::string serverName);
     virtual size_t getUserId() const override;
-    size_t getServerId() const;
     std::string getServerName() const;
 };
 
