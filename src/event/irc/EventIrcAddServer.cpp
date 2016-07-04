@@ -1,6 +1,5 @@
 #include "EventIrcAddServer.hpp"
 #include "utils/uuidGen.hpp"
-#include "service/irc/IrcChannelLoginData.hpp"
 
 
 EventIrcAddServer::EventIrcAddServer(size_t userId, std::string serverName)
