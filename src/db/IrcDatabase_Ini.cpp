@@ -8,6 +8,8 @@
 #include "event/irc/EventIrcActivateService.hpp"
 #include "event/irc/EventIrcJoinChannel.hpp"
 #include "event/irc/EventIrcPartChannel.hpp"
+#include "event/irc/EventIrcAddServer.hpp"
+#include "event/irc/EventIrcServerAdded.hpp"
 #include "utils/Filesystem.hpp"
 #include "utils/Ini.hpp"
 #include "utils/IdProvider.hpp"
@@ -35,6 +37,26 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
     if (eventType == EventQuit::uuid) {
         std::cout << "IrcDB received QUIT event" << std::endl;
         return false;
+    } else if (eventType == EventIrcAddServer::uuid) {
+        auto add = event->as<EventIrcAddServer>();
+
+        stringstream serversConfigFilename;
+        serversConfigFilename
+            << "config/user" << add->getUserId()
+            << "/irc.servers.ini";
+        Ini serversConfig(serversConfigFilename.str());
+
+        auto& serverEntry = serversConfig.expectCategory(add->getServerName());
+        string serverIdStr;
+        if (!serversConfig.getEntry(serverEntry, "id", serverIdStr)) {
+            size_t serverId = IdProvider::getInstance().generateNewId("server");
+            serverIdStr = to_string(serverId);
+            serversConfig.setEntry(serverEntry, "id", serverIdStr);
+
+            auto added = make_shared<EventIrcServerAdded>(add->getUserId(), serverId, add->getServerName());
+        } else {
+#warning EventIrcAddServer: handle server already exists case
+        }
     } else if (eventType == EventIrcJoinChannel::uuid) {
         auto join = event->as<EventIrcJoinChannel>();
 
