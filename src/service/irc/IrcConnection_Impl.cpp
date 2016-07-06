@@ -127,6 +127,7 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue,
 				}
 
 				auto& hostConfigurations = this->configuration.getHostConfigurations();
+				if (hostConfigurations.empty()) break;
 				hostIndex %= hostConfigurations.size();
 				auto hostIterator = hostConfigurations.begin();
 				advance(hostIterator, hostIndex);

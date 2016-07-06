@@ -21,40 +21,40 @@ using namespace std;
 
 
 Filesystem::Filesystem()
-	: impl{make_shared<Filesystem_Impl>()}
+    : impl{make_shared<Filesystem_Impl>()}
 {
 }
 
 Filesystem_Impl::Filesystem_Impl()
-	: root{currentDirectory()}
+    : root{currentDirectory()}
 {
 }
 
 std::string Filesystem_Impl::currentDirectory() {
-	lock_guard<recursive_mutex> _lock(lock);
+    lock_guard<recursive_mutex> _lock(lock);
 
-	vector<char> path(200);
-	while(true) {
-		if (getcwd((char*)path.data(), path.size()) != nullptr)
-			break;
-		if (errno = ENOMEM)
-			path.resize(path.size()*2);
-	}
+    vector<char> path(200);
+    while(true) {
+        if (getcwd((char*)path.data(), path.size()) != nullptr)
+            break;
+        if (errno = ENOMEM)
+            path.resize(path.size()*2);
+    }
 
-	auto it = find(path.begin(), path.end(), 0);
-	size_t end = (it == path.end()) ? path.size() : distance(path.begin(), it);
-	return string(path.data(), end);
+    auto it = find(path.begin(), path.end(), 0);
+    size_t end = (it == path.end()) ? path.size() : distance(path.begin(), it);
+    return string(path.data(), end);
 }
 
 Filesystem& Filesystem::getInstance() {
-	static Filesystem filesystem;
-	return filesystem;
+    static Filesystem filesystem;
+    return filesystem;
 }
 
 bool Filesystem_Impl::changeDirectory(const std::string& path) {
-	lock_guard<recursive_mutex> _lock(lock);
+    lock_guard<recursive_mutex> _lock(lock);
 
-	return chdir(path.c_str()) == 0;
+    return chdir(path.c_str()) == 0;
 }
 
 bool Filesystem_Impl::createDirectory(const std::string& path, mode_t mode) {
@@ -69,15 +69,17 @@ bool Filesystem::createPathRecursive(const std::string& path) {
     if (path.size() == 0) return true;
     impl->changeDirectory((path.at(0) == '/') ? "/" : impl->root);
 
-	istringstream is(path);
-	string part;
-	while (getline(is, part, '/')) {
-		if (part == "") continue;
-		if (!impl->changeDirectory(part)) {
-			if (!impl->createDirectory(part, 0770)) return false;
-			impl->changeDirectory(part);
-		}
-	}
+    istringstream is(path);
+    string part;
+    while (getline(is, part, '/')) {
+        if (part == "") continue;
+        if (!impl->changeDirectory(part)) {
+            if (!impl->createDirectory(part, 0770)) return false;
+            impl->changeDirectory(part);
+        }
+    }
 
-	return true;
+    impl->changeDirectory(impl->root);
+
+    return true;
 }
