@@ -121,6 +121,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             stringstream serversConfigFilename;
             serversConfigFilename << userDirectory.str() << "/irc.servers.ini";
             Ini serversConfig(serversConfigFilename.str());
+
             // add server configuration
             for (auto& serverCategoryPair : serversConfig) {
                 auto& serverCategory = serverCategoryPair.second;
@@ -143,7 +144,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
 
                 // load hosts settings
                 stringstream hostsConfigFilename;
-                hostsConfigFilename << serverDirectory << "/hosts.ini";
+                hostsConfigFilename << serverDirectory.str() << "/hosts.ini";
                 Ini hostsConfig(hostsConfigFilename.str());
                 // add host configuration
                 for (auto& hostCategoryPair : hostsConfig) {
@@ -172,8 +173,9 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
 
                 // load channel configuration
                 stringstream serverChannelsConfigFilename;
-                serverChannelsConfigFilename << serverDirectory << "/channels.ini";
+                serverChannelsConfigFilename << serverDirectory.str() << "/channels.ini";
                 Ini channelsConfig(serverChannelsConfigFilename.str());
+
                 // add channel configuration
                 for (auto& channelCategoryPair : channelsConfig) {
                     auto& channel = channelCategoryPair.second;
