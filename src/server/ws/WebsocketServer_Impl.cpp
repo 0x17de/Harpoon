@@ -8,6 +8,7 @@
 #include "event/irc/EventIrcKicked.hpp"
 #include "event/irc/EventIrcParted.hpp"
 #include "event/irc/EventIrcChatListing.hpp"
+#include "event/irc/EventIrcSettingsListing.hpp"
 #include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcTopic.hpp"
 #include "event/irc/EventIrcNickChanged.hpp"
@@ -36,8 +37,8 @@ WebsocketServer_Impl::WebsocketServer_Impl(EventQueue* queue, EventQueue* appQue
 {
     server.addWebSocketHandler("/ws", make_shared<WebsocketHandler>(appQueue, queue, clients));
     serverThread = thread([this]{
-			server.serve("public", 8080);
-		});
+        server.serve("public", 8080);
+    });
 }
 
 WebsocketServer_Impl::~WebsocketServer_Impl() {
@@ -57,8 +58,8 @@ bool WebsocketServer_Impl::onEvent(std::shared_ptr<IEvent> event) {
             addClient(loginResult->getUserId(), socket);
         } else {
             server.execute([=] {
-					socket->close();
-				});
+                socket->close();
+            });
         }
     } else if (eventType == EventLogout::uuid) {
         auto logout = event->as<EventLogout>();
@@ -72,10 +73,9 @@ void WebsocketServer_Impl::addClient(size_t userId, seasocks::WebSocket* socket)
     bool found = it != userToClients.end();
     std::list<WebsocketClientData>* dataList;
     if (!found) {
-        auto dataListIt = userToClients.emplace(
-												piecewise_construct,
-												forward_as_tuple(userId),
-												forward_as_tuple());
+        auto dataListIt = userToClients.emplace(piecewise_construct,
+                                                forward_as_tuple(userId),
+                                                forward_as_tuple());
         dataList = &dataListIt.first->second;
     } else {
         dataList = &it->second;
@@ -115,6 +115,34 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["channel"] = message->getChannel();
         root["nick"] = message->getFrom();
         root["msg"] = message->getMessage();
+    } else if (eventType == EventLoginResult::uuid) {
+        auto result = event->as<EventLoginResult>();
+        root["cmd"] = "login";
+        root["success"] = true;
+    } else if (eventType == EventIrcSettingsListing::uuid) {
+#warning EventIrcSettingsListing stub
+        auto settings = event->as<EventIrcSettingsListing>();
+        root["cmd"] = "settings";
+        root["type"] = "irc";
+        Json::Value& data = root["data"] = Json::objectValue;
+        Json::Value& servers = data["servers"];
+        for (auto& serverConfiguration : settings->getServerList()) {
+            Json::Value& server = servers[to_string(serverConfiguration.getServerId())];
+            Json::Value& hosts = server["hosts"] = Json::arrayValue;
+            for (auto& hostConfiguration : serverConfiguration.getHostConfigurations()) {
+                stringstream hostKey;
+                hostKey << hostConfiguration.getHostName() << ":" << hostConfiguration.getPort();
+                Json::Value& host = hosts[hostKey.str()] = Json::objectValue;
+                host["hasPassword"] = !hostConfiguration.getPassword().empty();
+                host["ipv6"] = hostConfiguration.getIpV6();
+                host["ssl"] = hostConfiguration.getSsl();
+            }
+            Json::Value& channels = server["channels"] = Json::arrayValue;
+            for (auto& channelConfiguration : serverConfiguration.getChannelLoginData()) {
+                Json::Value& channel = channels[channelConfiguration.getChannelName()];
+                channel["hasPassword"] = !channelConfiguration.getChannelPassword().empty();
+            }
+        }
     } else if (eventType == EventIrcChatListing::uuid) {
         auto listing = event->as<EventIrcChatListing>();
         root["cmd"] = "chatlist";
@@ -211,15 +239,15 @@ void WebsocketServer_Impl::sendEventToUser(std::shared_ptr<IEvent> event) {
             for (auto& clientData : clientDataList) {
                 if (clientData.socket == data) {
                     server.execute([=] {
-							clientData.socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
-						});
+                        clientData.socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
+                    });
                 }
             }
         } else {
             for (auto& clientData : clientDataList) {
                 server.execute([=] {
-						clientData.socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
-					});
+                    clientData.socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
+                });
             }
         }
     }

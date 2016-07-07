@@ -44,8 +44,7 @@ bool LoginDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             success = false;
         }
 
-        shared_ptr<EventLoginResult> loginResult{make_shared<EventLoginResult>(login->getTarget(), success, 1, login->getData())};
-        appQueue->sendEvent(loginResult);
+        appQueue->sendEvent(make_shared<EventLoginResult>(success, 1, login->getData()));
     }
     return true;
 }

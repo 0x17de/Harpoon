@@ -7,16 +7,11 @@ UUID EventLogin::getEventUuid() const {
     return this->uuid;
 }
 
-EventLogin::EventLogin(EventQueue* target, void* data, std::string username, std::string password)
-    : target{target}
-    , data{data}
+EventLogin::EventLogin(void* data, std::string username, std::string password)
+    : data{data}
     , username{username}
     , password{password}
 {
-}
-
-EventQueue* EventLogin::getTarget() const {
-    return target;
 }
 
 void* EventLogin::getData() const {

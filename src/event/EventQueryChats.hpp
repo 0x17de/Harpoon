@@ -16,7 +16,7 @@ public:
 
     EventQueryChats(size_t userId, void* data);
 
-    size_t getUserId() const;
+    virtual size_t getUserId() const override;
     void* getData() const;
 };
 

@@ -30,7 +30,8 @@ function sendPing() {
 	send({cmd:'ping'});
 }
 function send(json) {
-	ws.send(JSON.stringify(json));
+    console.log(">> "+JSON.stringify(json));
+    ws.send(JSON.stringify(json));
 }
 function startChat() {
 	if (!tryingToConnect)
@@ -71,7 +72,7 @@ function startChat() {
 function onMessage(msg) {
 	var json = JSON.parse(msg);
 	if (!json) {
-		console.log(msg);
+		console.log("!<< "+msg);
 		return;
 	}
 	if (json.type == 'irc')
@@ -85,7 +86,7 @@ function timestamp() {
 	return twoDigit(d.getHours()) + ":" + twoDigit(d.getMinutes()) + ":" + twoDigit(d.getSeconds());
 }
 function onIrcMessage(json) {
-	console.log(JSON.stringify(json));
+	console.log("<< "+JSON.stringify(json));
 
 	var target;
 	if (json.server && json.channel)
@@ -99,6 +100,15 @@ function onIrcMessage(json) {
 		var nick = pureNick && '<'+pureNick+'>';
 	}
 	switch (json.cmd) {
+    case 'login':
+        console.log('Login successful');
+        send({cmd:'querysettings'});
+        break;
+    case 'settings':
+        var service =  Service.map[json.type];
+        if (!service) break;
+        service.load(json.data);
+        break;
 	case 'chatlist':
 		var chooseFirstChannel = true;
 		serverList.clear('irc');

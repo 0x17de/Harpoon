@@ -2,6 +2,7 @@
 #include "WebsocketServer_Impl.hpp"
 #include "event/EventLogin.hpp"
 #include "event/EventLogout.hpp"
+#include "event/EventQuerySettings.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"
 #include <sstream>
 #include <json/json.h>
@@ -43,7 +44,7 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                 getline(lis, username, ' ');
                 string password;
                 getline(lis, password, ' ');
-                appQueue->sendEvent(make_shared<EventLogin>(queue, connection, username, password));
+                appQueue->sendEvent(make_shared<EventLogin>(connection, username, password));
             }
         }
     } else { // logged in
@@ -60,9 +61,9 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
             string channel = root.get("channel", "").asString();
             string message = root.get("msg", "").asString();
             appQueue->sendEvent(make_shared<EventIrcSendMessage>(clientData.userId, serverId, channel, message));
+        } else if (cmd == "querysettings") {
+            appQueue->sendEvent(make_shared<EventQuerySettings>(clientData.userId, connection));
         }
-#warning onData commands stub
-#warning json parse stub
     }
 }
 
