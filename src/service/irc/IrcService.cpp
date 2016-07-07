@@ -96,7 +96,7 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
             locks.emplace_back(connection.getChannelLoginDataMutex());
         }
 
-#pragma warning QuerySettings stub
+        appQueue->sendEvent(listing);
     } else if (type == EventIrcSendMessage::uuid) {
         auto message = event->as<EventIrcSendMessage>();
         auto it = ircConnections.find(message->getServerId());

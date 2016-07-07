@@ -2,11 +2,11 @@
 #define EVENTIRCSETTINGSLISTING_H
 
 #include "../ISingleClientEvent.hpp"
+#include "service/irc/IrcServerConfiguration.hpp"
 #include <string>
 #include <list>
 
 
-class IrcServerConfiguration;
 class EventIrcSettingsListing : public ISingleClientEvent {
     size_t userId;
 	std::list<IrcServerConfiguration> servers;
@@ -19,8 +19,8 @@ public:
     IrcServerConfiguration& addServer(size_t serverId, std::string serverName);
 
     size_t getUserId() const override;
+    void* getData() const override;
     const std::list<IrcServerConfiguration>& getServerList() const;
-    void* getData() const;
 };
 
 #endif

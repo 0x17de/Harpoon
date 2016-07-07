@@ -1,26 +1,24 @@
 #ifndef EVENTLOGINRESULT_H
 #define EVENTLOGINRESULT_H
 
+#include "ISingleClientEvent.hpp"
 #include <memory>
-#include "IEvent.hpp"
 
 
 class EventQueue;
-class EventLoginResult : public IEvent {
-    EventQueue* target;
+class EventLoginResult : public ISingleClientEvent {
     bool success;
     size_t userId;
     void* data;
 public:
-    EventLoginResult(EventQueue* target, bool success, size_t userId, void* data);
-
     static UUID uuid;
     virtual UUID getEventUuid() const override;
 
-    EventQueue* getTarget() const;
+    EventLoginResult(bool success, size_t userId, void* data);
+
+    virtual size_t getUserId() const override;
+    void* getData() const override;
     bool getSuccess() const;
-    size_t getUserId() const;
-    void* getData() const;
 };
 
 #endif

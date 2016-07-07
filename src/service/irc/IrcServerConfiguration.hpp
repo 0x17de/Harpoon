@@ -1,12 +1,12 @@
 #ifndef IRCSERVERCONFIGURATION_H
 #define IRCSERVERCONFIGURATION_H
 
+#include "IrcChannelLoginData.hpp"
+#include "IrcServerHostConfiguration.hpp"
 #include <list>
 #include <string>
 
 
-class IrcChannelLoginData;
-class IrcServerHostConfiguration;
 class IrcServerConfiguration {
     size_t serverId;
     std::string serverName;

@@ -36,13 +36,13 @@ ServiceIrc.prototype = Object.create(Service.prototype);
 ServiceIrc.prototype.constructor = ServiceIrc;
 ServiceIrc.prototype.load = function(json) {
 	this.data = json;
-	// TODO
+	// TODO load
 };
 ServiceIrc.prototype.addServer = function(servername) {
 	var server = (new Element('li')).text(servername);
 	this.networklist.add(server);
 };
 ServiceIrc.prototype.save = function() {
-	// TODO
+	// TODO save
 };
 
