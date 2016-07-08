@@ -31,13 +31,5 @@ public:
     void join();
 };
 
-class ManagingEventLoop : public EventLoop {
-public:
-    ManagingEventLoop();
-    ManagingEventLoop(std::set<UUID> processableEvents, std::list<bool(*)(IEvent*)> = {});
-    ~ManagingEventLoop();
-    virtual void sendEventToUser(std::shared_ptr<IEvent> event) = 0;
-};
-
 
 #endif

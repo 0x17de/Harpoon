@@ -8,29 +8,16 @@
 using namespace std;
 
 
-UserManager::UserManager(EventQueue* appQueue) :
-	ManagingEventLoop({
-		EventQuit::uuid,
-		EventLoginResult::uuid
-	}, {
-		&EventGuard<IActivateServiceEvent>
-	}),
-	appQueue{appQueue}
+UserManager::UserManager(EventQueue* appQueue)
+    : EventLoop({
+        EventQuit::uuid,
+        EventLoginResult::uuid
+      }, {
+          &EventGuard<IActivateServiceEvent>
+        , &EventGuard<IUserEvent>
+      })
+    , appQueue{appQueue}
 {
-}
-
-void UserManager::sendEventToUser(std::shared_ptr<IEvent> event) {
-	auto userEvent = event->as<IUserEvent>();
-	if (userEvent != nullptr) {
-		auto it = users.find(userEvent->getUserId());
-		if (it != users.end()) {
-			for (auto loop : it->second) {
-				EventQueue* queue = loop.second->getEventQueue();
-				if (queue->canProcessEvent(event.get()))
-					queue->sendEvent(event);
-			}
-		}
-	}
 }
 
 bool UserManager::onEvent(std::shared_ptr<IEvent> event) {
@@ -66,16 +53,19 @@ bool UserManager::onEvent(std::shared_ptr<IEvent> event) {
 				auto it = users.find(userId);
 				if (it != users.end()) {
 					for (auto p : it->second) {
-						p.second->getEventQueue()->sendEvent(event);
+						auto queue = p.second->getEventQueue();
+						if (queue->canProcessEvent(event.get()))
+							queue->sendEvent(event);
 					}
 				}
 			}
 		} else {
-			std::cout << "UM received other User event" << std::endl;
 			auto it = users.find(userId);
 			if (it != users.end()) {
 				for (auto p : it->second) {
-					p.second->getEventQueue()->sendEvent(event);
+					auto queue = p.second->getEventQueue();
+					if (queue->canProcessEvent(event.get()))
+						p.second->getEventQueue()->sendEvent(event);
 				}
 			}
 		}

@@ -38,17 +38,3 @@ EventQueue* EventLoop::getEventQueue() {
 void EventLoop::join() {
     t.join();
 }
-
-ManagingEventLoop::ManagingEventLoop()
-    : EventLoop()
-{
-}
-
-ManagingEventLoop::ManagingEventLoop(std::set<UUID> processableEvents, std::list<bool(*)(IEvent*)> eventGuards)
-    : EventLoop(processableEvents, eventGuards)
-{
-}
-
-ManagingEventLoop::~ManagingEventLoop() {
-}
-
