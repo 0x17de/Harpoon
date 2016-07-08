@@ -29,7 +29,7 @@ bool LoginDatabase_Dummy::onEvent(std::shared_ptr<IEvent> event) {
     } else if (eventType == EventLogin::uuid) {
         auto login = event->as<EventLogin>();
         bool success = login->getUsername() == "user" && login->getPassword() == "password";
-        appQueue->sendEvent(shared_ptr<EventLoginResult> loginResult{make_shared<EventLoginResult>(success, 1, login->getData()));
+        appQueue->sendEvent(make_shared<EventLoginResult>(success, 1, login->getData()));
     }
     return true;
 }

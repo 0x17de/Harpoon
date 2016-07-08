@@ -49,6 +49,32 @@ WebsocketServer_Impl::~WebsocketServer_Impl() {
 bool WebsocketServer_Impl::onEvent(std::shared_ptr<IEvent> event) {
     UUID eventType = event->getEventUuid();
 
+    auto userEvent = event->as<IClientEvent>();
+    if (userEvent) {
+        auto it = userToClients.find(userEvent->getUserId());
+        if (it != userToClients.end()) {
+            std::string json = eventToJson(event);
+            list<WebsocketClientData>& clientDataList = it->second;
+            auto singleClientEvent = event->as<ISingleClientEvent>();
+            if (singleClientEvent) {
+                void* data = singleClientEvent->getData();
+                for (auto& clientData : clientDataList) {
+                    if (clientData.socket == data) {
+                        server.execute([=] {
+                            clientData.socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
+                        });
+                    }
+                }
+            } else {
+                for (auto& clientData : clientDataList) {
+                    server.execute([=] {
+                        clientData.socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
+                    });
+                }
+            }
+        }
+    }
+    
     if (eventType == EventQuit::uuid) {
         return false;
     } else if (eventType == EventLoginResult::uuid) {
@@ -225,31 +251,3 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
 
     return Json::FastWriter{}.write(root);
 }
-
-void WebsocketServer_Impl::sendEventToUser(std::shared_ptr<IEvent> event) {
-    auto userEvent = event->as<IClientEvent>();
-    if (userEvent == nullptr) return;
-    auto it = userToClients.find(userEvent->getUserId());
-    if (it != userToClients.end()) {
-        std::string json = eventToJson(event);
-        list<WebsocketClientData>& clientDataList = it->second;
-        auto singleClientEvent = event->as<ISingleClientEvent>();
-        if (singleClientEvent) {
-            void* data = singleClientEvent->getData();
-            for (auto& clientData : clientDataList) {
-                if (clientData.socket == data) {
-                    server.execute([=] {
-                        clientData.socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
-                    });
-                }
-            }
-        } else {
-            for (auto& clientData : clientDataList) {
-                server.execute([=] {
-                    clientData.socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
-                });
-            }
-        }
-    }
-}
-

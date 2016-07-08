@@ -51,7 +51,6 @@ public:
     void removeClient(seasocks::WebSocket* socket);
 
     bool onEvent(std::shared_ptr<IEvent> event);
-    void sendEventToUser(std::shared_ptr<IEvent> event);
 };
 
 #endif

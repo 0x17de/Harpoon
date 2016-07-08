@@ -26,7 +26,4 @@ bool WebsocketServer::onEvent(std::shared_ptr<IEvent> event) {
     return impl->onEvent(event);
 }
 
-void WebsocketServer::sendEventToUser(std::shared_ptr<IEvent> event) {
-    impl->sendEventToUser(event);
-}
 
