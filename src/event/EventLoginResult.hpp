@@ -17,7 +17,7 @@ public:
     EventLoginResult(bool success, size_t userId, void* data);
 
     virtual size_t getUserId() const override;
-    void* getData() const override;
+    virtual void* getData() const override;
     bool getSuccess() const;
 };
 
