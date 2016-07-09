@@ -153,7 +153,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["cmd"] = "settings";
         root["type"] = "irc";
         Json::Value& data = root["data"] = Json::objectValue;
-        Json::Value& servers = data["servers"];
+        Json::Value& servers = data["servers"] = Json::arrayValue;
         for (auto& serverConfiguration : settings->getServerList()) {
             Json::Value& server = servers[to_string(serverConfiguration.getServerId())];
             Json::Value& hosts = server["hosts"] = Json::arrayValue;
@@ -175,11 +175,11 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         auto listing = event->as<EventIrcChatListing>();
         root["cmd"] = "chatlist";
         root["type"] = "irc";
-        Json::Value& serverList = root["servers"];
+        Json::Value& serverList = root["servers"] = Json::objectValue;
         for (auto& serverData : listing->getServerList()) {
             Json::Value& server = serverList[to_string(serverData.getServerId())];
             server["name"] = serverData.getServerName();
-            Json::Value& channelList = server["channels"];
+            Json::Value& channelList = server["channels"] = Json::objectValue;
             for (auto& channelData : serverData.getChannels()) {
                 Json::Value& channel = channelList[channelData.getChannelName()] = Json::objectValue;
                 Json::Value& users = channel["users"] = Json::objectValue;
