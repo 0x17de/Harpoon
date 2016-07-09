@@ -75,7 +75,8 @@ function onMessage(msg) {
 		console.log("!<< "+msg);
 		return;
 	}
-	if (json.type == 'irc')
+	console.log("<< "+JSON.stringify(json));
+	if (json.type === void 0 || json.type === 'irc')
 		onIrcMessage(json);
 }
 function twoDigit(e) {
@@ -86,8 +87,6 @@ function timestamp() {
 	return twoDigit(d.getHours()) + ":" + twoDigit(d.getMinutes()) + ":" + twoDigit(d.getSeconds());
 }
 function onIrcMessage(json) {
-	console.log("<< "+JSON.stringify(json));
-
 	var target;
 	if (json.server && json.channel)
 		target = serverList.get('irc', json.server).get(json.channel);

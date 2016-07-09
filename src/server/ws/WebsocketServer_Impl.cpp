@@ -49,6 +49,20 @@ WebsocketServer_Impl::~WebsocketServer_Impl() {
 bool WebsocketServer_Impl::onEvent(std::shared_ptr<IEvent> event) {
     UUID eventType = event->getEventUuid();
 
+    if (eventType == EventQuit::uuid) {
+        return false;
+    } else if (eventType == EventLoginResult::uuid) {
+        auto* loginResult = event->as<EventLoginResult>();
+        seasocks::WebSocket* socket = (seasocks::WebSocket*)loginResult->getData();
+        if (loginResult->getSuccess()) {
+            addClient(loginResult->getUserId(), socket);
+        } else {
+            server.execute([=] {
+                socket->close();
+            });
+        }
+    }
+
     auto userEvent = event->as<IClientEvent>();
     if (userEvent) {
         auto it = userToClients.find(userEvent->getUserId());
@@ -74,20 +88,8 @@ bool WebsocketServer_Impl::onEvent(std::shared_ptr<IEvent> event) {
             }
         }
     }
-    
-    if (eventType == EventQuit::uuid) {
-        return false;
-    } else if (eventType == EventLoginResult::uuid) {
-        auto* loginResult = event->as<EventLoginResult>();
-        seasocks::WebSocket* socket = (seasocks::WebSocket*)loginResult->getData();
-        if (loginResult->getSuccess()) {
-            addClient(loginResult->getUserId(), socket);
-        } else {
-            server.execute([=] {
-                socket->close();
-            });
-        }
-    } else if (eventType == EventLogout::uuid) {
+
+    if (eventType == EventLogout::uuid) {
         auto logout = event->as<EventLogout>();
         removeClient((seasocks::WebSocket*)logout->getData());
     }
