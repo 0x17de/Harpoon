@@ -28,6 +28,10 @@ size_t IrcConnection::getServerId() const {
     return impl->configuration.getServerId();
 }
 
+const IrcServerConfiguration& IrcConnection::getServerConfiguration() const {
+    return impl->configuration;
+}
+
 std::string IrcConnection::getServerName() const {
     return impl->configuration.getServerName();
 }

@@ -153,10 +153,10 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["cmd"] = "settings";
         root["type"] = "irc";
         Json::Value& data = root["data"] = Json::objectValue;
-        Json::Value& servers = data["servers"] = Json::arrayValue;
+        Json::Value& servers = data["servers"] = Json::objectValue;
         for (auto& serverConfiguration : settings->getServerList()) {
             Json::Value& server = servers[to_string(serverConfiguration.getServerId())];
-            Json::Value& hosts = server["hosts"] = Json::arrayValue;
+            Json::Value& hosts = server["hosts"] = Json::objectValue;
             for (auto& hostConfiguration : serverConfiguration.getHostConfigurations()) {
                 stringstream hostKey;
                 hostKey << hostConfiguration.getHostName() << ":" << hostConfiguration.getPort();
