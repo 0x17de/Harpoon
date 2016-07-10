@@ -62,12 +62,14 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
         auto query = event->as<EventQueryChats>();
 
         auto listing = make_shared<EventIrcChatListing>(userId, query->getData());
+
         std::list<lock_guard<mutex>> locks;
         // lock all to assure correct results
         for (auto& cxnPair : ircConnections) {
             auto& connection = cxnPair.second;
             locks.emplace_back(connection.getChannelLoginDataMutex());
         }
+
         for (auto& cxnPair : ircConnections) {
             auto& connection = cxnPair.second;
             IrcServerListing& server = listing->addServer(connection.getServerId(),
@@ -89,11 +91,28 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
         auto query = event->as<EventQuerySettings>();
 
         auto listing = make_shared<EventIrcSettingsListing>(userId, query->getData());
+
         std::list<lock_guard<mutex>> locks;
         // lock all to assure correct results
         for (auto& cxnPair : ircConnections) {
             auto& connection = cxnPair.second;
             locks.emplace_back(connection.getChannelLoginDataMutex());
+        }
+
+        for (auto& cxnPair : ircConnections) {
+            auto& connection = cxnPair.second;
+            auto& serverConfiguration = listing->addServer(connection.getServerId(),
+                                                           connection.getServerName());
+            auto& connectionServerConfiguration = connection.getServerConfiguration();
+            for (auto& nick : connectionServerConfiguration.getNicks())
+                serverConfiguration.addNick(nick);
+            for (auto& hostConfiguration : connectionServerConfiguration.getHostConfigurations()) {
+                serverConfiguration.addHostConfiguration(hostConfiguration.getHostName(),
+                                                         hostConfiguration.getPort(),
+                                                         hostConfiguration.getPassword(),
+                                                         hostConfiguration.getIpV6(),
+                                                         hostConfiguration.getSsl());
+            }
         }
 
         appQueue->sendEvent(listing);
