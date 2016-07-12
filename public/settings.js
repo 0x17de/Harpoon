@@ -1,45 +1,45 @@
 function Service(servicename, servicetype) {
-	this.serviceview = new Element('#serviceconfig-'+servicetype);
-	this.servicetype = servicetype;
-	this.selector = new Element('option').text(servicename);
-	this.selector.get().onclick = this.show;
-	this.selector.get().value = servicetype;
-	serviceSelector.add(this.selector);
+    this.serviceview = new Element('#serviceconfig-'+servicetype);
+    this.servicetype = servicetype;
+    this.selector = new Element('option').text(servicename);
+    this.selector.get().onclick = this.show;
+    this.selector.get().value = servicetype;
+    serviceSelector.add(this.selector);
 }
 Service.map = {};
 Service.active = null;
 Service.select = function(e) {
-	Service.map[e.value].show();
+    Service.map[e.value].show();
 };
 Service.add = function(service) {
-	Service.map[service.servicetype] = service;
+    Service.map[service.servicetype] = service;
 };
 Service.prototype.show = function() {
-	if (Service.active)
-		Service.active.hide();
-	this.serviceview.show();
+    if (Service.active)
+        Service.active.hide();
+    this.serviceview.show();
 };
 Service.prototype.hide = function() {
-	this.serviceview.hide();
+    this.serviceview.hide();
 };
 
 function ServiceIrc() {
-	Service.call(this, 'IRC', 'irc');
-	this.networklist = new Element('#serviceconfig-irc-networklist');
-	this.hostlist = new Element('#serviceconfig-irc-hostlist');
-	this.nicklist = new Element('#serviceconfig-irc-nicklist');
-	this.clear();
+    Service.call(this, 'IRC', 'irc');
+    this.networklist = new Element('#serviceconfig-irc-networklist');
+    this.hostlist = new Element('#serviceconfig-irc-hostlist');
+    this.nicklist = new Element('#serviceconfig-irc-nicklist');
+    this.clear();
 }
 ServiceIrc.prototype = Object.create(Service.prototype);
 ServiceIrc.prototype.constructor = ServiceIrc;
 ServiceIrc.prototype.clear = function() {
-	this.networklist.clear();
-	this.hostlist.clear();
-	this.nicklist.clear();
+    this.networklist.clear();
+    this.hostlist.clear();
+    this.nicklist.clear();
 };
 ServiceIrc.selectedServer = null;
 ServiceIrc.prototype.load = function(json) {
-	this.clear();
+    this.clear();
     this.data = json;
 
     var noneSelected = true;
@@ -86,7 +86,7 @@ ServiceIrc.prototype.addHost = function(hostKey, hostData) {
 };
 ServiceIrc.prototype.addServer = function(serverId, serverData) {
     var self = this;
-	var server = new Element('div');
+    var server = new Element('div');
 
     server.attr('data-id', serverId);
     server.get().onclick = function() {
@@ -97,7 +97,7 @@ ServiceIrc.prototype.addServer = function(serverId, serverData) {
         ServiceIrc.selectedServer = server;
     };
     server.text(serverData.name);
-	this.networklist.add(server);
+    this.networklist.add(server);
 
     var nicks = serverData.nicks;
     for (var i = 0; i < nicks.length; ++i)
@@ -113,6 +113,6 @@ ServiceIrc.prototype.addNick = function(nick) {
     this.nicklist.add(nickPad);
 };
 ServiceIrc.prototype.save = function() {
-	// TODO save
+    // TODO save
 };
 
