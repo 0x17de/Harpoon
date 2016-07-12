@@ -156,6 +156,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         Json::Value& servers = data["servers"] = Json::objectValue;
         for (auto& serverConfiguration : settings->getServerList()) {
             Json::Value& server = servers[to_string(serverConfiguration.getServerId())];
+            server["name"] = serverConfiguration.getServerName();
             Json::Value& hosts = server["hosts"] = Json::objectValue;
             for (auto& hostConfiguration : serverConfiguration.getHostConfigurations()) {
                 stringstream hostKey;
@@ -164,6 +165,10 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
                 host["hasPassword"] = !hostConfiguration.getPassword().empty();
                 host["ipv6"] = hostConfiguration.getIpV6();
                 host["ssl"] = hostConfiguration.getSsl();
+            }
+            Json::Value& nicks = server["nicks"] = Json::arrayValue;
+            for (auto& nick : serverConfiguration.getNicks()) {
+                nicks.append(nick);
             }
             Json::Value& channels = server["channels"] = Json::arrayValue;
             for (auto& channelConfiguration : serverConfiguration.getChannelLoginData()) {
