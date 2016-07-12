@@ -52,6 +52,10 @@ Element.prototype.class = function(c) {
 	this.e.classList.add(c);
 	return this;
 };
+Element.prototype.removeClass = function(c) {
+    this.e.classList.remove(c);
+    return this;
+}
 Element.prototype.val = function(t) {
 	var val = this.e.value;
 	if (t !== void 0) this.e.value = t;

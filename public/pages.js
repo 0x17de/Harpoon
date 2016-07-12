@@ -20,6 +20,6 @@ function closepage_(args) {
 	var e = args[0] || window.event;
 	if (e.stopPropagation) e.stopPropagation();
 	e.cancelBubble = true;
-	if (currentPage.get() == e.target)
+	if (currentPage && currentPage.get() == e.target)
 		closepage();
 }
