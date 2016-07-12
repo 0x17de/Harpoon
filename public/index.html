@@ -11,127 +11,145 @@
 </head>
 <body onload="init()">
   <div class="page" id="page-chat">
-	<div class="topbar">&nbsp;</div>
-	<div class="hchat">
-	  <div style="display:table-row;height:100%">
-		<div id="chatbar">
-		  <div class="vchatbar">
-			<div class="manageservers" onclick="showpage('manageservers')">
-			  <div class="top">
-				<h2>CHATS</h2>
-			  </div>
-			</div>
-			<div style="display:table-row">
-			  <div style="display:table-cell" style="width:100%">
-				<div class="topscroll" id="channellist" style="width:100%;height:calc(100vh - 24pt)"></div>
-			  </div>
-			</div>
-		  </div>
-		</div>
-		<div class="area">
-		  <div class="varea" style="table-layout:fixed">
-			<div style="display:table-row;height:24pt">
-			  <div class="top">
-				<h2 id="channeltitle"></h2>
-			  </div>
-			</div>
-			<div style="display:table-row">
-			  <div style="display:table-cell">
-				<div class="topscroll">
-				  <div class="topmargin">
-					<div id="backlog"></div>
-				  </div>
-				</div>
-			  </div>
-			</div>
-			<div style="display:table-row;height:calc(22pt + 4px)">
-			  <div class="bottom">
-				<input id="input" type="text" />
-			  </div>
-			</div>
-		  </div>
-		</div>
-		<div id="userbar">
-		  <div class="vuserlist">
-			<div style="display:table-row;height:24pt">
-			  <div class="top">
-				<h2>USERS</h2>
-			  </div>
-			</div>
-			<div style="display:table-row;height:24pt">
-			  <div style="display:table-cell" style="width:100%">
-				<div class="topscroll" id="userlist" style="width:100%;height:calc(100vh - 24pt)"></div>
-			  </div>
-			</div>
-		  </div>
-		</div>
-	  </div>
-	</div>
+    <div class="topbar">&nbsp;</div>
+    <div class="hchat">
+      <div style="display:table-row;height:100%">
+        <div id="chatbar">
+          <div class="vchatbar">
+            <div class="manageservers" onclick="showpage('manageservers')">
+              <div class="top">
+                <h2>CHATS</h2>
+              </div>
+            </div>
+            <div style="display:table-row">
+              <div style="display:table-cell" style="width:100%">
+                <div class="topscroll" id="channellist" style="width:100%;height:calc(100vh - 24pt)"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="area">
+          <div class="varea" style="table-layout:fixed">
+            <div style="display:table-row;height:24pt">
+              <div class="top">
+                <h2 id="channeltitle"></h2>
+              </div>
+            </div>
+            <div style="display:table-row">
+              <div style="display:table-cell">
+                <div class="topscroll">
+                  <div class="topmargin">
+                    <div id="backlog"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="display:table-row;height:calc(22pt + 4px)">
+              <div class="bottom">
+                <input id="input" type="text" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="userbar">
+          <div class="vuserlist">
+            <div style="display:table-row;height:24pt">
+              <div class="top">
+                <h2>USERS</h2>
+              </div>
+            </div>
+            <div style="display:table-row;height:24pt">
+              <div style="display:table-cell" style="width:100%">
+                <div class="topscroll" id="userlist" style="width:100%;height:calc(100vh - 24pt)"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <div id="page-transparent"></div>
   <div class="page" id="page-manageservers" onclick="closepage_(arguments)">
-	<div class="dialog">
-	  <button class="dialog-close" onclick="closepage(this)">X</button>
-	  <h1>Manage Networks</h1>
-	  <div class="dialog-margin" style="overflow:auto;height:calc(100% - 7em)">
-		<h2>Service</h2>
-		<select onselect="Service.select(this)" id="service-selector">
-		</select>
-		<div id="serviceviews">
-		  <div id="serviceconfig-irc">
-			<h3>Server Configurations</h3>
-			<div style="display:table;width:100%">
-		  	  <div style="display:table-row">
-				<div style="display:table-cell;width:100%">
-			  	  <div class="dialog-list" style="height:8em;overflow:auto" id="serviceconfig-irc-networklist">
-			  	  </div>
-				</div>
-				<div style="display:table-cell;vertical-align:top" class="rightaligned">
-			  	  <button>Rename</button>
-			  	  <button>Add</button>
-			  	  <button>Delete</button>
-				</div>
-		  	  </div>
-			</div>
-			<h4>Server Details</h4>
-			<div style="display:table;width:100%">
-		  	  <div style="display:table-row">
-				<div style="display:table-cell;width:100%">
-			  	  <div class="dialog-list" style="height:8em;overflow:auto" id="serviceconfig-irc-hostlist">
-			  	  </div>
-				</div>
-				<div style="display:table-cell;vertical-align:top" class="rightaligned">
-			  	  <button>Edit</button>
-			  	  <button>Add</button>
-			  	  <button>Delete</button>
-			  	  <div style="text-align:center">
-					<button style="width:2.3em">&uarr;</button>
-					<button style="width:2.3em">&darr;</button>
-			  	  </div>
-				</div>
-		  	  </div>
-			</div>
-			<h4>Nicks</h4>
-			<div style="display:table;width:100%">
-		  	  <div style="display:table-row">
-				<div style="display:table-cell;width:100%">
-			  	  <div class="dialog-list dialog-editlist" style="height:8em;overflow:auto" id="serviceconfig-irc-nicklist">
-			  	  </div>
-				</div>
-				<div style="display:table-cell;vertical-align:top" class="rightaligned">
-			  	  <button>Add</button>
-			  	  <button>Delete</button>
-			  	  <div style="text-align:center">
-					<button style="width:2.3em">&uarr;</button>
-					<button style="width:2.3em">&darr;</button>
-			  	  </div>
-				</div>
-		  	  </div>
-			</div>
-		  </div>
-		</div>
-	  </div>
-	</div>
+    <div class="dialog">
+      <button class="dialog-close" onclick="closepage(this)">X</button>
+      <h1>Manage Networks</h1>
+      <div class="dialog-margin" style="overflow:auto;height:calc(100% - 7em)">
+        <h2>Service</h2>
+        <select onselect="Service.select(this)" id="service-selector">
+        </select>
+        <div id="serviceviews">
+          <div id="serviceconfig-irc">
+            <h3>Server Configurations</h3>
+            <div style="display:table;width:100%">
+              <div style="display:table-row">
+                <div style="display:table-cell;width:100%">
+                  <div class="dialog-list dialog-editlist" style="height:8em;overflow:auto" id="serviceconfig-irc-networklist">
+                  </div>
+                </div>
+                <div style="display:table-cell;vertical-align:top" class="rightaligned">
+                  <button onclick="showpopup('irc-add-server')">Add</button>
+                  <button>Delete</button>
+                </div>
+              </div>
+            </div>
+            <h4>Server Details</h4>
+            <div style="display:table;width:100%">
+              <div style="display:table-row">
+                <div style="display:table-cell;width:100%">
+                  <div class="dialog-list" style="height:8em;overflow:auto" id="serviceconfig-irc-hostlist">
+                  </div>
+                </div>
+                <div style="display:table-cell;vertical-align:top" class="rightaligned">
+                  <button>Edit</button>
+                  <button>Add</button>
+                  <button>Delete</button>
+                  <div style="text-align:center">
+                    <button style="width:2.3em">&uarr;</button>
+                    <button style="width:2.3em">&darr;</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <h4>Nicks</h4>
+            <div style="display:table;width:100%">
+              <div style="display:table-row">
+                <div style="display:table-cell;width:100%">
+                  <div class="dialog-list dialog-editlist" style="height:8em;overflow:auto" id="serviceconfig-irc-nicklist">
+                  </div>
+                </div>
+                <div style="display:table-cell;vertical-align:top" class="rightaligned">
+                  <button>Add</button>
+                  <button>Delete</button>
+                  <div style="text-align:center">
+                    <button style="width:2.3em">&uarr;</button>
+                    <button style="width:2.3em">&darr;</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="page-transparent-popup"></div>
+  <div class="popup" id="popup-irc-add-server" onclick="closepopup_(arguments)">
+    <div class="dialog">
+      <button class="dialog-save" onclick="closepopup(this)">SAVE</button>
+      <button class="dialog-close" onclick="closepopup(this)">X</button>
+      <h1>IRC: Add Server</h1>
+      <div class="dialog-margin" style="overflow:auto;height:calc(100% - 7em)">
+        <h2>Server Name</h2>
+        <input id="serviceconfig-irc-newserver-name" />
+        <h2>Port</h2>
+        <input id="serviceconfig-irc-newserver-port" />
+        <h2>Password</h2>
+        <input type="password" id="serviceconfig-irc-newserver-password" />
+        <h2>Options</h2>
+        <label><input type="checkbox" id="serviceconfig-irc-newserver-option-ipv6" /> Use IPv6</label><br/>
+        <label><input type="checkbox" id="serviceconfig-irc-newserver-option-ssl" /> Use SSL</label><br/>
+      </div>
+    </div>
   </div>
 </body>
 </html>

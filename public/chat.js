@@ -13,6 +13,7 @@ var input,
     channeltitle,
     tryingToConnect = false,
     pageTransparent,
+    pageTransparentPopup,
     pageChat,
     serviceSelector;
 
@@ -68,6 +69,11 @@ function startChat() {
             onMessage(msg.data);
         }
     };
+}
+function getScroll(evt, cb) {
+    if (!evt) evt = event;
+    var direction = (evt.defaul < 0 || evt.whellDelta > 0) ? 1 : -1;
+    return direction;
 }
 function onMessage(msg) {
     var json = JSON.parse(msg);
@@ -209,6 +215,7 @@ function init() {
     channeltitle = new Element('#channeltitle');
     pageChat = new Element('#page-chat');
     pageTransparent = new Element('#page-transparent');
+    pageTransparentPopup = new Element('#page-transparent-popup');
     serviceSelector = new Element('#service-selector');
 
     // TODO: Server tells active services

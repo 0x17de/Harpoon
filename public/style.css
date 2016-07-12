@@ -10,7 +10,7 @@ h2 {
 .dialog h2, .dialog h3, .dialog h4 {
 	margin:0.5em 0 0 0; padding:0;
 }
-.page, #page-transparent {
+.page, #page-transparent, .popup {
 	position:absolute;
 	left:0; top:0;
 	width:100vw; height:100vh;
@@ -46,6 +46,13 @@ h2 {
 	background-color:#f5f5f5;
 	border-radius:0.1em;
 	border-top-left-radius:1em; border-top-right-radius:1em;
+}
+.dialog-save {
+	position:absolute;
+	top:0; right:2.28em;
+	width:4em !important; height:2em;
+	margin:0.28em 0.3em !important; padding:0 !important;
+	background-color:#ffc65d !important;
 }
 .dialog-close {
 	position:absolute;
@@ -86,6 +93,11 @@ h2 {
 	border:1px solid #444; border-radius:0.1em;
 	margin:0.2em 0.6em;
 }
+.dialog-margin > input:not([type]), .dialog-margin > input[type=password] {
+	width:100%;
+	background-color:#fff;
+	border:1px solid #444; border-radius:0.1em;
+}
 .dialog select {
 	width:100%;
 	background-color:#fff;
@@ -120,7 +132,7 @@ h2 {
 .dialog-list > div:hover, .dialog-list > div:hover > input {
 	background-color:#ffe68d;
 }
-.dialog-list > div.selected, .dialog-list > div > input:focus {
+.dialog-list > div.selected, .dialog-list > div.selected > input, .dialog-list > div > input:focus {
 	background-color:#ffc65d;
 }
 .topbar {
