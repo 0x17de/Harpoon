@@ -37,7 +37,6 @@ ServiceIrc.prototype.clear = function() {
     this.hostlist.clear();
     this.nicklist.clear();
 };
-ServiceIrc.selectedServer = null;
 ServiceIrc.prototype.load = function(json) {
     this.clear();
     this.data = json;
@@ -87,6 +86,8 @@ ServiceIrc.prototype.addHost = function(hostKey, hostData) {
 ServiceIrc.prototype.addServer = function(serverId, serverData) {
     var self = this;
     var server = new Element('div');
+    var serverInput = new Element('input');
+    server.add(serverInput);
 
     server.attr('data-id', serverId);
     server.get().onclick = function() {
@@ -96,7 +97,7 @@ ServiceIrc.prototype.addServer = function(serverId, serverData) {
         server.class('selected');
         ServiceIrc.selectedServer = server;
     };
-    server.text(serverData.name);
+    serverInput.val(serverData.name);
     this.networklist.add(server);
 
     var nicks = serverData.nicks;
@@ -109,6 +110,13 @@ ServiceIrc.prototype.addNick = function(nick) {
     var nickPad = new Element('div');
     var nickEntry = new Element('input');
     nickPad.add(nickEntry);
+
+    nickPad.get().onclick = function() {
+        if (ServiceIrc.selectedNick)
+            ServiceIrc.selectedNick.removeClass('selected');
+        nickPad.class('selected');
+        ServiceIrc.selectedNick = nickPad;
+    };
     nickEntry.val(nick);
     this.nicklist.add(nickPad);
 };
