@@ -105,6 +105,9 @@ function onIrcMessage(json) {
         var nick = pureNick && '<'+pureNick+'>';
     }
     switch (json.cmd) {
+    case 'addserver':
+        ServiceIrc.closeServerPopup();
+        break;
     case 'login':
         console.log('Login successful');
         send({cmd:'querysettings'});
