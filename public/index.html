@@ -87,7 +87,7 @@
                   </div>
                 </div>
                 <div style="display:table-cell;vertical-align:top" class="rightaligned">
-                  <button onclick="showpopup('irc-add-server')">Add</button>
+                  <button onclick="ServiceIrc.addServerPopup_Open()">Add</button>
                   <button>Delete</button>
                 </div>
               </div>
@@ -135,8 +135,8 @@
   <div id="page-transparent-popup"></div>
   <div class="popup" id="popup-irc-add-server" onclick="closepopup_(arguments)">
     <div class="dialog">
-      <button class="dialog-save" onclick="closepopup(this)">SAVE</button>
-      <button class="dialog-close" onclick="closepopup(this)">X</button>
+      <button class="dialog-save" id="serviceconfig-irc-newserver-btnsave" onclick="ServiceIrc.addServerPopup_Save()">SAVE</button>
+      <button class="dialog-close" id="serviceconfig-irc-newserver-btnclose" onclick="closepopup(this)">X</button>
       <h1>IRC: Add Server</h1>
       <div class="dialog-margin" style="overflow:auto;height:calc(100% - 7em)">
         <h2>Server Name</h2>

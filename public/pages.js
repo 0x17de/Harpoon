@@ -1,5 +1,6 @@
 var currentPage;
 var currentPopup;
+var disableClosePopup = false;
 function closepage(e) {
     if (e) {
         while (!e.classList.contains('page'))
@@ -18,6 +19,7 @@ function showpage(pagename) {
     (currentPage = new Element('#page-'+pagename)).show();
 }
 function closepopup(e) {
+    if (disableClosePopup) return;
     if (e) {
         while (!e.classList.contains('popup'))
             e = e.parentNode;

@@ -57,7 +57,13 @@ Element.prototype.removeClass = function(c) {
     return this;
 }
 Element.prototype.val = function(t) {
-    var val = this.e.value;
-    if (t !== void 0) this.e.value = t;
+    var val;
+    if (this.e.type === 'checkbox') {
+        val = this.e.checked;
+        if (t !== void 0) this.e.checked = t;
+    } else {
+        val = this.e.value;
+        if (t !== void 0) this.e.value = t;
+    }
     return val;
 };
