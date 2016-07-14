@@ -76,8 +76,11 @@ h2 {
 .dialog-editlist {
     background-color:#f5f5f5 !important;
 }
-.dialog-close:hover {
+.dialog-save:hover,.dialog-close:hover {
     background-color:#fde68d !important;
+}
+.dialog-save[disabled=disabled],.dialog-close[disabled=disabled] {
+    background-color:#ede6ed !important;
 }
 .dialog h1 {
     /*font-family:Verdana, Geneva, sans-serif;*/

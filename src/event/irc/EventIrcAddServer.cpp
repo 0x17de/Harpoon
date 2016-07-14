@@ -2,9 +2,10 @@
 #include "utils/uuidGen.hpp"
 
 
-EventIrcAddServer::EventIrcAddServer(size_t userId, std::string serverName)
+EventIrcAddServer::EventIrcAddServer(size_t userId,
+                                     std::string name)
     : userId{userId}
-    , serverName{serverName}
+    , name{name}
 {
 }
 
@@ -17,6 +18,6 @@ size_t EventIrcAddServer::getUserId() const {
     return userId;
 }
 
-std::string EventIrcAddServer::getServerName() const {
-    return serverName;
+std::string EventIrcAddServer::getName() const {
+    return name;
 }

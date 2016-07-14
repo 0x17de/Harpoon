@@ -26,7 +26,8 @@ IrcDatabase_Ini::IrcDatabase_Ini(EventQueue* appQueue) :
     EventLoop({
         EventInit::uuid,
         EventQuit::uuid,
-        EventLoginResult::uuid
+        EventLoginResult::uuid,
+        EventIrcAddServer::uuid
     }),
     appQueue{appQueue}
 {
@@ -46,14 +47,14 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             << "/irc.servers.ini";
         Ini serversConfig(serversConfigFilename.str());
 
-        auto& serverEntry = serversConfig.expectCategory(add->getServerName());
+        auto& serverEntry = serversConfig.expectCategory(add->getName());
         string serverIdStr;
         if (!serversConfig.getEntry(serverEntry, "id", serverIdStr)) {
             size_t serverId = IdProvider::getInstance().generateNewId("server");
             serverIdStr = to_string(serverId);
             serversConfig.setEntry(serverEntry, "id", serverIdStr);
 
-            auto added = make_shared<EventIrcServerAdded>(add->getUserId(), serverId, add->getServerName());
+            auto added = make_shared<EventIrcServerAdded>(add->getUserId(), serverId, add->getName());
         } else {
 #warning EventIrcAddServer: handle server already exists case
         }

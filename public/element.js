@@ -44,6 +44,9 @@ Element.prototype.attr = function(attr, value) {
     this.e.setAttribute(attr, value);
     return this;
 };
+Element.prototype.removeAttr = function(attr) {
+    this.e.removeAttribute(attr);
+};
 Element.prototype.add = function(e) {
     this.e.appendChild((e instanceof Element) ? e.get() : e);
     return this;

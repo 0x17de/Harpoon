@@ -101,7 +101,7 @@
                 </div>
                 <div style="display:table-cell;vertical-align:top" class="rightaligned">
                   <button>Edit</button>
-                  <button>Add</button>
+                  <button onclick="ServiceIrc.addHostPopup_Open()">Add</button>
                   <button>Delete</button>
                   <div style="text-align:center">
                     <button style="width:2.3em">&uarr;</button>
@@ -141,13 +141,24 @@
       <div class="dialog-margin" style="overflow:auto;height:calc(100% - 7em)">
         <h2>Server Name</h2>
         <input id="serviceconfig-irc-newserver-name" />
+      </div>
+    </div>
+  </div>
+  <div class="popup" id="popup-irc-add-host" onclick="closepopup_(arguments)">
+    <div class="dialog">
+      <button class="dialog-save" id="serviceconfig-irc-newhost-btnsave" onclick="ServiceIrc.addHostPopup_Save()">SAVE</button>
+      <button class="dialog-close" id="serviceconfig-irc-newhost-btnclose" onclick="closepopup(this)">X</button>
+      <h1>IRC: Add Host</h1>
+      <div class="dialog-margin" style="overflow:auto;height:calc(100% - 7em)">
+        <h2>Host</h2>
+        <input id="serviceconfig-irc-newhost-host" />
         <h2>Port</h2>
-        <input id="serviceconfig-irc-newserver-port" />
+        <input id="serviceconfig-irc-newhost-port" />
         <h2>Password</h2>
-        <input type="password" id="serviceconfig-irc-newserver-password" />
+        <input type="password" id="serviceconfig-irc-newhost-password" />
         <h2>Options</h2>
-        <label><input type="checkbox" id="serviceconfig-irc-newserver-option-ipv6" /> Use IPv6</label><br/>
-        <label><input type="checkbox" id="serviceconfig-irc-newserver-option-ssl" /> Use SSL</label><br/>
+        <label><input type="checkbox" id="serviceconfig-irc-newhost-option-ipv6" /> Use IPv6</label><br/>
+        <label><input type="checkbox" id="serviceconfig-irc-newhost-option-ssl" /> Use SSL</label><br/>
       </div>
     </div>
   </div>
