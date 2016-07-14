@@ -41,15 +41,25 @@ ServiceIrc.addServerPopup_Close = function(force) {
     if (force) disableClosePopup = false;
     closepopup((new Element('#popup-irc-add-server')).get());
 };
+ServiceIrc.addHostPopup_Close = function(force) {
+    if (force) disableClosePopup = false;
+    closepopup((new Element('#popup-irc-add-host')).get());
+};
 ServiceIrc.addServerPopup_Open = function() {
     showpopup('irc-add-server');
-    (new Element('#serviceconfig-irc-newserver-btnsave')).attr('disabled', '');
-    (new Element('#serviceconfig-irc-newserver-btnclose')).attr('disabled', '');
+    (new Element('#serviceconfig-irc-newserver-btnsave')).removeAttr('disabled');
+    (new Element('#serviceconfig-irc-newserver-btnclose')).removeAttr('disabled');
     (new Element('#serviceconfig-irc-newserver-name')).val('');
-    (new Element('#serviceconfig-irc-newserver-port')).val('');
-    (new Element('#serviceconfig-irc-newserver-password')).val('');
-    (new Element('#serviceconfig-irc-newserver-option-ipv6')).val(false);
-    (new Element('#serviceconfig-irc-newserver-option-ssl')).val(true);
+};
+ServiceIrc.addHostPopup_Open = function() {
+    showpopup('irc-add-host');
+    (new Element('#serviceconfig-irc-newhost-btnsave')).removeAttr('disabled');
+    (new Element('#serviceconfig-irc-newhost-btnclose')).removeAttr('disabled');
+    (new Element('#serviceconfig-irc-newhost-host')).val('');
+    (new Element('#serviceconfig-irc-newhost-port')).val('');
+    (new Element('#serviceconfig-irc-newhost-password')).val('');
+    (new Element('#serviceconfig-irc-newhost-option-ipv6')).val(false);
+    (new Element('#serviceconfig-irc-newhost-option-ssl')).val(true);
 };
 ServiceIrc.addServerPopup_Save = function() {
     disableClosePopup = true;
@@ -57,8 +67,18 @@ ServiceIrc.addServerPopup_Save = function() {
     (new Element('#serviceconfig-irc-newserver-btnclose')).attr('disabled', 'disabled');
     send({cmd: 'addserver',
           type: 'irc',
-          name: (new Element('#serviceconfig-irc-newserver-name')).val(),
-          port: (new Element('#serviceconfig-irc-newserver-port')).val(),
+          name: (new Element('#serviceconfig-irc-newserver-name')).val()
+         });
+};
+ServiceIrc.addHostPopup_Save = function() {
+    disableClosePopup = true;
+    (new Element('#serviceconfig-irc-newserver-btnsave')).attr('disabled', 'disabled');
+    (new Element('#serviceconfig-irc-newserver-btnclose')).attr('disabled', 'disabled');
+    send({cmd: 'addhost',
+          type: 'irc',
+          serverId: ServiceIrc.selectedServerId, /* TODO */
+          host: (new Element('#serviceconfig-irc-newserver-host')).val(),
+          port: parseInt((new Element('#serviceconfig-irc-newserver-port')).val()),
           password: (new Element('#serviceconfig-irc-newserver-password')).val(),
           ipv6: (new Element('#serviceconfig-irc-newserver-option-ipv6')).val(),
           ssl: (new Element('#serviceconfig-irc-newserver-option-ssl')).val()
@@ -122,6 +142,7 @@ ServiceIrc.prototype.addServer = function(serverId, serverData) {
             ServiceIrc.selectedServer.removeClass('selected');
         self.setServerData(serverData);
         server.class('selected');
+        ServiceIrc.selectedServerId = serverId;
         ServiceIrc.selectedServer = server;
     };
     serverInput.val(serverData.name);

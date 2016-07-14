@@ -5,17 +5,17 @@
 #include <string>
 
 
-class IrcChannelLoginData;
 class EventIrcAddServer : public IUserEvent {
     size_t userId;
-    std::string serverName;
+    std::string name;
 public:
     static UUID uuid;
     virtual UUID getEventUuid() const override;
 
-    EventIrcAddServer(size_t userId, std::string serverName);
+    EventIrcAddServer(size_t userId,
+                      std::string name);
     virtual size_t getUserId() const override;
-    std::string getServerName() const;
+    std::string getName() const;
 };
 
 #endif
