@@ -18,8 +18,8 @@ public:
     EventIrcSettingsListing(size_t userId, void* data);
     IrcServerConfiguration& addServer(size_t serverId, std::string serverName);
 
-    size_t getUserId() const override;
-    void* getData() const override;
+    virtual size_t getUserId() const override;
+    virtual void* getData() const override;
     const std::list<IrcServerConfiguration>& getServerList() const;
 };
 

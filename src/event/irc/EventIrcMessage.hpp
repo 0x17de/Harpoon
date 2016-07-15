@@ -17,7 +17,7 @@ public:
 
     EventIrcMessage(size_t userId, size_t serverId, const std::string& from, const std::string& channel, const std::string& message);
 
-    size_t getUserId() const override;
+    virtual size_t getUserId() const override;
     size_t getServerId() const;
     std::string getFrom() const;
     std::string getChannel() const;

@@ -51,7 +51,7 @@ public:
     EventIrcChatListing(size_t userId, void* data);
     IrcServerListing& addServer(size_t serverId, std::string serverName);
 
-    size_t getUserId() const override;
+    virtual size_t getUserId() const override;
     const std::list<IrcServerListing>& getServerList() const;
     void* getData() const;
 };

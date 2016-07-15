@@ -21,7 +21,7 @@ public:
                         const std::string& channel,
                         const std::string& mode,
                         const std::string& arg);
-    size_t getUserId() const override;
+    virtual size_t getUserId() const override;
     size_t getServerId() const;
     std::string getUsername() const;
     std::string getChannel() const;
