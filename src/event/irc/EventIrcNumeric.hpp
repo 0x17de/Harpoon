@@ -20,7 +20,7 @@ public:
                     unsigned int eventCode,
                     std::string from,
                     std::vector<std::string> parameters);
-    size_t getUserId() const override;
+    virtual size_t getUserId() const override;
     size_t getServerId() const;
     unsigned int getEventCode() const;
     std::string getFrom() const;

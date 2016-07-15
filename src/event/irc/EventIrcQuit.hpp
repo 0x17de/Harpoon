@@ -17,7 +17,7 @@ public:
     virtual UUID getEventUuid() const override;
 
     EventIrcQuit(size_t userId, size_t serverId, const std::string& who, const std::string& reason);
-    size_t getUserId() const override;
+    virtual size_t getUserId() const override;
     size_t getServerId() const;
     std::string getWho() const;
     std::string getReason() const;
