@@ -1,7 +1,7 @@
 # Harpoon
 Connect to various services through this bouncer. Initially meant for IRC
 
-This programm is still work in progress. It will require a server.
+This program is still work in progress. It will require a server.
 
 ![Screenshot](https://www.0x17.de/proj/harpoonClient4.png)
 
