@@ -54,7 +54,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             serverIdStr = to_string(serverId);
             serversConfig.setEntry(serverEntry, "id", serverIdStr);
 
-            auto added = make_shared<EventIrcServerAdded>(add->getUserId(), serverId, add->getName());
+            appQueue->sendEvent(make_shared<EventIrcServerAdded>(add->getUserId(), serverId, add->getName()));
         } else {
 #warning EventIrcAddServer: handle server already exists case
         }
