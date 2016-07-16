@@ -105,8 +105,9 @@ function onIrcMessage(json) {
         var nick = pureNick && '<'+pureNick+'>';
     }
     switch (json.cmd) {
-    case 'addserver':
-        ServiceIrc.closeServerPopup();
+    case 'serveradded':
+        ServiceIrc.addServerPopup_Close(true);
+        // TODO: handle event
         break;
     case 'login':
         console.log('Login successful');

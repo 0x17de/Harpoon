@@ -151,6 +151,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     } else if (eventType == EventIrcServerAdded::uuid) {
         auto added = event->as<EventIrcServerAdded>();
         root["cmd"] = "serveradded";
+        root["type"] = "irc";
         root["name"] = added->getServerName();
         root["id"] = to_string(added->getServerId());
     } else if (eventType == EventIrcSettingsListing::uuid) {
