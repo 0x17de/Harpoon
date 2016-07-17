@@ -52,6 +52,7 @@ ServiceIrc.addServerPopup_Open = function() {
     (new Element('#serviceconfig-irc-newserver-name')).val('');
 };
 ServiceIrc.addHostPopup_Open = function() {
+    if (ServiceIrc.selectedServerId == null) return;
     showpopup('irc-add-host');
     (new Element('#serviceconfig-irc-newhost-btnsave')).removeAttr('disabled');
     (new Element('#serviceconfig-irc-newhost-btnclose')).removeAttr('disabled');
@@ -76,7 +77,7 @@ ServiceIrc.addHostPopup_Save = function() {
     (new Element('#serviceconfig-irc-newserver-btnclose')).attr('disabled', 'disabled');
     send({cmd: 'addhost',
           type: 'irc',
-          serverId: ServiceIrc.selectedServerId, /* TODO */
+          serverId: ServiceIrc.selectedServerId,
           host: (new Element('#serviceconfig-irc-newserver-host')).val(),
           port: parseInt((new Element('#serviceconfig-irc-newserver-port')).val()),
           password: (new Element('#serviceconfig-irc-newserver-password')).val(),
