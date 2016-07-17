@@ -5,6 +5,7 @@
 #include "event/EventQuerySettings.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"
 #include "event/irc/EventIrcAddServer.hpp"
+#include "event/irc/EventIrcDeleteServer.hpp"
 #include <sstream>
 #include <json/json.h>
 
@@ -72,6 +73,11 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                 if (cmd == "addserver") {
                     string name = root.get("name", "").asString();
                     appQueue->sendEvent(make_shared<EventIrcAddServer>(clientData.userId, name));
+                } else if (cmd == "deleteserver") {
+                    size_t serverId;
+                    istringstream(root.get("id", "0").asString()) >> serverId;
+                    if (serverId != 0)
+                        appQueue->sendEvent(make_shared<EventIrcDeleteServer>(clientData.userId, serverId));
                 } else if (cmd == "addhost") {
                     /*
                     size_t serverId = root.get("serverId", "").asInt();

@@ -4,7 +4,6 @@
 #include "../IUserEvent.hpp"
 
 
-class IrcChannelLoginData;
 class EventIrcDeleteServer : public IUserEvent {
     size_t userId;
     size_t serverId;
