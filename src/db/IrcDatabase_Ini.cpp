@@ -28,7 +28,8 @@ IrcDatabase_Ini::IrcDatabase_Ini(EventQueue* appQueue) :
         EventInit::uuid,
         EventQuit::uuid,
         EventLoginResult::uuid,
-        EventIrcAddServer::uuid
+        EventIrcAddServer::uuid,
+        EventIrcDeleteServer::uuid
     }),
     appQueue{appQueue}
 {
@@ -61,21 +62,23 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
         }
     } else if (eventType == EventIrcDeleteServer::uuid) {
         auto del = event->as<EventIrcDeleteServer>();
+        if (del->getServerId() > 0) {
+            stringstream serversConfigFilename;
+            serversConfigFilename
+                << "config/user" << del->getUserId()
+                << "/irc.servers.ini";
+            Ini serversConfig(serversConfigFilename.str());
 
-        stringstream serversConfigFilename;
-        serversConfigFilename
-            << "config/user" << del->getUserId()
-            << "/irc.servers.ini";
-        Ini serversConfig(serversConfigFilename.str());
-
-        for (auto& categoryPair : serversConfig) {
-            size_t serverId;
-            string serverIdStr;
-            serversConfig.getEntry(categoryPair.second, "id", serverIdStr);
-            istringstream(serverIdStr) >> serverId;
-            if (serverId == del->getServerId()) {
-                serversConfig.deleteCategory(categoryPair.first);
-                break;
+            for (auto& categoryPair : serversConfig) {
+                size_t serverId;
+                string serverIdStr;
+                serversConfig.getEntry(categoryPair.second, "id", serverIdStr);
+                istringstream(serverIdStr) >> serverId;
+                cout << categoryPair.first << ":" << serverId << ":" << del->getServerId() << endl;
+                if (serverId == del->getServerId()) {
+                    serversConfig.deleteCategory(categoryPair.first);
+                    break;
+                }
             }
         }
 #warning EventIrcDeleteServer: Cleanup directories
