@@ -1,4 +1,7 @@
 Element = function(tagOrElement) {
+    if (!(this instanceof Element))
+        return new Element(tagOrElement);
+
     if ((typeof tagOrElement) === 'string') {
         if (tagOrElement[0] === '#') {
             this.e = document.getElementById(tagOrElement.substr(1));

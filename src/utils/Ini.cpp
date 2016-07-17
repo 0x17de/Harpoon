@@ -94,6 +94,7 @@ Ini::Entries& Ini::expectCategory(const std::string& category) {
 }
 
 void Ini::deleteCategory(const std::string& category) {
+    modified = true;
     categories.erase(category);
 }
 

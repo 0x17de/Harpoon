@@ -137,7 +137,7 @@ ServiceIrc.prototype.addServer = function(serverId, serverData) {
     var serverInput = new Element('input');
     server.add(serverInput);
 
-    server.attr('data-id', serverId);
+    server.attr('id', 'irc-server-'+serverId);
     server.get().onclick = function() {
         if (ServiceIrc.selectedServer)
             ServiceIrc.selectedServer.removeClass('selected');
@@ -154,6 +154,14 @@ ServiceIrc.prototype.addServer = function(serverId, serverData) {
         this.addNick(nicks[i]);
 
     return server;
+};
+ServiceIrc.deleteServer = function(serverId) {
+    send({type:'irc', cmd:'deleteserver', id:serverId});
+    var serverItem = Element('#irc-server-'+serverId);
+    var next = serverItem.get().nextElementSibling || serverItem.get().previousElementSibling;
+    if (next) next.click();
+    serverItem.remove();
+    serverList.get('irc', serverId).remove();
 };
 ServiceIrc.prototype.addNick = function(nick) {
     var nickPad = new Element('div');
