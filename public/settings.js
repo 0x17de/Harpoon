@@ -137,6 +137,9 @@ ServiceIrc.prototype.addServer = function(serverId, serverData) {
     var serverInput = new Element('input');
     server.add(serverInput);
 
+    if (!serverData.nicks) serverData.nicks = [];
+    if (!serverData.hosts) serverData.hosts = {};
+
     server.attr('id', 'irc-server-'+serverId);
     server.get().onclick = function() {
         if (ServiceIrc.selectedServer)
