@@ -11,6 +11,8 @@
 #include "event/irc/EventIrcSendMessage.hpp"
 #include "event/irc/EventIrcChatListing.hpp"
 #include "event/irc/EventIrcSettingsListing.hpp"
+#include "event/irc/EventIrcServerAdded.hpp"
+#include "event/irc/EventIrcServerDeleted.hpp"
 #include "service/irc/IrcChannelStore.hpp"
 #include <iostream>
 #include <mutex>
@@ -23,7 +25,9 @@ IrcService::IrcService(size_t userId, EventQueue* appQueue)
           EventQuit::uuid,
           EventQueryChats::uuid,
           EventQuerySettings::uuid,
-          EventIrcSendMessage::uuid
+          EventIrcSendMessage::uuid,
+          EventIrcServerAdded::uuid,
+          EventIrcServerDeleted::uuid
       }, {
           &EventGuard<IActivateServiceEvent>
       })
@@ -58,6 +62,22 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
         for (auto& connection : ircConnections)
             connection.second.join();
         return false;
+    } else if (type == EventIrcServerAdded::uuid) {
+        auto add = event->as<EventIrcServerAdded>();
+        ircConnections.emplace(piecewise_construct,
+                               forward_as_tuple(add->getServerId()),
+                               forward_as_tuple(appQueue,
+                                                add->getUserId(),
+                                                (IrcServerConfiguration){add->getServerId(), add->getServerName()}));
+    } else if (type == EventIrcServerDeleted::uuid) {
+        auto del = event->as<EventIrcServerDeleted>();
+        auto it = ircConnections.find(del->getServerId());
+        if (it != ircConnections.end()) {
+            auto& connection = it->second;
+            connection.getEventQueue()->sendEvent(make_shared<EventQuit>());
+            connection.join();
+            ircConnections.erase(it);
+        }
     } else if (type == EventQueryChats::uuid) {
         auto query = event->as<EventQueryChats>();
 
