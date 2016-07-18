@@ -107,7 +107,8 @@ function onIrcMessage(json) {
     switch (json.cmd) {
     case 'serveradded':
         ServiceIrc.addServerPopup_Close(true);
-        // TODO: handle event
+        Service.map['irc'].addServer(json.id, {name: json.name});;
+        serverList.add('irc', json.id, json.name);
         break;
     case 'login':
         console.log('Login successful');
