@@ -11,6 +11,7 @@
 #include "event/irc/EventIrcAddServer.hpp"
 #include "event/irc/EventIrcDeleteServer.hpp"
 #include "event/irc/EventIrcServerAdded.hpp"
+#include "event/irc/EventIrcServerDeleted.hpp"
 #include "utils/Filesystem.hpp"
 #include "utils/Ini.hpp"
 #include "utils/IdProvider.hpp"
@@ -74,9 +75,9 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
                 string serverIdStr;
                 serversConfig.getEntry(categoryPair.second, "id", serverIdStr);
                 istringstream(serverIdStr) >> serverId;
-                cout << categoryPair.first << ":" << serverId << ":" << del->getServerId() << endl;
                 if (serverId == del->getServerId()) {
                     serversConfig.deleteCategory(categoryPair.first);
+                    appQueue->sendEvent(make_shared<EventIrcServerDeleted>(del->getUserId(), del->getServerId()));
                     break;
                 }
             }

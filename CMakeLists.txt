@@ -62,6 +62,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 	src/event/irc/EventIrcAddHost.cpp src/event/irc/EventIrcAddHost.hpp
 	src/event/irc/EventIrcDeleteServer.cpp src/event/irc/EventIrcDeleteServer.hpp
 	src/event/irc/EventIrcServerAdded.cpp src/event/irc/EventIrcServerAdded.hpp
+	src/event/irc/EventIrcServerDeleted.cpp src/event/irc/EventIrcServerDeleted.hpp
 	src/event/EventQuit.cpp src/event/EventQuit.hpp
 	)
 
