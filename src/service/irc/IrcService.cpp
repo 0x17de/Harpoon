@@ -13,6 +13,8 @@
 #include "event/irc/EventIrcSettingsListing.hpp"
 #include "event/irc/EventIrcServerAdded.hpp"
 #include "event/irc/EventIrcServerDeleted.hpp"
+#include "event/irc/EventIrcHostAdded.hpp"
+#include "event/irc/EventIrcHostDeleted.hpp"
 #include "service/irc/IrcChannelStore.hpp"
 #include <iostream>
 #include <mutex>
@@ -27,7 +29,9 @@ IrcService::IrcService(size_t userId, EventQueue* appQueue)
           EventQuerySettings::uuid,
           EventIrcSendMessage::uuid,
           EventIrcServerAdded::uuid,
-          EventIrcServerDeleted::uuid
+          EventIrcServerDeleted::uuid,
+          EventIrcHostAdded::uuid,
+          EventIrcHostDeleted::uuid
       }, {
           &EventGuard<IActivateServiceEvent>
       })
@@ -77,6 +81,26 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
             connection.getEventQueue()->sendEvent(make_shared<EventQuit>());
             connection.join();
             ircConnections.erase(it);
+        }
+    } else if (type == EventIrcHostAdded::uuid) {
+        auto add = event->as<EventIrcHostAdded>();
+        auto it = ircConnections.find(add->getServerId());
+        if (it != ircConnections.end()) {
+            auto& connection = it->second;
+            lock_guard<mutex> lock(connection.getChannelLoginDataMutex());
+            connection.addHost(add->getHost(),
+                               add->getPort(),
+                               add->getPassword(),
+                               add->getIpV6(),
+                               add->getSsl());
+        }
+    } else if (type == EventIrcHostDeleted::uuid) {
+        auto del = event->as<EventIrcHostDeleted>();
+        auto it = ircConnections.find(del->getServerId());
+        if (it != ircConnections.end()) {
+            auto& connection = it->second;
+            lock_guard<mutex> lock(connection.getChannelLoginDataMutex());
+            connection.removeHost(del->getHost(), del->getPort());
         }
     } else if (type == EventQueryChats::uuid) {
         auto query = event->as<EventQueryChats>();

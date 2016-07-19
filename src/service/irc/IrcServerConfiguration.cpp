@@ -42,6 +42,16 @@ void IrcServerConfiguration::addHostConfiguration(const std::string& hostName,
 	hostConfigurations.emplace_back(hostName, port, password, ipV6, ssl);
 }
 
+void IrcServerConfiguration::removeHost(const std::string& hostName, int port) {
+    for (auto it = hostConfigurations.begin(); it != hostConfigurations.end(); ++it) {
+        auto& host = *it;
+        if (host.getHostName() == hostName && host.getPort() == port) {
+            hostConfigurations.erase(it);
+            break;
+        }
+    }
+}
+
 const std::list<IrcServerHostConfiguration>& IrcServerConfiguration::getHostConfigurations() const {
 	return hostConfigurations;
 }

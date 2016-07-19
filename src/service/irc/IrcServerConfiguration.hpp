@@ -28,6 +28,7 @@ public:
                               const std::string& password,
                               bool ipV6,
                               bool ssl);
+    void removeHost(const std::string& hostName, int port);
     const std::list<IrcServerHostConfiguration>& getHostConfigurations() const;
 };
 

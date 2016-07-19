@@ -22,6 +22,12 @@ public:
     size_t getServerId() const;
     std::string getServerName() const;
     std::mutex& getChannelLoginDataMutex() const;
+    void addHost(const std::string& hostName,
+                 int port,
+                 const std::string& password,
+                 bool ipV6,
+                 bool ssl);
+    void removeHost(const std::string& host, int port);
     const IrcServerConfiguration& getServerConfiguration() const;
     const std::map<std::string, IrcChannelStore>& getChannelStore() const;
     const IrcChannelStore* getChannelStore(const std::string& channelName) const;

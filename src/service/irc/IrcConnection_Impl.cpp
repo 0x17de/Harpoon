@@ -115,7 +115,7 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue,
 
         size_t hostIndex = 0; // on error choose next server
         while (ircSession != 0 && running) {
-            const IrcServerHostConfiguration* hostConfiguration = 0;
+            IrcServerHostConfiguration hostConfiguration;
             {
                 lock_guard<mutex> lock(channelLoginDataMutex);
                 // copy channels to login
@@ -127,29 +127,28 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue,
                 }
 
                 auto& hostConfigurations = this->configuration.getHostConfigurations();
-                if (hostConfigurations.empty()) break;
+                if (hostConfigurations.empty()) break; // give up
                 hostIndex %= hostConfigurations.size();
                 auto hostIterator = hostConfigurations.begin();
                 advance(hostIterator, hostIndex);
-                hostConfiguration = &*hostIterator;
+                hostConfiguration = *hostIterator;
 
                 if (!findUnusedNick(nick)) break; // give up
             }
 
             // connect to server
-            if (hostConfiguration == 0
-             || irc_connect(ircSession,
-                            hostConfiguration->getHostName().c_str(),
-                            hostConfiguration->getPort(),
-                            hostConfiguration->getPassword().empty()
+            if (irc_connect(ircSession,
+                            hostConfiguration.getHostName().c_str(),
+                            hostConfiguration.getPort(),
+                            hostConfiguration.getPassword().empty()
                             ? 0
-                            : hostConfiguration->getPassword().c_str(),
+                            : hostConfiguration.getPassword().c_str(),
                             nick.c_str(),
                             0 /* username */,
                             0 /* realname */)) {
                 hostIndex += 1;
             }
-            cout << "[IC] Connection initiated: " << hostConfiguration->getHostName() << ":" << hostConfiguration->getPort() << endl;
+            cout << "[IC] Connection initiated: " << hostConfiguration.getHostName() << ":" << hostConfiguration.getPort() << endl;
 
             // run irc event loop
             if (irc_run(ircSession))

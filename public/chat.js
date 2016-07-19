@@ -119,6 +119,7 @@ function onIrcMessage(json) {
             ipv6: json.ipv6,
             ssl: json.ssl
         };
+        ircService.load();
         ServiceIrc.addHostPopup_Close(true);
         break;
     case 'login':

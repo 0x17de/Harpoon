@@ -90,8 +90,8 @@ ServiceIrc.prototype.load = function(json) {
     if (json) this.data = json;
 
     var noneSelected = true;
-    if (!json.servers) json.servers = {};
-    var servers = json.servers;
+    if (!this.data.servers) this.data.servers = {};
+    var servers = this.data.servers;
     for (var serverId in servers) {
         if (!servers[serverId].channels) servers[serverId.channels] = [];
         if (!servers[serverId].hosts) servers[serverId.hosts] = {};
