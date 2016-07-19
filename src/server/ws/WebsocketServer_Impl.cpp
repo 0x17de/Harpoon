@@ -14,6 +14,7 @@
 #include "event/irc/EventIrcNickChanged.hpp"
 #include "event/irc/EventIrcNoticed.hpp"
 #include "event/irc/EventIrcServerAdded.hpp"
+#include "event/irc/EventIrcHostAdded.hpp"
 #include "event/EventLoginResult.hpp"
 #include "event/EventLogout.hpp"
 #include "event/EventQueryChats.hpp"
@@ -154,6 +155,16 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["type"] = "irc";
         root["name"] = added->getServerName();
         root["id"] = to_string(added->getServerId());
+    } else if (eventType == EventIrcHostAdded::uuid) {
+        auto added = event->as<EventIrcHostAdded>();
+        root["cmd"] = "hostadded";
+        root["type"] = "irc";
+        root["serverId"] = to_string(added->getServerId());
+        root["host"] = added->getHost();
+        root["hasPassword"] = added->getPassword().size() > 0;
+        root["port"] = added->getPort();
+        root["ipv6"] = added->getIpV6();
+        root["ssl"] = added->getSsl();
     } else if (eventType == EventIrcSettingsListing::uuid) {
 #warning EventIrcSettingsListing stub
         auto settings = event->as<EventIrcSettingsListing>();

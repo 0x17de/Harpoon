@@ -106,9 +106,20 @@ function onIrcMessage(json) {
     }
     switch (json.cmd) {
     case 'serveradded':
+        var ircService = Service.map['irc'];
+        ircService.data.servers[json.serverId] = {name: json.name};
+        ircService.load();
         ServiceIrc.addServerPopup_Close(true);
-        Service.map['irc'].addServer(json.id, {name: json.name});;
-        serverList.add('irc', json.id, json.name);
+        break;
+    case 'hostadded':
+        var hostKey = json.host + ":" + json.port;
+        var ircService = Service.map['irc'];
+        ircService.data.servers[json.serverId].hosts[hostKey] = {
+            hasPassword: json.hasPassword,
+            ipv6: json.ipv6,
+            ssl: json.ssl
+        };
+        ServiceIrc.addHostPopup_Close(true);
         break;
     case 'login':
         console.log('Login successful');

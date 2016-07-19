@@ -163,6 +163,7 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue,
                 this_thread::sleep_for(chrono::seconds(1));
             }
         }
+#warning IrcConnection_Impl: send disconnected event to appqueue
     });
 }
 
