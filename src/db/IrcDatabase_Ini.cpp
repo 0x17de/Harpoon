@@ -14,6 +14,8 @@
 #include "event/irc/EventIrcServerDeleted.hpp"
 #include "event/irc/EventIrcAddHost.hpp"
 #include "event/irc/EventIrcHostAdded.hpp"
+#include "event/irc/EventIrcDeleteHost.hpp"
+#include "event/irc/EventIrcHostDeleted.hpp"
 #include "utils/Filesystem.hpp"
 #include "utils/Ini.hpp"
 #include "utils/IdProvider.hpp"
@@ -33,7 +35,8 @@ IrcDatabase_Ini::IrcDatabase_Ini(EventQueue* appQueue) :
         EventLoginResult::uuid,
         EventIrcAddServer::uuid,
         EventIrcDeleteServer::uuid,
-        EventIrcAddHost::uuid
+        EventIrcAddHost::uuid,
+        EventIrcDeleteHost::uuid
     }),
     appQueue{appQueue}
 {
@@ -119,6 +122,22 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
         } else {
 #warning EventIrcAddHost: handle host already exists case
         }
+    } else if (eventType == EventIrcDeleteHost::uuid) {
+        auto del = event->as<EventIrcDeleteHost>();
+        if (del->getServerId() > 0) {
+            stringstream hostsConfigFilename;
+            hostsConfigFilename
+                << "config/user" << del->getUserId()
+                << "/server" << del->getServerId()
+                << "/hosts.ini";
+            Ini hostsConfig(hostsConfigFilename.str());
+
+            stringstream hostKey;
+            hostKey << del->getHost() << ":" << del->getPort();
+            hostsConfig.deleteCategory(hostKey.str());
+            appQueue->sendEvent(make_shared<EventIrcHostDeleted>(del->getUserId(), del->getServerId(), del->getHost(), del->getPort()));
+        }
+#warning EventIrcDeleteServer: Cleanup directories
     } else if (eventType == EventIrcJoinChannel::uuid) {
         auto join = event->as<EventIrcJoinChannel>();
 

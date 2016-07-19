@@ -78,20 +78,24 @@ ServiceIrc.addHostPopup_Save = function() {
     send({cmd: 'addhost',
           type: 'irc',
           serverId: ServiceIrc.selectedServerId,
-          host: (new Element('#serviceconfig-irc-newserver-host')).val(),
-          port: parseInt((new Element('#serviceconfig-irc-newserver-port')).val()),
-          password: (new Element('#serviceconfig-irc-newserver-password')).val(),
-          ipv6: (new Element('#serviceconfig-irc-newserver-option-ipv6')).val(),
-          ssl: (new Element('#serviceconfig-irc-newserver-option-ssl')).val()
+          host: (new Element('#serviceconfig-irc-newhost-host')).val(),
+          port: parseInt((new Element('#serviceconfig-irc-newhost-port')).val()),
+          password: (new Element('#serviceconfig-irc-newhost-password')).val(),
+          ipv6: (new Element('#serviceconfig-irc-newhost-option-ipv6')).val(),
+          ssl: (new Element('#serviceconfig-irc-newhost-option-ssl')).val()
          });
 };
 ServiceIrc.prototype.load = function(json) {
     this.clear();
-    this.data = json;
+    if (json) this.data = json;
 
     var noneSelected = true;
+    if (!json.servers) json.servers = {};
     var servers = json.servers;
     for (var serverId in servers) {
+        if (!servers[serverId].channels) servers[serverId.channels] = [];
+        if (!servers[serverId].hosts) servers[serverId.hosts] = {};
+
         var serverData = servers[serverId];
         var server = this.addServer(serverId, serverData);
         if (noneSelected) {
@@ -119,9 +123,15 @@ ServiceIrc.prototype.addHost = function(hostKey, hostData) {
     var self = this;
     var host = new Element('div');
 
+    var splitKey = hostKey.split(":", 2);
+    var hostVal = splitKey[0];
+    var portVal = parseInt(splitKey[1]);
+
+    host.attr('id', 'irc-host-'+hostVal+"-"+portVal);
     host.get().onclick = function() {
         if (ServiceIrc.selectedHost)
             ServiceIrc.selectedHost.removeClass('selected');
+        ServiceIrc.selectedHostKey = hostKey;
         ServiceIrc.selectedHostData = hostData;
         host.class('selected');
         ServiceIrc.selectedHost = host;
@@ -166,6 +176,17 @@ ServiceIrc.deleteServer = function(serverId) {
     serverItem.remove();
     serverList.get('irc', serverId).remove();
 };
+ServiceIrc.deleteHost = function(serverId, hostKey) {
+    var splitKey = hostKey.split(":", 2);
+    var host = splitKey[0];
+    var port = parseInt(splitKey[1]);
+
+    send({type:'irc', cmd:'deletehost', serverId:serverId, host:host, port:port});
+    var hostItem = Element('#irc-host-'+host+"-"+port);
+    var next = hostItem.get().nextElementSibling || hostItem.get().previousElementSibling;
+    if (next) next.click();
+    hostItem.remove();
+};
 ServiceIrc.prototype.addNick = function(nick) {
     var nickPad = new Element('div');
     var nickEntry = new Element('input');
@@ -183,4 +204,3 @@ ServiceIrc.prototype.addNick = function(nick) {
 ServiceIrc.prototype.save = function() {
     // TODO save
 };
-

@@ -7,6 +7,7 @@
 #include "event/irc/EventIrcAddServer.hpp"
 #include "event/irc/EventIrcDeleteServer.hpp"
 #include "event/irc/EventIrcAddHost.hpp"
+#include "event/irc/EventIrcDeleteHost.hpp"
 #include <sstream>
 #include <json/json.h>
 
@@ -80,7 +81,8 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                     if (serverId != 0)
                         appQueue->sendEvent(make_shared<EventIrcDeleteServer>(clientData.userId, serverId));
                 } else if (cmd == "addhost") {
-                    size_t serverId = root.get("serverId", "").asInt();
+                    size_t serverId;
+                    istringstream(root.get("serverId", "0").asString()) >> serverId;
                     string host = root.get("host", "").asString();
                     string password = root.get("password", "").asString();
                     int port = root.get("port", -1).asInt();
@@ -94,6 +96,16 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                                                                      password,
                                                                      ipV6,
                                                                      ssl));
+                } else if (cmd == "deletehost") {
+                    size_t serverId;
+                    istringstream(root.get("serverId", "0").asString()) >> serverId;
+                    string host = root.get("host", "").asString();
+                    int port = root.get("port", -1).asInt();
+
+                    appQueue->sendEvent(make_shared<EventIrcDeleteHost>(clientData.userId,
+                                                                        serverId,
+                                                                        host,
+                                                                        port));
                 }
             }
         } catch(std::exception const& error) {
@@ -107,5 +119,3 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
 void WebsocketHandler::onDisconnect(seasocks::WebSocket* connection) {
     queue->sendEvent(make_shared<EventLogout>(connection));
 }
-
-
