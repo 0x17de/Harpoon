@@ -5,7 +5,6 @@
 #include <string>
 
 
-class IrcChannelLoginData;
 class EventIrcAddHost : public IUserEvent {
     size_t userId;
     size_t serverId;
@@ -20,9 +19,9 @@ public:
 
     EventIrcAddHost(size_t userId,
                     size_t serverId,
-                    std::string host,
-                    std::string password,
+                    const std::string& host,
                     int port,
+                    const std::string& password,
                     bool ipV6,
                     bool ssl);
     virtual size_t getUserId() const override;

@@ -3,12 +3,12 @@
 
 
 EventIrcAddHost::EventIrcAddHost(size_t userId,
-                                   size_t serverId,
-                                   std::string host,
-                                   std::string password,
-                                   int port,
-                                   bool ipV6,
-                                   bool ssl)
+                                 size_t serverId,
+                                 const std::string& host,
+                                 int port,
+                                 const std::string& password,
+                                 bool ipV6,
+                                 bool ssl)
     : userId{userId}
     , serverId{serverId}
     , host{host}
