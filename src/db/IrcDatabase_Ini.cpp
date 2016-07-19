@@ -65,6 +65,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
 
             appQueue->sendEvent(make_shared<EventIrcServerAdded>(add->getUserId(), serverId, add->getName()));
         } else {
+            cout << "IMPL ERROR: SERVER ALREADY EXISTS" << endl;
 #warning EventIrcAddServer: handle server already exists case
         }
     } else if (eventType == EventIrcDeleteServer::uuid) {
@@ -120,6 +121,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
                                                                add->getIpV6(),
                                                                add->getSsl()));
         } else {
+            cout << "IMPL ERROR: HOST ALREADY EXISTS" << endl;
 #warning EventIrcAddHost: handle host already exists case
         }
     } else if (eventType == EventIrcDeleteHost::uuid) {

@@ -1,6 +1,9 @@
 #include "IrcServerHostConfiguration.hpp"
 
 
+IrcServerHostConfiguration::IrcServerHostConfiguration() {
+}
+
 IrcServerHostConfiguration::IrcServerHostConfiguration(const std::string& hostName,
 													   int port,
 													   const std::string& password,

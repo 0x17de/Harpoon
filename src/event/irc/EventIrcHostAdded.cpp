@@ -14,6 +14,13 @@ EventIrcHostAdded::EventIrcHostAdded(size_t userId,
                                          const std::string& password,
                                          bool ipV6,
                                          bool ssl)
+    : userId{userId}
+    , serverId{serverId}
+    , host{host}
+    , port{port}
+    , password{password}
+    , ipV6{ipV6}
+    , ssl{ssl}
 {
 }
 
