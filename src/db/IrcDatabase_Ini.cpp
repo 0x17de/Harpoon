@@ -12,6 +12,8 @@
 #include "event/irc/EventIrcDeleteServer.hpp"
 #include "event/irc/EventIrcServerAdded.hpp"
 #include "event/irc/EventIrcServerDeleted.hpp"
+#include "event/irc/EventIrcAddHost.hpp"
+#include "event/irc/EventIrcHostAdded.hpp"
 #include "utils/Filesystem.hpp"
 #include "utils/Ini.hpp"
 #include "utils/IdProvider.hpp"
@@ -30,7 +32,8 @@ IrcDatabase_Ini::IrcDatabase_Ini(EventQueue* appQueue) :
         EventQuit::uuid,
         EventLoginResult::uuid,
         EventIrcAddServer::uuid,
-        EventIrcDeleteServer::uuid
+        EventIrcDeleteServer::uuid,
+        EventIrcAddHost::uuid
     }),
     appQueue{appQueue}
 {
@@ -83,6 +86,39 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             }
         }
 #warning EventIrcDeleteServer: Cleanup directories
+    } else if (eventType == EventIrcAddHost::uuid) {
+        auto add = event->as<EventIrcAddHost>();
+
+        stringstream serverPath;
+        serverPath
+            << "config/user" << add->getUserId()
+            << "/server" << add->getServerId();
+
+        Filesystem::getInstance().createPathRecursive(serverPath.str());
+
+        stringstream hostsConfigFilename;
+        hostsConfigFilename << serverPath.str() << "/hosts.ini";
+        Ini hostsConfig(hostsConfigFilename.str());
+
+        stringstream hostKey;
+        hostKey << add->getHost() << ":" << add->getPort();
+
+        bool existed = hostsConfig.hasCategory(hostKey.str());
+        if (!existed) {
+            auto& hostEntry = hostsConfig.expectCategory(hostKey.str());
+            hostsConfig.setEntry(hostEntry, "password", add->getPassword());
+            hostsConfig.setEntry(hostEntry, "ipv6", add->getIpV6() ? "y" : "n");
+            hostsConfig.setEntry(hostEntry, "ssl", add->getSsl() ? "y" : "n");
+            appQueue->sendEvent(make_shared<EventIrcHostAdded>(add->getUserId(),
+                                                               add->getServerId(),
+                                                               add->getHost(),
+                                                               add->getPort(),
+                                                               add->getPassword(),
+                                                               add->getIpV6(),
+                                                               add->getSsl()));
+        } else {
+#warning EventIrcAddHost: handle host already exists case
+        }
     } else if (eventType == EventIrcJoinChannel::uuid) {
         auto join = event->as<EventIrcJoinChannel>();
 

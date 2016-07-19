@@ -6,6 +6,7 @@
 #include "event/irc/EventIrcSendMessage.hpp"
 #include "event/irc/EventIrcAddServer.hpp"
 #include "event/irc/EventIrcDeleteServer.hpp"
+#include "event/irc/EventIrcAddHost.hpp"
 #include <sstream>
 #include <json/json.h>
 
@@ -79,7 +80,6 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                     if (serverId != 0)
                         appQueue->sendEvent(make_shared<EventIrcDeleteServer>(clientData.userId, serverId));
                 } else if (cmd == "addhost") {
-                    /*
                     size_t serverId = root.get("serverId", "").asInt();
                     string host = root.get("host", "").asString();
                     string password = root.get("password", "").asString();
@@ -87,14 +87,13 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                     bool ipV6 = root.get("ipv6", true).asBool();
                     bool ssl = root.get("ssl", true).asBool();
 
-                    appQueue->sendEvent(make_shared<EventIrcAddServer>(clientData.userId,
-                                                                       name,
-                                                                       host,
-                                                                       password,
-                                                                       port,
-                                                                       ipV6,
-                                                                       ssl));
-                    */
+                    appQueue->sendEvent(make_shared<EventIrcAddHost>(clientData.userId,
+                                                                     serverId,
+                                                                     host,
+                                                                     port,
+                                                                     password,
+                                                                     ipV6,
+                                                                     ssl));
                 }
             }
         } catch(std::exception const& error) {

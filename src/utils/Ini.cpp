@@ -83,6 +83,11 @@ Ini::Categories::iterator Ini::end() {
     return ::end(categories);
 }
 
+bool Ini::hasCategory(const std::string& category) {
+    auto it = categories.find(category);
+    return it != categories.end();
+}
+
 Ini::Entries& Ini::expectCategory(const std::string& category) {
     auto it = categories.find(category);
     if (it != categories.end())
