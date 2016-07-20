@@ -14,6 +14,7 @@ std::string Base64::decode(const std::string& source) {
     const uint8_t* in_iterator = reinterpret_cast<const uint8_t*>(source.data());
     uint8_t* out_iterator = outData.data();
     size_t position = 0;
+    size_t outPosition = 0;
 
     while (position < source.size()) {
         int len = 4;
@@ -37,10 +38,11 @@ std::string Base64::decode(const std::string& source) {
         size_t c3 = base64chars.find(in_iterator[2]);
         size_t c4 = base64chars.find(in_iterator[3]);
 
-        out_iterator[0] = len >= 2 ? ((c1 << 2) & 0xfc) + ((c2 >> 4) & 0x3) : (c1 << 2) & 0xfc;
-        out_iterator[1] = len >= 3 ? ((c2 << 4) & 0xf0) + ((c3 >> 2) & 0xf) : (c2 << 4) & 0xf0;
-        out_iterator[2] = len == 4 ? ((c3 << 6) & 0xc0) + (c4 & 0x3f) : (c3 << 6) & 0xc0;
+        if (outPosition < outData.size()) out_iterator[0] = len >= 2 ? ((c1 << 2) & 0xfc) + ((c2 >> 4) & 0x3) : (c1 << 2) & 0xfc;
+        if (outPosition+1 < outData.size()) out_iterator[1] = len >= 3 ? ((c2 << 4) & 0xf0) + ((c3 >> 2) & 0xf) : (c2 << 4) & 0xf0;
+        if (outPosition+2 < outData.size()) out_iterator[2] = len == 4 ? ((c3 << 6) & 0xc0) + (c4 & 0x3f) : (c3 << 6) & 0xc0;
 
+        outPosition += 3;
         position += 4;
         in_iterator += 4;
         out_iterator += 3;
@@ -54,8 +56,8 @@ size_t Base64::decodedLength(const std::string& source) {
     size_t length = (source.size()+3) / 4 * 3;
     if (source.at(source.size()-1) == '=')
         length -= 1;
-    if (source.at(source.size()-2) == '=')
-        length -= 1;
+    else if (source.at(source.size()-2) == '=')
+        length -= 2;
     return length;
 }
 

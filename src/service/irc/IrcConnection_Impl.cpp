@@ -82,6 +82,7 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue,
     , userId{userId}
     , configuration{configuration}
     , running{true}
+    , ircSession{0}
 {
     ircLoop = thread([this]{
         irc_callbacks_t callbacks = {0};

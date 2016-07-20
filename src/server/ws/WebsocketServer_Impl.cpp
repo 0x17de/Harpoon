@@ -55,11 +55,11 @@ bool WebsocketServer_Impl::onEvent(std::shared_ptr<IEvent> event) {
         return false;
     } else if (eventType == EventLoginResult::uuid) {
         auto* loginResult = event->as<EventLoginResult>();
-        seasocks::WebSocket* socket = (seasocks::WebSocket*)loginResult->getData();
+        auto socket = (seasocks::WebSocket*)loginResult->getData();
         if (loginResult->getSuccess()) {
             addClient(loginResult->getUserId(), socket);
         } else {
-            server.execute([=] {
+            server.execute([socket] {
                 socket->close();
             });
         }
@@ -76,15 +76,17 @@ bool WebsocketServer_Impl::onEvent(std::shared_ptr<IEvent> event) {
                 void* data = singleClientEvent->getData();
                 for (auto& clientData : clientDataList) {
                     if (clientData.socket == data) {
-                        server.execute([=] {
-                            clientData.socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
+                        auto socket = clientData.socket;
+                        server.execute([socket, json] {
+                            socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
                         });
                     }
                 }
             } else {
                 for (auto& clientData : clientDataList) {
-                    server.execute([=] {
-                        clientData.socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
+                    auto socket = clientData.socket;
+                    server.execute([socket, json] {
+                        socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
                     });
                 }
             }
