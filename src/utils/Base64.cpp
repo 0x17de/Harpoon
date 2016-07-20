@@ -51,7 +51,7 @@ std::string Base64::decode(const std::string& source) {
 
 size_t Base64::decodedLength(const std::string& source) {
     if (source.size() == 0 || source.size() % 4 != 0) return 0;
-    size_t length = source.size() / 4 * 3;
+    size_t length = (source.size()+3) / 4 * 3;
     if (source.at(source.size()-1) == '=')
         length -= 1;
     if (source.at(source.size()-2) == '=')
