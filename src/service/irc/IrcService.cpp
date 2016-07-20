@@ -15,6 +15,7 @@
 #include "event/irc/EventIrcServerDeleted.hpp"
 #include "event/irc/EventIrcHostAdded.hpp"
 #include "event/irc/EventIrcHostDeleted.hpp"
+#include "event/irc/EventIrcReconnectServer.hpp"
 #include "service/irc/IrcChannelStore.hpp"
 #include <iostream>
 #include <mutex>
@@ -31,7 +32,8 @@ IrcService::IrcService(size_t userId, EventQueue* appQueue)
           EventIrcServerAdded::uuid,
           EventIrcServerDeleted::uuid,
           EventIrcHostAdded::uuid,
-          EventIrcHostDeleted::uuid
+          EventIrcHostDeleted::uuid,
+          EventIrcReconnectServer::uuid
       }, {
           &EventGuard<IActivateServiceEvent>
       })
@@ -66,6 +68,21 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
         for (auto& connection : ircConnections)
             connection.second.join();
         return false;
+    } else if (type == EventIrcReconnectServer::uuid) {
+        auto reconnect = event->as<EventIrcReconnectServer>();
+        auto it = ircConnections.find(reconnect->getServerId());
+        if (it != ircConnections.end()) {
+            auto& connection = it->second;
+            IrcServerConfiguration configuration = connection.getServerConfiguration();
+            connection.getEventQueue()->sendEvent(make_shared<EventQuit>());
+            connection.join();
+            // overwrite old irc connection
+            ircConnections.emplace(piecewise_construct,
+                                   forward_as_tuple(reconnect->getServerId()),
+                                   forward_as_tuple(appQueue,
+                                                    reconnect->getUserId(),
+                                                    configuration));
+        }
     } else if (type == EventIrcServerAdded::uuid) {
         auto add = event->as<EventIrcServerAdded>();
         ircConnections.emplace(piecewise_construct,

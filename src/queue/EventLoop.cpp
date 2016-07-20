@@ -1,6 +1,9 @@
 #include "EventLoop.hpp"
 #include "queue/EventQueue.hpp"
 
+using namespace std;
+
+
 EventLoop::EventLoop()
     : t{std::thread(go, this)}
 {
