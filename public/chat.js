@@ -99,9 +99,7 @@ function onIrcMessage(json) {
 
     var pureNick, nick;
     if (json.nick !== void 0) {
-        pureNick = (json.nick === '')
-            ? activeNick
-            : json.nick.substr(0, json.nick.indexOf('!'));
+        pureNick = json.nick.indexOf('!') == -1 ? json.nick : json.nick.substr(0, json.nick.indexOf('!'));
         var nick = pureNick && '<'+pureNick+'>';
     }
     switch (json.cmd) {
