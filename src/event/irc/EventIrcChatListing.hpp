@@ -53,7 +53,7 @@ public:
 
     virtual size_t getUserId() const override;
     const std::list<IrcServerListing>& getServerList() const;
-    void* getData() const;
+    virtual void* getData() const override;
 };
 
 #endif
