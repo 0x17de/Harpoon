@@ -76,6 +76,7 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
             IrcServerConfiguration configuration = connection.getServerConfiguration();
             connection.getEventQueue()->sendEvent(make_shared<EventQuit>());
             connection.join();
+            ircConnections.erase(it);
             // overwrite old irc connection
             ircConnections.emplace(piecewise_construct,
                                    forward_as_tuple(reconnect->getServerId()),
