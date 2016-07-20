@@ -137,19 +137,25 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue,
                 if (!findUnusedNick(nick)) break; // give up
             }
 
+            stringstream host;
+            if (hostConfiguration.getSsl())
+                host << "#";
+            host << hostConfiguration.getHostName();
             // connect to server
-            if (irc_connect(ircSession,
-                            hostConfiguration.getHostName().c_str(),
-                            hostConfiguration.getPort(),
-                            hostConfiguration.getPassword().empty()
-                            ? 0
-                            : hostConfiguration.getPassword().c_str(),
-                            nick.c_str(),
-                            0 /* username */,
-                            0 /* realname */)) {
+            if ((hostConfiguration.getIpV6()
+                 ? irc_connect6
+                 : irc_connect)(ircSession,
+                                host.str().c_str(),
+                                hostConfiguration.getPort(),
+                                hostConfiguration.getPassword().empty()
+                                ? 0
+                                : hostConfiguration.getPassword().c_str(),
+                                nick.c_str(),
+                                0 /* username */,
+                                0 /* realname */)) {
                 hostIndex += 1;
             }
-            cout << "[IC] Connection initiated: " << hostConfiguration.getHostName() << ":" << hostConfiguration.getPort() << endl;
+            cout << "[IC] Connection initiated: " << host.str() << ":" << hostConfiguration.getPort() << endl;
 
             // run irc event loop
             if (irc_run(ircSession))
