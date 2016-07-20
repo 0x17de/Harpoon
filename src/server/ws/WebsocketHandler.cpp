@@ -8,6 +8,7 @@
 #include "event/irc/EventIrcDeleteServer.hpp"
 #include "event/irc/EventIrcAddHost.hpp"
 #include "event/irc/EventIrcDeleteHost.hpp"
+#include "event/irc/EventIrcReconnectServer.hpp"
 #include <sstream>
 #include <json/json.h>
 
@@ -96,6 +97,12 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                                                                      password,
                                                                      ipV6,
                                                                      ssl));
+                } else if (cmd == "reconnect") {
+                    size_t serverId;
+                    istringstream(root.get("serverId", "0").asString()) >> serverId;
+
+                    appQueue->sendEvent(make_shared<EventIrcReconnectServer>(clientData.userId,
+                                                                             serverId));
                 } else if (cmd == "deletehost") {
                     size_t serverId;
                     istringstream(root.get("serverId", "0").asString()) >> serverId;

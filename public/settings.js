@@ -151,7 +151,7 @@ ServiceIrc.prototype.addServer = function(serverId, serverData) {
     if (!serverData.hosts) serverData.hosts = {};
 
     server.attr('id', 'irc-server-'+serverId);
-    server.get().onclick = function() {
+    serverInput.get().onfocus = server.get().onclick = function() {
         if (ServiceIrc.selectedServer)
             ServiceIrc.selectedServer.removeClass('selected');
         self.setServerData(serverData);
@@ -187,12 +187,15 @@ ServiceIrc.deleteHost = function(serverId, hostKey) {
     if (next) next.click();
     hostItem.remove();
 };
+ServiceIrc.reconnectServer = function(serverId) {
+    send({type:'irc', cmd:'reconnect', serverId:serverId});
+};
 ServiceIrc.prototype.addNick = function(nick) {
     var nickPad = new Element('div');
     var nickEntry = new Element('input');
     nickPad.add(nickEntry);
 
-    nickPad.get().onclick = function() {
+    nickEntry.get().onfocus = nickPad.get().onclick = function() {
         if (ServiceIrc.selectedNick)
             ServiceIrc.selectedNick.removeClass('selected');
         nickPad.class('selected');
