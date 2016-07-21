@@ -8,6 +8,8 @@
 #include "event/irc/EventIrcDeleteServer.hpp"
 #include "event/irc/EventIrcAddHost.hpp"
 #include "event/irc/EventIrcDeleteHost.hpp"
+#include "event/irc/EventIrcModifyNick.hpp"
+#include "event/irc/EventIrcDeleteNick.hpp"
 #include "event/irc/EventIrcReconnectServer.hpp"
 #include <sstream>
 #include <json/json.h>
@@ -97,6 +99,24 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                                                                      password,
                                                                      ipV6,
                                                                      ssl));
+                } else if (cmd == "modifynick") {
+                    size_t serverId;
+                    istringstream(root.get("serverId", "0").asString()) >> serverId;
+                    string oldNick = root.get("oldnick", "").asString();
+                    string newNick = root.get("newnick", "").asString();
+
+                    appQueue->sendEvent(make_shared<EventIrcModifyNick>(clientData.userId,
+                                                                        serverId,
+                                                                        oldNick,
+                                                                        newNick));
+                } else if (cmd == "deletenick") {
+                    size_t serverId;
+                    istringstream(root.get("serverId", "0").asString()) >> serverId;
+                    string nick = root.get("nick", "").asString();
+
+                    appQueue->sendEvent(make_shared<EventIrcDeleteNick>(clientData.userId,
+                                                                        serverId,
+                                                                        nick));
                 } else if (cmd == "reconnect") {
                     size_t serverId;
                     istringstream(root.get("serverId", "0").asString()) >> serverId;
