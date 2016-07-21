@@ -201,28 +201,35 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
         lock_guard<mutex> lock(channelLoginDataMutex);
         auto joinCommand = event->as<EventIrcJoinChannel>();
         for (auto& entry : joinCommand->getLoginData()) {
-            string channelName = entry.getChannelName();
+            string channelName = entry.name;
             string channelLower = channelName;
             transform(channelLower.begin(), channelLower.end(), channelLower.begin(), ::tolower);
 
             auto it = channelStores.find(channelLower);
             if (it != channelStores.end())
                 continue;
-            string channelPassword = it->second.getChannelPassword();
+            string channelPassword = entry.password;
             irc_cmd_join(ircSession,
                          channelLower.c_str(),
                          channelPassword.c_str());
             channelStores.emplace(channelLower, channelPassword);
+            appQueue->sendEvent(make_shared<EventIrcJoined>(joinCommand->getUserId(),
+                                                            joinCommand->getServerId(),
+                                                            "",
+                                                            channelLower));
         }
     } else if (type == EventIrcJoined::uuid) {
         auto join = event->as<EventIrcJoined>();
-        string channelName = join->getChannel();
+        string userName = join->getUsername();
+        if (userName.size() > 0)  {
+            string channelName = join->getChannel();
 
-        lock_guard<mutex> lock(channelLoginDataMutex);
-        auto it = channelStores.find(channelName);
-        if (it != channelStores.end()) {
-            IrcChannelStore& channelStore = it->second;
-            channelStore.addUser(getPureNick(join->getUsername()), "");
+            lock_guard<mutex> lock(channelLoginDataMutex);
+            auto it = channelStores.find(channelName);
+            if (it != channelStores.end()) {
+                IrcChannelStore& channelStore = it->second;
+                channelStore.addUser(getPureNick(userName), "");
+            }
         }
     } else if (type == EventIrcParted::uuid) {
         auto part = event->as<EventIrcParted>();
@@ -302,6 +309,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                     channelStore->addUser(user, "");
                 }
             }
+#warning send USERLIST to all connected clients
         } else if (code == LIBIRC_RFC_RPL_ENDOFNAMES) {
             lock_guard<mutex> lock(channelLoginDataMutex);
             auto num = event->as<EventIrcNumeric>();
@@ -331,8 +339,26 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
         }
     } else if (type == EventIrcSendMessage::uuid) {
         auto message = event->as<EventIrcSendMessage>();
-        if (!irc_cmd_msg(ircSession, message->getChannel().c_str(), message->getMessage().c_str())) {
-            appQueue->sendEvent(make_shared<EventIrcMessage>(message->getUserId(), message->getServerId(), nick, message->getChannel(), message->getMessage()));
+        auto text = message->getMessage();
+        if (text.size() > 0) {
+            if (text.size() > 1 && text[0] == '/' && text[1] != '/') {
+                istringstream cmdStream(text.substr(1));
+                string cmd;
+                cmdStream >> cmd;
+                if (cmd == "join") {
+                    string channel, password;
+                    cmdStream >> channel >> password;
+                    auto join = make_shared<EventIrcJoinChannel>(message->getUserId(), message->getServerId());
+                    join->addLoginData(channel, password);
+                    queue->sendEvent(join);
+                }
+            } else {
+                if (text[0] == '/')
+                    text = text.substr(1);
+                if (!irc_cmd_msg(ircSession, message->getChannel().c_str(), message->getMessage().c_str())) {
+                    appQueue->sendEvent(make_shared<EventIrcMessage>(message->getUserId(), message->getServerId(), nick, message->getChannel(), message->getMessage()));
+                }
+            }
         }
     }
     return true;

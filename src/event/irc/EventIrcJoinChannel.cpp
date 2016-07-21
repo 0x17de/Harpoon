@@ -3,6 +3,12 @@
 #include "service/irc/IrcChannelLoginData.hpp"
 
 
+IrcChannelJoinData::IrcChannelJoinData(const std::string& name, const std::string& password)
+    : name{name}
+    , password{password}
+{
+}
+
 EventIrcJoinChannel::EventIrcJoinChannel(size_t userId, size_t serverId)
     : userId{userId}
     , serverId{serverId}
@@ -21,10 +27,12 @@ size_t EventIrcJoinChannel::getUserId() const {
 size_t EventIrcJoinChannel::getServerId() const {
     return serverId;
 }
-std::list<IrcChannelLoginData> EventIrcJoinChannel::getLoginData() {
-    return loginData;
+
+void EventIrcJoinChannel::addLoginData(const std::string& name, const std::string& password) {
+    return loginData.emplace_back(name, password);
 }
-const std::list<IrcChannelLoginData> EventIrcJoinChannel::getLoginData() const {
+
+const std::list<IrcChannelJoinData>& EventIrcJoinChannel::getLoginData() const {
     return loginData;
 }
 

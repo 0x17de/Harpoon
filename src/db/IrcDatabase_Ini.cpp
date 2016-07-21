@@ -242,13 +242,13 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
 
         // save data from join event to ini
         for (auto& loginData : join->getLoginData()) {
-            auto& channelEntry = channelsConfig.expectCategory(loginData.getChannelName());
+            auto& channelEntry = channelsConfig.expectCategory(loginData.name);
             string channelId;
             if (!channelsConfig.getEntry(channelEntry, "id", channelId)) {
                 channelId = to_string(IdProvider::getInstance().generateNewId("channel"));
                 channelsConfig.setEntry(channelEntry, "id", channelId);
             }
-            channelsConfig.setEntry(channelEntry, "password", loginData.getChannelPassword());
+            channelsConfig.setEntry(channelEntry, "password", loginData.password);
         }
     } else if (eventType == EventIrcPartChannel::uuid) {
         auto part = event->as<EventIrcPartChannel>();
