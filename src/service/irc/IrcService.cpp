@@ -16,6 +16,8 @@
 #include "event/irc/EventIrcHostAdded.hpp"
 #include "event/irc/EventIrcHostDeleted.hpp"
 #include "event/irc/EventIrcReconnectServer.hpp"
+#include "event/irc/EventIrcModifyNick.hpp"
+#include "event/irc/EventIrcDeleteNick.hpp"
 #include "service/irc/IrcChannelStore.hpp"
 #include <iostream>
 #include <mutex>
@@ -33,7 +35,9 @@ IrcService::IrcService(size_t userId, EventQueue* appQueue)
           EventIrcServerDeleted::uuid,
           EventIrcHostAdded::uuid,
           EventIrcHostDeleted::uuid,
-          EventIrcReconnectServer::uuid
+          EventIrcReconnectServer::uuid,
+          EventIrcModifyNick::uuid,
+          EventIrcDeleteNick::uuid
       }, {
           &EventGuard<IActivateServiceEvent>
       })
@@ -120,6 +124,16 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
             lock_guard<mutex> lock(connection.getChannelLoginDataMutex());
             connection.removeHost(del->getHost(), del->getPort());
         }
+    } else if (type == EventIrcModifyNick::uuid) {
+        auto modify = event->as<EventIrcModifyNick>();
+        auto it = ircConnections.find(modify->getServerId());
+        if (it != ircConnections.end())
+            it->second.getEventQueue()->sendEvent(event);
+    } else if (type == EventIrcDeleteNick::uuid) {
+        auto del = event->as<EventIrcDeleteNick>();
+        auto it = ircConnections.find(del->getServerId());
+        if (it != ircConnections.end())
+            it->second.getEventQueue()->sendEvent(event);
     } else if (type == EventQueryChats::uuid) {
         auto query = event->as<EventQueryChats>();
 

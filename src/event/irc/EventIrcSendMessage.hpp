@@ -14,7 +14,7 @@ public:
     static UUID uuid;
     virtual UUID getEventUuid() const override;
 
-    EventIrcSendMessage(size_t userId, size_t serverId, std::string channel, std::string message);
+    EventIrcSendMessage(size_t userId, size_t serverId, const std::string& channel, const std::string& message);
     virtual size_t getUserId() const override;
     size_t getServerId() const;
     std::string getChannel() const;

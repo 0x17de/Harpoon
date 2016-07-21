@@ -11,6 +11,8 @@
 #include "event/irc/EventIrcSendMessage.hpp"
 #include "event/irc/EventIrcMessage.hpp"
 #include "event/irc/EventIrcNumeric.hpp"
+#include "event/irc/EventIrcModifyNick.hpp"
+#include "event/irc/EventIrcDeleteNick.hpp"
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -232,6 +234,12 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
             IrcChannelStore& channelStore = it->second;
             channelStore.removeUser(getPureNick(part->getUsername()));
         }
+    } else if (type == EventIrcModifyNick::uuid) {
+        auto modify = event->as<EventIrcModifyNick>();
+        configuration.modifyNick(modify->getOldNick(), modify->getNewNick());
+    } else if (type == EventIrcDeleteNick::uuid) {
+        auto del = event->as<EventIrcDeleteNick>();
+        configuration.modifyNick(del->getNick(), "");
     } else if (type == EventIrcNickChanged::uuid) {
         auto nickChange = event->as<EventIrcNickChanged>();
 
