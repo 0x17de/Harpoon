@@ -153,12 +153,22 @@ function onIrcMessage(json) {
         }
         break;
     case 'join':
-        putLog(json.type, json.server, json.channel, timestamp(), '-->', pureNick+' joined the channel', 'event');
-        target.addUser(pureNick);
+        if (json.nick === '') {
+            var server = serverList.get('irc', json.server);
+            server.add(json.channel);
+        } else {
+            putLog(json.type, json.server, json.channel, timestamp(), '-->', pureNick+' joined the channel', 'event');
+            target.addUser(pureNick);
+        }
         break;
     case 'part':
-        putLog(json.type, json.server, json.channel, timestamp(), '<--', pureNick+' left the channel', 'event');
-        target.removeUser(pureNick);
+        if (json.nick === '') {
+            var server = serverList.get('irc', json.server);
+            // TODO: remove channel
+        } else {
+            putLog(json.type, json.server, json.channel, timestamp(), '<--', pureNick+' left the channel', 'event');
+            target.removeUser(pureNick);
+        }
         break;
     case 'quit':
         var channels = serverList.get('irc', json.server).channels;
