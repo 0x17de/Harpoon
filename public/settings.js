@@ -228,7 +228,7 @@ ServiceIrc.prototype.addNick = function(nick) {
         if (newNick === "") {
             ServiceIrc.deleteNick();
         } else if (newNick !== oldNick) {
-            send({type:'irc', cmd:'nickmodify', serverId:ServiceIrc.selectedServerId, oldnick:oldNick, newnick:newNick});
+            send({type:'irc', cmd:'modifynick', serverId:ServiceIrc.selectedServerId, oldnick:oldNick, newnick:newNick});
             nickPad.attr('data-previous-name', newNick);
         }
     };
