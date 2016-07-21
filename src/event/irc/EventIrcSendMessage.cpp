@@ -7,7 +7,7 @@ UUID EventIrcSendMessage::getEventUuid() const {
     return this->uuid;
 }
 
-EventIrcSendMessage::EventIrcSendMessage(size_t userId, size_t serverId, std::string channel, std::string message)
+EventIrcSendMessage::EventIrcSendMessage(size_t userId, size_t serverId, const std::string& channel, const std::string& message)
     :
     userId{userId},
     serverId{serverId},

@@ -1,6 +1,9 @@
 #include "IrcChannelLoginData.hpp"
 #include "IrcServerHostConfiguration.hpp"
 #include "IrcServerConfiguration.hpp"
+#include <algorithm>
+
+using namespace std;
 
 
 IrcServerConfiguration::IrcServerConfiguration(size_t serverId,
@@ -12,6 +15,17 @@ IrcServerConfiguration::IrcServerConfiguration(size_t serverId,
 
 void IrcServerConfiguration::addNick(const std::string& nick) {
     nicks.emplace_back(nick);
+}
+
+void IrcServerConfiguration::modifyNick(const std::string& oldNick, const std::string& newNick) {
+    if (oldNick.size() == 0) {
+        nicks.push_back(newNick);
+    } else if (newNick.size() == 0) {
+        nicks.remove(oldNick);
+    } else {
+        auto it = find(nicks.begin(), nicks.end(), oldNick);
+        *it = newNick;
+    }
 }
 
 const std::list<std::string>& IrcServerConfiguration::getNicks() const {

@@ -18,6 +18,7 @@ public:
                            const std::string& serverName);
 
     void addNick(const std::string& nick);
+    void modifyNick(const std::string& oldNick, const std::string& newNick);
     const std::list<std::string>& getNicks() const;
     void addChannelLoginData(size_t channelId, const std::string& channelName, const std::string& channelPassword);
     const std::list<IrcChannelLoginData>& getChannelLoginData() const;
