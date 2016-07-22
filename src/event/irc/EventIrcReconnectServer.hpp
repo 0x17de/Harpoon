@@ -1,11 +1,11 @@
 #ifndef EVENTIRCRECONNECTSERVER_H
 #define EVENTIRCRECONNECTSERVER_H
 
-#include "../IUserEvent.hpp"
+#include "IIrcCommand.hpp"
 #include <cstddef>
 
 
-class EventIrcReconnectServer : public IUserEvent {
+class EventIrcReconnectServer : public IIrcCommand {
     size_t userId;
     size_t serverId;
 public:
@@ -15,7 +15,7 @@ public:
     EventIrcReconnectServer(size_t userId,
                             size_t serverId);
     virtual size_t getUserId() const override;
-    size_t getServerId() const;
+    virtual size_t getServerId() const override;
 };
 
 #endif

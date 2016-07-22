@@ -1,11 +1,11 @@
 #ifndef EVENTIRCMODIFYNICK_H
 #define EVENTIRCMODIFYNICK_H
 
-#include "../IUserEvent.hpp"
+#include "IIrcCommand.hpp"
 #include <string>
 
 
-class EventIrcModifyNick : public IUserEvent {
+class EventIrcModifyNick : public IIrcCommand {
     size_t userId;
     size_t serverId;
     std::string oldNick, newNick;
@@ -18,7 +18,7 @@ public:
                        const std::string& oldNick,
                        const std::string& newNick);
     virtual size_t getUserId() const override;
-    size_t getServerId() const;
+    virtual size_t getServerId() const override;
     std::string getOldNick() const;
     std::string getNewNick() const;
 };

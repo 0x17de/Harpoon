@@ -3,8 +3,7 @@
 
 
 EventIrcPartChannel::EventIrcPartChannel(size_t userId,
-                                         size_t serverId,
-                                         std::list<std::string> partChannels)
+                                         size_t serverId)
     : userId{userId}
     , serverId{serverId}
     , channels{channels}
@@ -24,7 +23,10 @@ size_t EventIrcPartChannel::getServerId() const {
     return serverId;
 }
 
+void EventIrcPartChannel::addChannel(const std::string& channel) {
+    channels.push_back(channel);
+}
+
 const std::list<std::string> EventIrcPartChannel::getChannels() const {
     return channels;
 }
-

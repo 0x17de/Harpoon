@@ -16,9 +16,8 @@
 #include "event/irc/EventIrcHostAdded.hpp"
 #include "event/irc/EventIrcHostDeleted.hpp"
 #include "event/irc/EventIrcReconnectServer.hpp"
-#include "event/irc/EventIrcModifyNick.hpp"
-#include "event/irc/EventIrcDeleteNick.hpp"
 #include "service/irc/IrcChannelStore.hpp"
+#include "event/irc/IIrcCommand.hpp"
 #include <iostream>
 #include <mutex>
 
@@ -30,16 +29,13 @@ IrcService::IrcService(size_t userId, EventQueue* appQueue)
           EventQuit::uuid,
           EventQueryChats::uuid,
           EventQuerySettings::uuid,
-          EventIrcSendMessage::uuid,
           EventIrcServerAdded::uuid,
           EventIrcServerDeleted::uuid,
           EventIrcHostAdded::uuid,
           EventIrcHostDeleted::uuid,
-          EventIrcReconnectServer::uuid,
-          EventIrcModifyNick::uuid,
-          EventIrcDeleteNick::uuid
       }, {
-          &EventGuard<IActivateServiceEvent>
+          &EventGuard<IActivateServiceEvent>,
+          &EventGuard<IIrcCommand>
       })
     , userId{userId}
     , appQueue{appQueue}
@@ -124,16 +120,6 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
             lock_guard<mutex> lock(connection.getChannelLoginDataMutex());
             connection.removeHost(del->getHost(), del->getPort());
         }
-    } else if (type == EventIrcModifyNick::uuid) {
-        auto modify = event->as<EventIrcModifyNick>();
-        auto it = ircConnections.find(modify->getServerId());
-        if (it != ircConnections.end())
-            it->second.getEventQueue()->sendEvent(event);
-    } else if (type == EventIrcDeleteNick::uuid) {
-        auto del = event->as<EventIrcDeleteNick>();
-        auto it = ircConnections.find(del->getServerId());
-        if (it != ircConnections.end())
-            it->second.getEventQueue()->sendEvent(event);
     } else if (type == EventQueryChats::uuid) {
         auto query = event->as<EventQueryChats>();
 
@@ -192,11 +178,13 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
         }
 
         appQueue->sendEvent(listing);
-    } else if (type == EventIrcSendMessage::uuid) {
-        auto message = event->as<EventIrcSendMessage>();
-        auto it = ircConnections.find(message->getServerId());
-        if (it != ircConnections.end())
-            it->second.getEventQueue()->sendEvent(event);
+    } else {
+        auto ircCommand = event->as<IIrcCommand>();
+        if (ircCommand) {
+            auto it = ircConnections.find(ircCommand->getServerId());
+            if (it != ircConnections.end())
+                it->second.getEventQueue()->sendEvent(event);
+        }
     }
     return true;
 }

@@ -1,12 +1,12 @@
 #ifndef EVENTIRCPARTCHANNEL_H
 #define EVENTIRCPARTCHANNEL_H
 
-#include "../IUserEvent.hpp"
+#include "IIrcCommand.hpp"
 #include <list>
 #include <string>
 
 
-class EventIrcPartChannel : public IUserEvent {
+class EventIrcPartChannel : public IIrcCommand {
 	size_t userId;
 	size_t serverId;
 	std::list<std::string> channels;
@@ -14,9 +14,10 @@ public:
 	static UUID uuid;
 	virtual UUID getEventUuid() const override;
 
-	EventIrcPartChannel(size_t userId, size_t serverId, std::list<std::string> partChannels);
+	EventIrcPartChannel(size_t userId, size_t serverId);
 	virtual size_t getUserId() const override;
-	size_t getServerId() const;
+	virtual size_t getServerId() const override;
+    void addChannel(const std::string& channel);
 	const std::list<std::string> getChannels() const;
 };
 

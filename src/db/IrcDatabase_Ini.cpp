@@ -17,7 +17,6 @@
 #include "event/irc/EventIrcDeleteHost.hpp"
 #include "event/irc/EventIrcHostDeleted.hpp"
 #include "event/irc/EventIrcModifyNick.hpp"
-#include "event/irc/EventIrcDeleteNick.hpp"
 #include "utils/Filesystem.hpp"
 #include "utils/Ini.hpp"
 #include "utils/IdProvider.hpp"
@@ -39,8 +38,7 @@ IrcDatabase_Ini::IrcDatabase_Ini(EventQueue* appQueue) :
         EventIrcDeleteServer::uuid,
         EventIrcAddHost::uuid,
         EventIrcDeleteHost::uuid,
-        EventIrcModifyNick::uuid,
-        EventIrcDeleteNick::uuid
+        EventIrcModifyNick::uuid
     }),
     appQueue{appQueue}
 {
@@ -125,56 +123,19 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
                         stringstream newNicksStream;
                         string nick;
                         while (getline(oldNicksStream, nick, ',')) {
+                            if (nick == modify->getOldNick())
+                                nick = modify->getNewNick(); // change nick to new one
+                            if (nick.size() == 0) continue; // delete nick if empty
                             if (first) {
                                 first = false;
                             } else {
                                 newNicksStream << ",";
                             }
-                            if (nick == modify->getOldNick())
-                                nick = modify->getNewNick(); // change nick to new one
                             newNicksStream << nick;
                         }
                         serversConfig.setEntry(server, "nicks", newNicksStream.str());
                     }
                     break; // nicks were changed
-                }
-            }
-        }
-    } else if (eventType == EventIrcDeleteNick::uuid) {
-        auto del = event->as<EventIrcDeleteNick>();
-        if (del->getServerId() > 0) {
-            stringstream serversConfigFilename;
-            serversConfigFilename
-                << "config/user" << del->getUserId()
-                << "/irc.servers.ini";
-            Ini serversConfig(serversConfigFilename.str());
-
-            // find server by id
-            for (auto& categoryPair : serversConfig) {
-                auto& server = categoryPair.second;
-                size_t serverId;
-                string serverIdStr;
-                serversConfig.getEntry(server, "id", serverIdStr);
-                istringstream(serverIdStr) >> serverId;
-                if (serverId == del->getServerId()) {
-                    string nicksStr;
-                    serversConfig.getEntry(server, "nicks", nicksStr);
-
-                    bool first = true;
-                    istringstream oldNicksStream(nicksStr);
-                    stringstream newNicksStream;
-                    string nick;
-                    while (getline(oldNicksStream, nick, ',')) {
-                        if (nick == del->getNick()) continue; // skip nick to match
-                        if (first) {
-                            first = false;
-                        } else {
-                            newNicksStream << ",";
-                        }
-                        newNicksStream << nick;
-                    }
-                    serversConfig.setEntry(server, "nicks", newNicksStream.str());
-                    break; // nick was deleted
                 }
             }
         }

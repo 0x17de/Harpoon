@@ -9,8 +9,9 @@
 #include "event/irc/EventIrcAddHost.hpp"
 #include "event/irc/EventIrcDeleteHost.hpp"
 #include "event/irc/EventIrcModifyNick.hpp"
-#include "event/irc/EventIrcDeleteNick.hpp"
 #include "event/irc/EventIrcReconnectServer.hpp"
+#include "event/irc/EventIrcJoinChannel.hpp"
+#include "event/irc/EventIrcPartChannel.hpp"
 #include <sstream>
 #include <json/json.h>
 
@@ -75,7 +76,22 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                     appQueue->sendEvent(make_shared<EventQuerySettings>(clientData.userId, connection));
                 }
             } else if (type == "irc") {
-                if (cmd == "addserver") {
+                if (cmd == "join") {
+                    size_t serverId;
+                    istringstream(root.get("serverId", "0").asString()) >> serverId;
+                    string channel = root.get("channel", "").asString();
+                    string password = root.get("password", "").asString();
+                    auto join = make_shared<EventIrcJoinChannel>(clientData.userId, serverId);
+                    join->addLoginData(channel, password);
+                    appQueue->sendEvent(join);
+                } else if (cmd == "part") {
+                    size_t serverId;
+                    istringstream(root.get("serverId", "0").asString()) >> serverId;
+                    string channel = root.get("channel", "").asString();
+                    auto part = make_shared<EventIrcPartChannel>(clientData.userId, serverId);
+                    part->addChannel(channel);
+                    appQueue->sendEvent(part);
+                } else if (cmd == "addserver") {
                     string name = root.get("name", "").asString();
                     appQueue->sendEvent(make_shared<EventIrcAddServer>(clientData.userId, name));
                 } else if (cmd == "deleteserver") {
@@ -109,14 +125,6 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                                                                         serverId,
                                                                         oldNick,
                                                                         newNick));
-                } else if (cmd == "deletenick") {
-                    size_t serverId;
-                    istringstream(root.get("serverId", "0").asString()) >> serverId;
-                    string nick = root.get("nick", "").asString();
-
-                    appQueue->sendEvent(make_shared<EventIrcDeleteNick>(clientData.userId,
-                                                                        serverId,
-                                                                        nick));
                 } else if (cmd == "reconnect") {
                     size_t serverId;
                     istringstream(root.get("serverId", "0").asString()) >> serverId;

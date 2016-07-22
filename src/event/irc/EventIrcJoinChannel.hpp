@@ -1,7 +1,7 @@
 #ifndef EVENTIRCJOINCHANNEL_H
 #define EVENTIRCJOINCHANNEL_H
 
-#include "../IUserEvent.hpp"
+#include "IIrcCommand.hpp"
 #include <list>
 #include <string>
 
@@ -14,7 +14,7 @@ struct IrcChannelJoinData {
 };
 
 class IrcChannelLoginData;
-class EventIrcJoinChannel : public IUserEvent {
+class EventIrcJoinChannel : public IIrcCommand {
     size_t userId;
     size_t serverId;
     std::list<IrcChannelJoinData> loginData;
@@ -24,7 +24,7 @@ public:
 
     EventIrcJoinChannel(size_t userId, size_t serverId);
     virtual size_t getUserId() const override;
-    size_t getServerId() const;
+    virtual size_t getServerId() const override;
     void addLoginData(const std::string& name, const std::string& password);
     const std::list<IrcChannelJoinData>& getLoginData() const;
 };

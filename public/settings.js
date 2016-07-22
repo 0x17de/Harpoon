@@ -208,7 +208,7 @@ ServiceIrc.deleteNick = function() {
     ServiceIrc.selectedNick = null;
     if (next) next.click();
     pad.remove();
-    send({type:'irc', cmd:'deletenick', serverId:ServiceIrc.selectedServerId, nick:oldNick});
+    send({type:'irc', cmd:'modifynick', serverId:ServiceIrc.selectedServerId, oldnick:oldNick, newnick:''});
 }
 ServiceIrc.prototype.addNick = function(nick) {
     if (!nick) nick = '';

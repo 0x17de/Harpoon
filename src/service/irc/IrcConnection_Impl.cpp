@@ -12,7 +12,6 @@
 #include "event/irc/EventIrcMessage.hpp"
 #include "event/irc/EventIrcNumeric.hpp"
 #include "event/irc/EventIrcModifyNick.hpp"
-#include "event/irc/EventIrcDeleteNick.hpp"
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -244,9 +243,6 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
     } else if (type == EventIrcModifyNick::uuid) {
         auto modify = event->as<EventIrcModifyNick>();
         configuration.modifyNick(modify->getOldNick(), modify->getNewNick());
-    } else if (type == EventIrcDeleteNick::uuid) {
-        auto del = event->as<EventIrcDeleteNick>();
-        configuration.modifyNick(del->getNick(), "");
     } else if (type == EventIrcNickChanged::uuid) {
         auto nickChange = event->as<EventIrcNickChanged>();
 
@@ -339,26 +335,8 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
         }
     } else if (type == EventIrcSendMessage::uuid) {
         auto message = event->as<EventIrcSendMessage>();
-        auto text = message->getMessage();
-        if (text.size() > 0) {
-            if (text.size() > 1 && text[0] == '/' && text[1] != '/') {
-                istringstream cmdStream(text.substr(1));
-                string cmd;
-                cmdStream >> cmd;
-                if (cmd == "join") {
-                    string channel, password;
-                    cmdStream >> channel >> password;
-                    auto join = make_shared<EventIrcJoinChannel>(message->getUserId(), message->getServerId());
-                    join->addLoginData(channel, password);
-                    queue->sendEvent(join);
-                }
-            } else {
-                if (text[0] == '/')
-                    text = text.substr(1);
-                if (!irc_cmd_msg(ircSession, message->getChannel().c_str(), message->getMessage().c_str())) {
-                    appQueue->sendEvent(make_shared<EventIrcMessage>(message->getUserId(), message->getServerId(), nick, message->getChannel(), message->getMessage()));
-                }
-            }
+        if (!irc_cmd_msg(ircSession, message->getChannel().c_str(), message->getMessage().c_str())) {
+            appQueue->sendEvent(make_shared<EventIrcMessage>(message->getUserId(), message->getServerId(), nick, message->getChannel(), message->getMessage()));
         }
     }
     return true;
