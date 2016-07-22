@@ -3,6 +3,8 @@ Connect to various services through this bouncer. Initially meant for IRC
 
 This program is still work in progress. It will require a server.
 
+**You can ask questions and make requests on [freenode.net channel #harpoon](https://webchat.freenode.net/?channels=harpoon).**
+
 ![Screenshot](https://www.0x17.de/proj/harpoonClient4.png)
 
 ## Features
