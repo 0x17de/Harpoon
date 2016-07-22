@@ -22,7 +22,32 @@ function sendInput() {
     sendMessage(input.value);
     input.value = '';
 }
+function parseMessageCommand(msg) {
+    var splitMsg = msg.split(' ', 2);
+    var cmd = splitMsg[0];
+    if (Channel.active && Channel.active.type === 'irc') {
+        if (cmd === 'join') {
+            var loginData = splitMsg[1].split(' ');
+            send({type:'irc', cmd:'join', serverId:Channel.active.serverId, channel:loginData[0], password:loginData[1]});
+        } else  if (cmd === 'part') {
+            var channel = splitMsg[1] || Channel.active.channelName;
+            send({type:'irc', cmd:'part', serverId:Channel.active.serverId, channel:channel});
+            var channelPage = serverList.get('irc', Channel.active.serverId).get(channel);
+            channelPage.unlink();
+            channelPage.remove();
+        }
+    }
+}
 function sendMessage(msg) {
+    if (msg.length === 0) return;
+    if (msg[0] === '/') {
+        if (msg[1] === '/') {
+            msg = msg.substr(1);
+        } else {
+            parseMessageCommand(msg.substr(1));
+            return;
+        }
+    }
     if (!Channel.active) return;
     if (Channel.active.bServerChannel) return;
     send({cmd:"chat", server:Channel.active.serverId, channel:Channel.active.channelName, msg:msg});

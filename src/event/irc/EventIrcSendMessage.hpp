@@ -1,11 +1,11 @@
 #ifndef EVENTIRCSENDMESSAGE_H
 #define EVENTIRCSENDMESSAGE_H
 
-#include "../IUserEvent.hpp"
+#include "IIrcCommand.hpp"
 #include <string>
 
 
-class EventIrcSendMessage : public IUserEvent {
+class EventIrcSendMessage : public IIrcCommand {
     size_t userId;
     size_t serverId;
     std::string channel;
@@ -16,7 +16,7 @@ public:
 
     EventIrcSendMessage(size_t userId, size_t serverId, const std::string& channel, const std::string& message);
     virtual size_t getUserId() const override;
-    size_t getServerId() const;
+    virtual size_t getServerId() const override;
     std::string getChannel() const;
     std::string getMessage() const;
 };

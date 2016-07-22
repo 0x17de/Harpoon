@@ -1,5 +1,6 @@
-function Channel(serverId, parent, channelName, bServerChannel, bAppLog) {
+function Channel(type, serverId, parent, channelName, bServerChannel, bAppLog) {
     var self = this;
+    this.type = type;
     this.serverId = serverId;
     this.channelName = channelName;
     this.bServerChannel = bServerChannel;
@@ -72,13 +73,14 @@ Channel.prototype.removeUser = function(userName) {
     return true;
 }
 
-function Server(parent, serverId, serverName) {
+function Server(type, parent, serverId, serverName) {
     var self = this;
+    this.type = type;
     this.root = new Element('li');
     this.channels = {};
     this.serverId = serverId;
     this.serverName = (new Element('div')).text(serverName).attr('data-id', serverId);
-    this.serverLog = new Channel(this.serverId, this.serverName, '['+serverName+']', true);
+    this.serverLog = new Channel(this.type, this.serverId, this.serverName, '['+serverName+']', true);
     this.channelRoot = new Element('ul');
     parent.add(
         this.root
@@ -90,7 +92,7 @@ Server.prototype.remove = function() {
     this.root.remove();
 }
 Server.prototype.add = function(channelName) {
-    return this.channels[channelName] = new Channel(this.serverId, this.channelRoot, channelName);
+    return this.channels[channelName] = new Channel(this.type, this.serverId, this.channelRoot, channelName);
 }
 Server.prototype.get = function(channelName) {
     var channel = this.channels[channelName];
@@ -104,7 +106,7 @@ Server.prototype.getServerLog = function() {
 function ServerList(root) {
     this.root = root;
     this.byType = {};
-    this.log = new Channel('', null, '*LOG*', true, true);
+    this.log = new Channel('', '', null, '*LOG*', true, true);
     this.showLog();
 }
 ServerList.prototype.showLog = function() {
@@ -127,7 +129,7 @@ ServerList.prototype.add = function(type, serverId, serverName) {
         };
         this.root.add(typeData.root);
     }
-    return typeData.servers[serverId] = new Server(typeData.root, serverId, serverName);
+    return typeData.servers[serverId] = new Server(type, typeData.root, serverId, serverName);
 }
 ServerList.prototype.get = function(type, serverId) {
     var typeData = this.byType[type];
