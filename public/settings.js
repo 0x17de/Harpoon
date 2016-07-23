@@ -1,4 +1,5 @@
 function Service(servicename, servicetype) {
+    this.data = {};
     this.serviceview = new Element('#serviceconfig-'+servicetype);
     this.servicetype = servicetype;
     this.selector = new Element('option').text(servicename);
@@ -93,10 +94,10 @@ ServiceIrc.prototype.load = function(json) {
     if (!this.data.servers) this.data.servers = {};
     var servers = this.data.servers;
     for (var serverId in servers) {
-        if (!servers[serverId].channels) servers[serverId.channels] = [];
-        if (!servers[serverId].hosts) servers[serverId.hosts] = {};
-
         var serverData = servers[serverId];
+        if (!serverData.channels) servers[serverId].channels = [];
+        if (!serverData.hosts) servers[serverId].hosts = {};
+
         var server = this.addServer(serverId, serverData);
         if (noneSelected) {
             noneSelected = false;
@@ -108,8 +109,19 @@ ServiceIrc.prototype.setServerData = function(serverData) {
     ServiceIrc.selectedServerData = serverData;
     ServiceIrc.selectedHost = null;
     this.hostlist.clear();
+    this.nicklist.clear();
 
     var noneSelected = true;
+    var nicks = serverData.nicks;
+    for (var i = 0; i < nicks.length; ++i) {
+        var nick = this.addNick(nicks[i]);
+        if (noneSelected) {
+            noneSelected = false;
+            nick.get().click();
+        }
+    }
+
+    noneSelected = true;
     var hosts = serverData.hosts;
     for (var hostKey in hosts) {
         var host = this.addHost(hostKey, hosts[hostKey]);
@@ -162,10 +174,6 @@ ServiceIrc.prototype.addServer = function(serverId, serverData) {
     };
     serverInput.val(serverData.name);
     this.networklist.add(server);
-
-    var nicks = serverData.nicks;
-    for (var i = 0; i < nicks.length; ++i)
-        this.addNick(nicks[i]);
 
     return server;
 };
@@ -241,6 +249,7 @@ ServiceIrc.prototype.addNick = function(nick) {
     nickEntry.val(nick);
     this.nicklist.add(nickPad);
     if (nick === '') nickEntry.get().focus();
+    return nickPad;
 };
 ServiceIrc.prototype.save = function() {
     // TODO save

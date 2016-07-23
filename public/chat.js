@@ -107,6 +107,7 @@ function getScroll(evt, cb) {
 }
 function onMessage(msg) {
     if (msg === '') return;
+    console.log("<< "+msg);
     try {
         var json = JSON.parse(msg);
         if (json.type === void 0 || json.type === 'irc')
@@ -124,8 +125,8 @@ function timestamp(opt_ts) {
 }
 function onIrcMessage(json) {
     var target;
-    if ((json.server || json.serverId) && json.channel) {
-        var server = serverList.get('irc', json.server || json.serverId);
+    if (json.server && json.channel) {
+        var server = serverList.get('irc', json.server);
         if (server)
             target = server.get(json.channel);
     }
@@ -138,14 +139,14 @@ function onIrcMessage(json) {
     switch (json.cmd) {
     case 'serveradded':
         var ircService = Service.map['irc'];
-        ircService.data.servers[json.serverId] = {name: json.name};
+        ircService.data.servers[json.server] = {name: json.name};
         ircService.load();
         ServiceIrc.addServerPopup_Close(true);
         break;
     case 'hostadded':
         var hostKey = json.host + ":" + json.port;
         var ircService = Service.map['irc'];
-        ircService.data.servers[json.serverId].hosts[hostKey] = {
+        ircService.data.servers[json.server].hosts[hostKey] = {
             hasPassword: json.hasPassword,
             ipv6: json.ipv6,
             ssl: json.ssl
