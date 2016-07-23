@@ -274,7 +274,9 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["channel"] = notice->getTarget();
         root["nick"] = notice->getUsername();
         root["msg"] = notice->getMessage();
+    } else {
+        return "";
     }
-
+    root["time"] = (Json::UInt64)chrono::duration_cast<chrono::milliseconds>(event->getTimestamp().time_since_epoch()).count();
     return Json::FastWriter{}.write(root);
 }

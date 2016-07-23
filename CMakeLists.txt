@@ -12,7 +12,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
     src/db/LoginDatabase_Ini.cpp src/db/LoginDatabase_Ini.hpp
     src/db/IrcDatabase_Dummy.cpp src/db/IrcDatabase_Dummy.hpp
     src/db/IrcDatabase_Ini.cpp src/db/IrcDatabase_Ini.hpp
-    src/event/IEvent.hpp src/event/IClientEvent.hpp src/event/irc/IIrcCommand.hpp
+    src/event/IEvent.hpp src/event/IEvent.cpp src/event/IClientEvent.hpp src/event/irc/IIrcCommand.hpp
     src/service/irc/IrcChannelLoginData.cpp src/service/irc/IrcChannelLoginData.hpp
     src/service/irc/IrcServerConfiguration.cpp src/service/irc/IrcServerConfiguration.hpp
     src/service/irc/IrcServerHostConfiguration.cpp src/service/irc/IrcServerHostConfiguration.hpp
