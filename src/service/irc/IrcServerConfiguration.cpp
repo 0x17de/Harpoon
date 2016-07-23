@@ -24,7 +24,11 @@ void IrcServerConfiguration::modifyNick(const std::string& oldNick, const std::s
         nicks.remove(oldNick);
     } else {
         auto it = find(nicks.begin(), nicks.end(), oldNick);
-        *it = newNick;
+        if (it == nicks.end()) {
+            nicks.push_back(newNick);
+        } else {
+            *it = newNick;
+        }
     }
 }
 

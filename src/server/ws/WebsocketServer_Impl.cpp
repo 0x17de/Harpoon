@@ -156,7 +156,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         auto userlist = event->as<EventIrcUserlistReceived>();
         root["cmd"] = "userlist";
         root["type"] = "irc";
-        root["serverId"] = to_string(userlist->getServerId());
+        root["server"] = to_string(userlist->getServerId());
         root["channel"] = userlist->getChannel();
         auto& users = root["users"] = Json::arrayValue;
         for (auto& user : userlist->getUsers())
@@ -166,12 +166,12 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["cmd"] = "serveradded";
         root["type"] = "irc";
         root["name"] = added->getServerName();
-        root["id"] = to_string(added->getServerId());
+        root["server"] = to_string(added->getServerId());
     } else if (eventType == EventIrcHostAdded::uuid) {
         auto added = event->as<EventIrcHostAdded>();
         root["cmd"] = "hostadded";
         root["type"] = "irc";
-        root["serverId"] = to_string(added->getServerId());
+        root["server"] = to_string(added->getServerId());
         root["host"] = added->getHost();
         root["hasPassword"] = added->getPassword().size() > 0;
         root["port"] = added->getPort();
