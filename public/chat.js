@@ -113,8 +113,8 @@ function onMessage(msg) {
 function twoDigit(e) {
     return e < 10 ? '0'+e : ''+e;
 }
-function timestamp() {
-    var d = new Date();
+function timestamp(opt_ts) {
+    var d = opt_ts ? new Date(opt_ts) : new Date();
     return twoDigit(d.getHours()) + ":" + twoDigit(d.getMinutes()) + ":" + twoDigit(d.getSeconds());
 }
 function onIrcMessage(json) {
@@ -182,7 +182,7 @@ function onIrcMessage(json) {
             var server = serverList.get('irc', json.server);
             server.add(json.channel);
         } else {
-            putLog(json.type, json.server, json.channel, timestamp(), '-->', pureNick+' joined the channel', 'event');
+            putLog(json.type, json.server, json.channel, timestamp(json.time), '-->', pureNick+' joined the channel', 'event');
             target.addUser(pureNick);
         }
         break;
@@ -191,7 +191,7 @@ function onIrcMessage(json) {
             var server = serverList.get('irc', json.server);
             // TODO: remove channel
         } else {
-            putLog(json.type, json.server, json.channel, timestamp(), '<--', pureNick+' left the channel', 'event');
+            putLog(json.type, json.server, json.channel, timestamp(json.time), '<--', pureNick+' left the channel', 'event');
             target.removeUser(pureNick);
         }
         break;
@@ -199,28 +199,28 @@ function onIrcMessage(json) {
         var channels = serverList.get('irc', json.server).channels;
         for (var channelName in channels) {
             if (channels[channelName].removeUser(pureNick))
-                putLog(json.type, json.server, channelName, timestamp(), '<--', pureNick+' has quit'+(json.msg?' ('+json.msg+')':''), 'event');
+                putLog(json.type, json.server, channelName, timestamp(json.time), '<--', pureNick+' has quit'+(json.msg?' ('+json.msg+')':''), 'event');
         }
         break;
     case 'chat':
-        putLog(json.type, json.server, json.channel, timestamp(), nick, json.msg);
+        putLog(json.type, json.server, json.channel, timestamp(json.time), nick, json.msg);
         break;
     case 'action':
-        putLog(json.type, json.server, json.channel, timestamp(), '*', pureNick+' '+json.msg, 'action');
+        putLog(json.type, json.server, json.channel, timestamp(json.time), '*', pureNick+' '+json.msg, 'action');
         break;
     case 'kick':
-        putLog(json.type, json.server, json.channel, timestamp(), '<--', pureNick+' was kicked', 'event');
+        putLog(json.type, json.server, json.channel, timestamp(json.time), '<--', pureNick+' was kicked', 'event');
         target.removeUser(pureNick);
         break;
     case 'nickchange':
         var channels = serverList.get('irc', json.server).channels;
         for (var channelName in channels) {
             if (channels[channelName].renameUser(pureNick, json.newNick))
-                putLog(json.type, json.server, channelName, timestamp(), '<->', pureNick+' is now known as '+json.newNick, 'event');
+                putLog(json.type, json.server, channelName, timestamp(json.time), '<->', pureNick+' is now known as '+json.newNick, 'event');
         }
         break;
     case 'notice':
-        putLog(json.type, json.server, json.channel, timestamp(), '*'+pureNick+'*', json.msg, 'notice');
+        putLog(json.type, json.server, json.channel, timestamp(json.time), '*'+pureNick+'*', json.msg, 'notice');
         break;
     default:
         console.warning("Unknown command: "+json.cmd);
