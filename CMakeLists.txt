@@ -51,6 +51,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
     src/event/irc/EventIrcUserModeChanged.cpp src/event/irc/EventIrcUserModeChanged.hpp
     src/event/irc/EventIrcQuit.cpp src/event/irc/EventIrcQuit.hpp
     src/event/irc/EventIrcParted.cpp src/event/irc/EventIrcParted.hpp
+    src/event/irc/EventIrcChangeNick.cpp src/event/irc/EventIrcChangeNick.hpp
     src/event/irc/EventIrcNickChanged.cpp src/event/irc/EventIrcNickChanged.hpp
     src/event/irc/EventIrcPartChannel.cpp src/event/irc/EventIrcPartChannel.hpp
     src/event/irc/EventIrcKicked.cpp src/event/irc/EventIrcKicked.hpp
@@ -67,6 +68,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
     src/event/irc/EventIrcServerDeleted.cpp src/event/irc/EventIrcServerDeleted.hpp
     src/event/irc/EventIrcHostDeleted.cpp src/event/irc/EventIrcHostDeleted.hpp
     src/event/irc/EventIrcModifyNick.cpp src/event/irc/EventIrcModifyNick.hpp
+    src/event/irc/EventIrcUserlistReceived.cpp src/event/irc/EventIrcUserlistReceived.hpp
     src/event/irc/EventIrcReconnectServer.cpp src/event/irc/EventIrcReconnectServer.hpp
     src/event/EventQuit.cpp src/event/EventQuit.hpp
     )

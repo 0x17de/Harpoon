@@ -12,6 +12,7 @@
 #include "event/irc/EventIrcReconnectServer.hpp"
 #include "event/irc/EventIrcJoinChannel.hpp"
 #include "event/irc/EventIrcPartChannel.hpp"
+#include "event/irc/EventIrcChangeNick.hpp"
 #include <sstream>
 #include <json/json.h>
 
@@ -91,6 +92,11 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                     auto part = make_shared<EventIrcPartChannel>(clientData.userId, serverId);
                     part->addChannel(channel);
                     appQueue->sendEvent(part);
+                } else if (cmd == "nick") {
+                    size_t serverId;
+                    istringstream(root.get("serverId", "0").asString()) >> serverId;
+                    string nick = root.get("nick", "").asString();
+                    appQueue->sendEvent(make_shared<EventIrcChangeNick>(clientData.userId, serverId, nick));
                 } else if (cmd == "addserver") {
                     string name = root.get("name", "").asString();
                     appQueue->sendEvent(make_shared<EventIrcAddServer>(clientData.userId, name));
