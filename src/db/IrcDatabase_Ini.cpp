@@ -38,7 +38,9 @@ IrcDatabase_Ini::IrcDatabase_Ini(EventQueue* appQueue) :
         EventIrcDeleteServer::uuid,
         EventIrcAddHost::uuid,
         EventIrcDeleteHost::uuid,
-        EventIrcModifyNick::uuid
+        EventIrcModifyNick::uuid,
+        EventIrcJoinChannel::uuid,
+        EventIrcPartChannel::uuid
     }),
     appQueue{appQueue}
 {
