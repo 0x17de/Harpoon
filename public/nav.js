@@ -64,6 +64,10 @@ Channel.prototype.renameUser = function(userName, newName) {
     userData.root.text(newName);
     return true;
 }
+Channel.prototype.clearUsers = function() {
+    for (var username in this.users)
+        this.removeUser(username);
+}
 Channel.prototype.removeUser = function(userName) {
     var userNameLower = userName.toLowerCase();
     var user = this.users[userNameLower];

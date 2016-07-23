@@ -8,7 +8,6 @@
 #include "event/EventQueryChats.hpp"
 #include "event/EventQuerySettings.hpp"
 #include "event/irc/EventIrcActivateService.hpp"
-#include "event/irc/EventIrcSendMessage.hpp"
 #include "event/irc/EventIrcChatListing.hpp"
 #include "event/irc/EventIrcSettingsListing.hpp"
 #include "event/irc/EventIrcServerAdded.hpp"
@@ -17,7 +16,6 @@
 #include "event/irc/EventIrcHostDeleted.hpp"
 #include "event/irc/EventIrcReconnectServer.hpp"
 #include "service/irc/IrcChannelStore.hpp"
-#include "event/irc/IIrcCommand.hpp"
 #include <iostream>
 #include <mutex>
 

@@ -12,6 +12,8 @@
 #include "event/irc/EventIrcMessage.hpp"
 #include "event/irc/EventIrcNumeric.hpp"
 #include "event/irc/EventIrcModifyNick.hpp"
+#include "event/irc/EventIrcChangeNick.hpp"
+#include "event/irc/EventIrcUserlistReceived.hpp"
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -196,6 +198,10 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
         running = false;
         cout << "[IC] received QUIT" << endl;
         return false;
+    } else if (type == EventIrcChangeNick::uuid) {
+        lock_guard<mutex> lock(channelLoginDataMutex);
+        auto nick = event->as<EventIrcChangeNick>();
+        irc_cmd_nick(ircSession, nick->getNick().c_str());
     } else if (type == EventIrcJoinChannel::uuid) {
         lock_guard<mutex> lock(channelLoginDataMutex);
         auto joinCommand = event->as<EventIrcJoinChannel>();
@@ -241,6 +247,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
             channelStore.removeUser(getPureNick(part->getUsername()));
         }
     } else if (type == EventIrcModifyNick::uuid) {
+        lock_guard<mutex> lock(channelLoginDataMutex);
         auto modify = event->as<EventIrcModifyNick>();
         configuration.modifyNick(modify->getOldNick(), modify->getNewNick());
     } else if (type == EventIrcNickChanged::uuid) {
@@ -251,7 +258,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
             IrcChannelStore& channelStore = channelStorePair.second;
             channelStore.renameUser(getPureNick(nickChange->getUsername()), nickChange->getNewNick());
         }
-        if (nick == nickChange->getUsername())
+        if (nick == getPureNick(nickChange->getUsername()))
             nick = nickChange->getNewNick();
     } else if (type == EventIrcNumeric::uuid) {
         auto num = event->as<EventIrcNumeric>();
@@ -290,6 +297,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                 }
                 // assign users from parameter
                 channelStore->clear();
+                auto userlist = make_shared<EventIrcUserlistReceived>(num->getUserId(), num->getServerId(), channelName);
                 istringstream users(parameters.at(3));
                 string user;
                 while (getline(users, user, ' ')) {
@@ -303,9 +311,10 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                         user = user.substr(1);
                     }
                     channelStore->addUser(user, "");
+                    userlist->addUser(user);
                 }
+                appQueue->sendEvent(userlist);
             }
-#warning send USERLIST to all connected clients
         } else if (code == LIBIRC_RFC_RPL_ENDOFNAMES) {
             lock_guard<mutex> lock(channelLoginDataMutex);
             auto num = event->as<EventIrcNumeric>();

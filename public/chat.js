@@ -18,6 +18,7 @@ var input,
     serviceSelector;
 
 function sendInput() {
+    if (!connected) return;
     var input = document.getElementById('input');
     sendMessage(input.value);
     input.value = '';
@@ -35,6 +36,10 @@ function parseMessageCommand(msg) {
             var channelPage = serverList.get('irc', Channel.active.serverId).get(channel);
             channelPage.unlink();
             channelPage.remove();
+        } else if (cmd === 'nick') {
+            send({type:'irc', cmd:'nick', serverId:Channel.active.serverId, nick:splitMsg[1]});
+        } else if (cmd === 'me') {
+            send({type:'irc', cmd:'me', serverId:Channel.active.serverId, channel:Channel.active.channelName, nick:splitMsg[1]});
         }
     }
 }
@@ -101,14 +106,14 @@ function getScroll(evt, cb) {
     return direction;
 }
 function onMessage(msg) {
-    var json = JSON.parse(msg);
-    if (!json) {
-        console.log("!<< "+msg);
-        return;
+    if (msg === '') return;
+    try {
+        var json = JSON.parse(msg);
+        if (json.type === void 0 || json.type === 'irc')
+            onIrcMessage(json);
+    } catch(e) {
+        console.log("Failed to parse >>" + msg + "<<. Reason: "+e);
     }
-    console.log("<< "+JSON.stringify(json));
-    if (json.type === void 0 || json.type === 'irc')
-        onIrcMessage(json);
 }
 function twoDigit(e) {
     return e < 10 ? '0'+e : ''+e;
@@ -119,8 +124,11 @@ function timestamp(opt_ts) {
 }
 function onIrcMessage(json) {
     var target;
-    if (json.server && json.channel)
-        target = serverList.get('irc', json.server).get(json.channel);
+    if ((json.server || json.serverId) && json.channel) {
+        var server = serverList.get('irc', json.server || json.serverId);
+        if (server)
+            target = server.get(json.channel);
+    }
 
     var pureNick, nick;
     if (json.nick !== void 0) {
@@ -153,6 +161,12 @@ function onIrcMessage(json) {
         var service =  Service.map[json.type];
         if (!service) break;
         service.load(json.data);
+        break;
+    case 'userlist':
+        target.clearUsers();
+        var users = json.users;
+        for (var i = 0; i < users.length; ++i)
+            target.addUser(users[i]);
         break;
     case 'chatlist':
         var chooseFirstChannel = true;
@@ -223,7 +237,7 @@ function onIrcMessage(json) {
         putLog(json.type, json.server, json.channel, timestamp(json.time), '*'+pureNick+'*', json.msg, 'notice');
         break;
     default:
-        console.warning("Unknown command: "+json.cmd);
+        console.log("WARNING: Unknown command: "+json.cmd);
     }
 }
 function putLog(type, serverId, channelName, time, nick, msg, style) {
