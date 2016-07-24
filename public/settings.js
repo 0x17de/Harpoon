@@ -78,7 +78,7 @@ ServiceIrc.addHostPopup_Save = function() {
     (new Element('#serviceconfig-irc-newserver-btnclose')).attr('disabled', 'disabled');
     send({cmd: 'addhost',
           type: 'irc',
-          serverId: ServiceIrc.selectedServerId,
+          server: ServiceIrc.selectedServerId,
           host: (new Element('#serviceconfig-irc-newhost-host')).val(),
           port: parseInt((new Element('#serviceconfig-irc-newhost-port')).val()),
           password: (new Element('#serviceconfig-irc-newhost-password')).val(),
@@ -99,7 +99,9 @@ ServiceIrc.prototype.load = function(json) {
         if (!serverData.hosts) servers[serverId].hosts = {};
 
         var server = this.addServer(serverId, serverData);
-        if (noneSelected) {
+        if (noneSelected || serverData.select) {
+            if (serverData.select)
+                delete serverData.select;
             noneSelected = false;
             server.get().click();
         }
@@ -194,7 +196,7 @@ ServiceIrc.deleteHost = function(serverId, hostKey) {
     var host = splitKey[0];
     var port = parseInt(splitKey[1]);
 
-    send({type:'irc', cmd:'deletehost', serverId:serverId, host:host, port:port});
+    send({type:'irc', cmd:'deletehost', server:serverId, host:host, port:port});
     var hostItem = Element('#irc-host-'+host+"-"+port);
     var next = hostItem.get().nextElementSibling || hostItem.get().previousElementSibling;
     ServiceIrc.selectedHostKey = ServiceIrc.selectedHostData = null;
@@ -203,7 +205,7 @@ ServiceIrc.deleteHost = function(serverId, hostKey) {
     hostItem.remove();
 };
 ServiceIrc.reconnectServer = function(serverId) {
-    send({type:'irc', cmd:'reconnect', serverId:serverId});
+    send({type:'irc', cmd:'reconnect', server:serverId});
 };
 ServiceIrc.addNewNick = function() {
     Service.map['irc'].addNick();
@@ -212,11 +214,19 @@ ServiceIrc.deleteNick = function() {
     var pad = ServiceIrc.selectedNick;
     if (!pad) return;
     var oldNick = pad.attr('data-previous-name');
+
+    var nicks = ServiceIrc.selectedServerData.nicks;
+    for (var i = 0; i < nicks.length; ++i) {
+        if (nicks[i] === oldNick) {
+            nicks.splice(i, 1); --i;
+        }
+    }
+
     var next = pad.get().nextElementSibling || pad.get().previousElementSibling;
     ServiceIrc.selectedNick = null;
     if (next) next.click();
     pad.remove();
-    send({type:'irc', cmd:'modifynick', serverId:ServiceIrc.selectedServerId, oldnick:oldNick, newnick:''});
+    send({type:'irc', cmd:'modifynick', server:ServiceIrc.selectedServerId, oldnick:oldNick, newnick:''});
 }
 ServiceIrc.prototype.addNick = function(nick) {
     if (!nick) nick = '';
@@ -236,7 +246,16 @@ ServiceIrc.prototype.addNick = function(nick) {
         if (newNick === "") {
             ServiceIrc.deleteNick();
         } else if (newNick !== oldNick) {
-            send({type:'irc', cmd:'modifynick', serverId:ServiceIrc.selectedServerId, oldnick:oldNick, newnick:newNick});
+            var nicks = ServiceIrc.selectedServerData.nicks;
+            if (oldNick === '') {
+                nicks.push(newNick);
+            } else {
+                for (var i = 0; i < nicks.length; ++i) {
+                    if (nicks[i] === oldNick)
+                        nicks[i] = newNick;
+                }
+            }
+            send({type:'irc', cmd:'modifynick', server:ServiceIrc.selectedServerId, oldnick:oldNick, newnick:newNick});
             nickPad.attr('data-previous-name', newNick);
         }
     };

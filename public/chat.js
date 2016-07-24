@@ -29,17 +29,17 @@ function parseMessageCommand(msg) {
     if (Channel.active && Channel.active.type === 'irc') {
         if (cmd === 'join') {
             var loginData = splitMsg[1].split(' ');
-            send({type:'irc', cmd:'join', serverId:Channel.active.serverId, channel:loginData[0], password:loginData[1]});
+            send({type:'irc', cmd:'join', server:Channel.active.serverId, channel:loginData[0], password:loginData[1]});
         } else  if (cmd === 'part') {
             var channel = splitMsg[1] || Channel.active.channelName;
-            send({type:'irc', cmd:'part', serverId:Channel.active.serverId, channel:channel});
+            send({type:'irc', cmd:'part', server:Channel.active.serverId, channel:channel});
             var channelPage = serverList.get('irc', Channel.active.serverId).get(channel);
             channelPage.unlink();
             channelPage.remove();
         } else if (cmd === 'nick') {
-            send({type:'irc', cmd:'nick', serverId:Channel.active.serverId, nick:splitMsg[1]});
+            send({type:'irc', cmd:'nick', server:Channel.active.serverId, nick:splitMsg[1]});
         } else if (cmd === 'me') {
-            send({type:'irc', cmd:'me', serverId:Channel.active.serverId, channel:Channel.active.channelName, nick:splitMsg[1]});
+            send({type:'irc', cmd:'me', server:Channel.active.serverId, channel:Channel.active.channelName, nick:splitMsg[1]});
         }
     }
 }
@@ -139,7 +139,7 @@ function onIrcMessage(json) {
     switch (json.cmd) {
     case 'serveradded':
         var ircService = Service.map['irc'];
-        ircService.data.servers[json.server] = {name: json.name};
+        ircService.data.servers[json.server] = {name: json.name, select: true};
         ircService.load();
         ServiceIrc.addServerPopup_Close(true);
         break;
