@@ -68,6 +68,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
     src/event/irc/EventIrcServerDeleted.cpp src/event/irc/EventIrcServerDeleted.hpp
     src/event/irc/EventIrcHostDeleted.cpp src/event/irc/EventIrcHostDeleted.hpp
     src/event/irc/EventIrcModifyNick.cpp src/event/irc/EventIrcModifyNick.hpp
+    src/event/irc/EventIrcNickModified.cpp src/event/irc/EventIrcNickModified.hpp
     src/event/irc/EventIrcUserlistReceived.cpp src/event/irc/EventIrcUserlistReceived.hpp
     src/event/irc/EventIrcReconnectServer.cpp src/event/irc/EventIrcReconnectServer.hpp
     src/event/EventQuit.cpp src/event/EventQuit.hpp
