@@ -12,6 +12,7 @@
 #include "event/irc/EventIrcMessage.hpp"
 #include "event/irc/EventIrcNumeric.hpp"
 #include "event/irc/EventIrcModifyNick.hpp"
+#include "event/irc/EventIrcNickModified.hpp"
 #include "event/irc/EventIrcChangeNick.hpp"
 #include "event/irc/EventIrcUserlistReceived.hpp"
 #include <algorithm>
@@ -250,6 +251,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
         lock_guard<mutex> lock(channelLoginDataMutex);
         auto modify = event->as<EventIrcModifyNick>();
         configuration.modifyNick(modify->getOldNick(), modify->getNewNick());
+        appQueue->sendEvent(make_shared<EventIrcNickModified>(modify->getUserId(), modify->getServerId(), modify->getOldNick(), modify->getNewNick()));
     } else if (type == EventIrcNickChanged::uuid) {
         auto nickChange = event->as<EventIrcNickChanged>();
 
