@@ -79,7 +79,7 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
             } else if (type == "irc") {
                 if (cmd == "join") {
                     size_t serverId;
-                    istringstream(root.get("serverId", "0").asString()) >> serverId;
+                    istringstream(root.get("server", "0").asString()) >> serverId;
                     string channel = root.get("channel", "").asString();
                     string password = root.get("password", "").asString();
                     auto join = make_shared<EventIrcJoinChannel>(clientData.userId, serverId);
@@ -87,14 +87,14 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                     appQueue->sendEvent(join);
                 } else if (cmd == "part") {
                     size_t serverId;
-                    istringstream(root.get("serverId", "0").asString()) >> serverId;
+                    istringstream(root.get("server", "0").asString()) >> serverId;
                     string channel = root.get("channel", "").asString();
                     auto part = make_shared<EventIrcPartChannel>(clientData.userId, serverId);
                     part->addChannel(channel);
                     appQueue->sendEvent(part);
                 } else if (cmd == "nick") {
                     size_t serverId;
-                    istringstream(root.get("serverId", "0").asString()) >> serverId;
+                    istringstream(root.get("server", "0").asString()) >> serverId;
                     string nick = root.get("nick", "").asString();
                     appQueue->sendEvent(make_shared<EventIrcChangeNick>(clientData.userId, serverId, nick));
                 } else if (cmd == "addserver") {
@@ -107,7 +107,7 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                         appQueue->sendEvent(make_shared<EventIrcDeleteServer>(clientData.userId, serverId));
                 } else if (cmd == "addhost") {
                     size_t serverId;
-                    istringstream(root.get("serverId", "0").asString()) >> serverId;
+                    istringstream(root.get("server", "0").asString()) >> serverId;
                     string host = root.get("host", "").asString();
                     string password = root.get("password", "").asString();
                     int port = root.get("port", -1).asInt();
@@ -123,7 +123,7 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                                                                      ssl));
                 } else if (cmd == "modifynick") {
                     size_t serverId;
-                    istringstream(root.get("serverId", "0").asString()) >> serverId;
+                    istringstream(root.get("server", "0").asString()) >> serverId;
                     string oldNick = root.get("oldnick", "").asString();
                     string newNick = root.get("newnick", "").asString();
 
@@ -133,13 +133,13 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                                                                         newNick));
                 } else if (cmd == "reconnect") {
                     size_t serverId;
-                    istringstream(root.get("serverId", "0").asString()) >> serverId;
+                    istringstream(root.get("server", "0").asString()) >> serverId;
 
                     appQueue->sendEvent(make_shared<EventIrcReconnectServer>(clientData.userId,
                                                                              serverId));
                 } else if (cmd == "deletehost") {
                     size_t serverId;
-                    istringstream(root.get("serverId", "0").asString()) >> serverId;
+                    istringstream(root.get("server", "0").asString()) >> serverId;
                     string host = root.get("host", "").asString();
                     int port = root.get("port", -1).asInt();
 
