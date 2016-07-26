@@ -154,6 +154,30 @@ function onIrcMessage(json) {
         ircService.load();
         ServiceIrc.addHostPopup_Close(true);
         break;
+    case 'nickmodified':
+        var ircService = Service.map['irc'];
+        var nicks = ircService.data.servers[json.server].nicks;
+        var oldNick = json.oldnick;
+        var newNick = json.newnick;
+        if (newNick === "") {
+            for (var i = 0; i < nicks.length; ++i) {
+                if (nicks[i] === oldNick) {
+                    nicks.splice(i, 1); // delete
+                    --i;
+                }
+            }
+        } else {
+            if (oldNick === "") {
+                if (nicks.indexOf(newNick) === -1)
+                    nicks.push(newNick); // add
+            } else {
+                for (var i = 0; i < nicks.length; ++i) {
+                    if (nicks[i] === oldNick)
+                        nicks[i] = newNick; // replace
+                }
+            }
+        }
+        break;
     case 'login':
         console.log('Login successful');
         send({cmd:'querysettings'});
