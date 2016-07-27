@@ -9,11 +9,10 @@ namespace Query {
     {
     }
 
-    DatabaseQuery::DatabaseQuery(const std::string& table, And&& rule)
+    Join::Join(const std::string& table, Eq&& comparison)
         : table{table}
-        , rule{rule}
+        , comparison{comparison}
     {
     }
 
 }
-
