@@ -3,6 +3,7 @@
 
 #include <string>
 #include <list>
+#include <tuple>
 #include <type_traits>
 
 
@@ -32,17 +33,17 @@ namespace Query {
         Eq(const std::string& key, const std::string& value);
     };
 
+    template<class ...T>
     class Or : public FilterLogic {
-        std::list<Filter> rules;
+        std::tuple<T...> rules;
     public:
-        template<class ...T>
         Or(T&&...t) : rules{std::forward<T>(t)...} {};
     };
 
+    template<class ...T>
     class And : public FilterLogic {
-        std::list<Filter> rules;
+        std::tuple<T...> rules;
     public:
-        template<class ...T>
         And(T&&...t) : rules{std::forward<T>(t)...} {};
     };
 
