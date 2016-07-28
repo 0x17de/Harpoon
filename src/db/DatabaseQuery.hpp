@@ -3,86 +3,49 @@
 
 #include <string>
 #include <list>
-#include <tuple>
-#include <type_traits>
 
 
-namespace Query {
+namespace Database {
 
-    // BASE TYPES
-    class Filter {
-    protected:
-        Filter() = default;
+    enum class OperationType {
+        CompareAnd,
+        CompareOr,
+        Assign,
+        Join
     };
 
-    class FilterLogic : public Filter {
-    protected:
-        FilterLogic() = default;
-    };
-
-    class JoinLogic {
-    protected:
-        JoinLogic() = default;
-    };
-
-    // FILTER
-    class Eq : public Filter {
-        std::string key;
-        std::string value;
+    class Operation {
+        OperationType operation;
+        std::string left, right;
+        std::string extra;
     public:
-        Eq(const std::string& key, const std::string& value);
+        Operation(OperationType operation,
+                  const std::string& left,
+                  const std::string& right,
+                  const std::string& extra = "");
+
+        OperationType getOperation() const;
+        const std::string& getLeft() const;
+        const std::string& getRight() const;
+        const std::string& getExtra() const;
     };
 
-    template<class ...T>
-    class Or : public FilterLogic {
-        std::tuple<T...> rules;
-    public:
-        Or(T&&...t) : rules{std::forward<T>(t)...} {};
-    };
-
-    template<class ...T>
-    class And : public FilterLogic {
-        std::tuple<T...> rules;
-    public:
-        And(T&&...t) : rules{std::forward<T>(t)...} {};
-    };
-
-    class Any : public FilterLogic {
-    };
-
-    // JOIN
-    class Join : public JoinLogic {
-        std::string table;
-        Eq comparison;
-    public:
-        Join(const std::string& table, Eq&& comparison);
-    };
-
-    class NoJoin : public JoinLogic {
-    };
-
-    // QUERY
-    template<class R = Any, class J = NoJoin>
-    class DatabaseQuery {
+    class Query {
         std::string table;
         std::list<std::string> columns;
-        R rule;
-        J join;
+        std::list<Operation> operations;
     public:
-        static_assert(std::is_base_of<FilterLogic, R>::value, "T must be descendant of FilterLogic");
-        static_assert(std::is_base_of<JoinLogic, J>::value, "J must be descendant of JoinLogic");
-        static_assert(!std::is_same<FilterLogic, R>::value, "T must be descendant of FilterLogic");
-        static_assert(!std::is_same<JoinLogic, J>::value, "J must be descendant of JoinLogic");
+        Query(const std::string& table,
+              std::list<std::string>&& columns);
 
-        DatabaseQuery(const std::string& table,
-                      std::list<std::string>&& columns,
-                      R&& rule = R{},
-                      std::list<J>&& join = {})
-            : columns{columns}
-            , rule{std::forward(rule)}
-            , join{std::forward(join)}
-        {
-        };
+        void add(OperationType operation,
+                 const std::string& left,
+                 const std::string& right,
+                 const std::string& extra = "");
+
+        const std::string& getTable() const;
+        const std::list<std::string>& getColumns() const;
+        const std::list<Operation>& getOperations() const;
     };
 
 }
