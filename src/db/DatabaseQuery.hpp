@@ -18,16 +18,23 @@ namespace Database {
         OperationType operation;
         std::string left, right;
         std::string extra;
+        std::list<Operation> suboperations;
     public:
         Operation(OperationType operation,
                   const std::string& left,
                   const std::string& right,
                   const std::string& extra = "");
 
+        Operation& add(OperationType operation,
+                       const std::string& left,
+                       const std::string& right,
+                       const std::string& extra = "");
+
         OperationType getOperation() const;
         const std::string& getLeft() const;
         const std::string& getRight() const;
         const std::string& getExtra() const;
+        const std::list<Operation>& getSuboperations() const;
     };
 
     class Query {
@@ -38,10 +45,10 @@ namespace Database {
         Query(const std::string& table,
               std::list<std::string>&& columns);
 
-        void add(OperationType operation,
-                 const std::string& left,
-                 const std::string& right,
-                 const std::string& extra = "");
+        Operation& add(OperationType operation,
+                       const std::string& left,
+                       const std::string& right,
+                       const std::string& extra = "");
 
         const std::string& getTable() const;
         const std::list<std::string>& getColumns() const;
