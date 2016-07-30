@@ -85,6 +85,16 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
 #       src/commands/client.proto)
 
 
+if(${USE_POSTGRES_DATABASE})
+    message("Postgres included")
+    set(SOURCE_FILES ${SOURCE_FILES}
+        src/db/handler/Postgres.hpp
+        src/db/handler/Postgres.cpp
+    )
+    add_definitions(-DUSE_POSTGRES_DATABASE)
+endif()
+
+
 if(${USE_WEBSOCKET_SERVER})
     message("Websocket server included")
     if(${USE_WEBSOCKET_SERVER_VERBOSE})

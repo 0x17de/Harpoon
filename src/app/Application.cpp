@@ -31,10 +31,12 @@ Application::Application()
     eventHandlers.push_back(userManager);
 
     string loginDatabaseType,
-        enableWebChat;
+        enableWebChat,
+        databaseType;
 
     coreIni.getEntry(modules, "login", loginDatabaseType);
     coreIni.getEntry(modules, "webchat", enableWebChat);
+    coreIni.getEntry(modules, "database", databaseType);
 
     auto& moduleProvider = ModuleProvider::getInstance();
     eventHandlers.push_back(moduleProvider.initializeModule("login_database", loginDatabaseType, queue));
@@ -50,6 +52,9 @@ Application::Application()
         ircIni.getEntry(modules, "settings_database", ircDatabaseType);
         eventHandlers.push_back(moduleProvider.initializeModule("irc_database", ircDatabaseType, queue));
     }
+
+    if (databaseType != "" && databaseType != "none")
+        eventHandlers.push_back(moduleProvider.initializeModule("database", databaseType, queue));
 
 #ifdef USE_WEBSOCKET_SERVER
     if (enableWebChat == "y")
