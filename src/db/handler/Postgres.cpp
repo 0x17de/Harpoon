@@ -1,4 +1,5 @@
 #include "Postgres.hpp"
+#include "utils/ModuleProvider.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventInit.hpp"
 
@@ -6,6 +7,9 @@ using namespace std;
 
 
 namespace Database {
+
+    PROVIDE_MODULE("database", "postgres", Postgres);
+
 
     struct Postgres_Impl {
         EventQueue* appQueue;
