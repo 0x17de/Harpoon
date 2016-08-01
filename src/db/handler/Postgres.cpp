@@ -42,18 +42,28 @@ namespace Database {
         } else if (eventType == EventInit::uuid) {
             using namespace soci;
 
-            string username, password, database;
+            string host,
+                port,
+                username,
+                password,
+                database;
 
             Ini dbIni("config/postgres.ini");
             auto& auth = dbIni.expectCategory("auth");
+            dbIni.getEntry(auth, "host", host);
+            dbIni.getEntry(auth, "port", port);
             dbIni.getEntry(auth, "username", username);
             dbIni.getEntry(auth, "password", password);
             dbIni.getEntry(auth, "database", database);
 
 #warning check if values are 'evil'
             stringstream login;
-            login << "postgresql://"
-                  << "dbname=" << database << " "
+            login << "postgresql://";
+            if (host.size() > 0)
+                login << "host=" << host << " ";
+            if (port.size() > 0)
+                login << "port=" << port << " ";
+            login << "dbname=" << database << " "
                   << "user=" << username << " "
                   << "password=" << password;
 
