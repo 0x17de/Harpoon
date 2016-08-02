@@ -2,6 +2,7 @@
 #include "utils/ModuleProvider.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventInit.hpp"
+#include "event/EventDatabaseQuery.hpp"
 #include "utils/Ini.hpp"
 
 #include <iostream>
@@ -26,7 +27,12 @@ namespace Database {
     };
 
     Postgres::Postgres(EventQueue* appQueue)
-        : EventLoop{}
+        : EventLoop{
+            {},
+            {
+                &EventGuard<IDatabaseEvent>
+            }
+        }
         , impl{make_shared<Postgres_Impl>(appQueue)}
     {
     }
@@ -39,6 +45,21 @@ namespace Database {
         UUID eventType = event->getEventUuid();
         if (eventType == EventQuit::uuid) {
             return false;
+        } else if (eventType == EventDatabaseQuery::uuid) {
+            auto db = event->as<EventDatabaseQuery>();
+            for (const auto& query : db->getQueries()) {
+                switch (query.getType()) {
+                case Database::QueryType::Fetch:
+#warning Postgres QueryType::Fetch stub
+                    break;
+                case Database::QueryType::Insert:
+#warning Postgres QueryType::Insert stub
+                    break;
+                case Database::QueryType::Delete:
+#warning Postgres QueryType::Delete stub
+                    break;
+                }
+            }
         } else if (eventType == EventInit::uuid) {
             using namespace soci;
 

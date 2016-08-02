@@ -58,6 +58,7 @@ namespace Database {
                        const std::string& right,
                        const std::string& extra = "");
 
+        QueryType getType() const;
         const std::string& getTable() const;
         const std::list<std::string>& getColumns() const;
         const std::list<Operation>& getOperations() const;
