@@ -48,9 +48,14 @@ Application::Application()
         Ini ircIni("config/irc.ini");
         auto& modules = ircIni.expectCategory("modules");
 
-        string ircDatabaseType;
+        string ircDatabaseType,
+            backlogEnabled;
         ircIni.getEntry(modules, "settings_database", ircDatabaseType);
+        ircIni.getEntry(modules, "backlog", backlogEnabled);
+
         eventHandlers.push_back(moduleProvider.initializeModule("irc_database", ircDatabaseType, queue));
+        if (backlogEnabled == "y")
+            eventHandlers.push_back(moduleProvider.initializeModule("irc_backlog", "default", queue));
     }
 
     if (databaseType != "" && databaseType != "none")

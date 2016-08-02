@@ -10,7 +10,8 @@ namespace Database {
     enum class QueryType {
         Fetch,
         Insert,
-        Delete
+        Delete,
+        SetupTable
     };
 
     enum class OperationType {
@@ -65,5 +66,6 @@ namespace Database {
     };
 
 }
+
 
 #endif

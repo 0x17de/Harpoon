@@ -10,8 +10,8 @@
     static class ProvideModule_##className {                               \
     public:                                                                \
         ProvideModule_##className() {                                      \
-            auto&& func = [](EventQueue* appQueue)->shared_ptr<EventLoop>{ \
-                return make_shared<className>(appQueue);                   \
+            auto&& func = [](EventQueue* appQueue)->std::shared_ptr<EventLoop>{ \
+                return std::make_shared<className>(appQueue);           \
             };                                                             \
             ModuleProvider::getInstance().registerModule(category,         \
                                                          name,             \

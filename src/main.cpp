@@ -56,7 +56,8 @@ bool doSetup(bool save) {
     string loginDatabaseType,
         ircSettingsDatabaseType,
         enableWebChat,
-        enableIrcService;
+        enableIrcService,
+        enableIrcBacklog;
     static const array<string, 2> validLoginDatabaseTypes{"dummy", "ini"};
     static const array<string, 2> validIrcDatabaseTypes{"dummy", "ini"};
     static const array<string, 2> validYesNoAnswers{"y", "n"};
@@ -82,6 +83,12 @@ bool doSetup(bool save) {
             if (ircSettingsDatabaseType.size() == 0) // auto value
                 ircSettingsDatabaseType = "dummy";
         } while (find(validIrcDatabaseTypes.begin(), validIrcDatabaseTypes.end(), ircSettingsDatabaseType) == validIrcDatabaseTypes.end());
+        do {
+            cout << "Collect IRC backlog (y/n) [y]: ";
+            getline(cin, ircSettingsDatabaseType);
+            if (ircSettingsDatabaseType.size() == 0) // auto value
+                ircSettingsDatabaseType = "y";
+        } while (find(validYesNoAnswers.begin(), validYesNoAnswers.end(), enableIrcBacklog) == validYesNoAnswers.end());
     }
 
     do {
@@ -109,6 +116,7 @@ bool doSetup(bool save) {
 
         auto& modules = irc.expectCategory("modules");
         irc.setEntry(modules, "settings_database", ircSettingsDatabaseType);
+        irc.setEntry(modules, "backlog", enableIrcBacklog);
     }
 
     // create first user if no users.ini exists
