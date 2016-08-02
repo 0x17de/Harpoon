@@ -55,6 +55,10 @@ namespace Database {
         return operations.back();
     }
 
+    QueryType Query::getType() const {
+        return type;
+    }
+
     const std::string& Query::getTable() const {
         return table;
     }
