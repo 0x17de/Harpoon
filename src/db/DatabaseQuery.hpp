@@ -7,6 +7,12 @@
 
 namespace Database {
 
+    enum class QueryType {
+        Fetch,
+        Insert,
+        Delete
+    };
+
     enum class OperationType {
         CompareAnd,
         CompareOr,
@@ -38,11 +44,13 @@ namespace Database {
     };
 
     class Query {
+        QueryType type;
         std::string table;
         std::list<std::string> columns;
         std::list<Operation> operations;
     public:
-        Query(const std::string& table,
+        Query(QueryType type,
+              const std::string& table,
               std::list<std::string>&& columns);
 
         Operation& add(OperationType operation,
