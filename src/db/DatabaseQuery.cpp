@@ -38,9 +38,11 @@ namespace Database {
         return suboperations;
     }
 
-    Query::Query(const std::string& table,
+    Query::Query(QueryType type,
+                 const std::string& table,
                  std::list<std::string>&& columns)
-        : table{table}
+        : type{type}
+        , table{table}
         , columns{columns}
     {
     }
@@ -64,6 +66,5 @@ namespace Database {
     const std::list<Operation>& Query::getOperations() const {
         return operations;
     }
-
 
 }

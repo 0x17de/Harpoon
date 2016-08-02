@@ -33,6 +33,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
     src/utils/Password.cpp src/utils/Password.hpp
     src/utils/IdProvider.cpp src/utils/IdProvider.hpp
     src/event/EventInit.cpp src/event/EventInit.hpp
+    src/event/EventDatabaseQuery.cpp src/event/EventDatabaseQuery.hpp
     src/event/IActivateServiceEvent.hpp
     src/event/irc/EventIrcActivateService.cpp src/event/irc/EventIrcActivateService.hpp
     src/event/EventLogin.cpp src/event/EventLogin.hpp
