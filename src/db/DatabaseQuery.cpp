@@ -22,6 +22,10 @@ namespace Database {
         return suboperations.back();
     }
 
+    OperationType Operation::getOperation() const {
+        return operation;
+    }
+
     const std::string& Operation::getLeft() const {
         return left;
     }
