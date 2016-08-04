@@ -22,6 +22,7 @@ This program is still work in progress. It will require a server.
    - Hangouts
    - Steam
    - Jabber
+   - You can additionally rely on the [bitlbee](https://www.bitlbee.org/) project, which is using the IRC protocol
    - ...
 
 ## Setup
@@ -29,6 +30,8 @@ This program is still work in progress. It will require a server.
  - Services
    - IRC
      - LibIrcClient (>=1.6-r2)
+   - Backlog (optional, via USE_*_DATABASE flags)
+     - SOCI (>=3.2.2)
  - Client Protocols
    - WebChat (optional via USE_WEBSOCKET_SERVER)
      - Seasocks (>=1.2.4)
