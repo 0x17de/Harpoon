@@ -26,13 +26,13 @@ This program is still work in progress. It will require a server.
 
 ## Setup
 ### Dependencies
- - Core
-   - Protobuf
-   - OpenSSL
-   - LibIrcClient
- - WebChat (optional via USE_WEBSOCKET_SERVER)
-   - Seasocks
-   - JsonCpp
+ - Services
+   - IRC
+     - LibIrcClient (>=1.6-r2)
+ - Client Protocols
+   - WebChat (optional via USE_WEBSOCKET_SERVER)
+     - Seasocks (>=1.2.4)
+     - JsonCpp (>=0.10.2-r1)
 
 ### Generate Makefiles
 For building the source CMake is required. Run the following in the project's build folder:
