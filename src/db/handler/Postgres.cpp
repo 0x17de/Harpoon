@@ -117,18 +117,53 @@ namespace Database {
         }
         once << " FROM " << query.getTable();
 
-        bool where = false, join = false;
+        bool where = false, join = false, limit = false;
         for (auto& op : query.getOperations()) {
-            if (op.getOperation() == Database::OperationType::CompareAnd
-                || op.getOperation() == Database::OperationType::CompareOr)
+            switch (op.getOperation()) {
+            case Database::OperationType::CompareAnd:
+            case Database::OperationType::CompareOr:
                 where = true;
-            if (op.getOperation() == Database::OperationType::Join)
+                break;
+            case Database::OperationType::Join:
                 join = true;
+                break;
+            case Database::OperationType::Limit:
+                limit = true;
+                break;
+            }
         }
     }
 
     void Postgres_Impl::query_delete(const Database::Query& query) {
 #warning Postgres QueryType::Delete stub
+        auto once(sqlSession->once);
+        once << "DELETE ";
+        bool first = true;
+        for (auto& column : query.getColumns()) {
+            if (first) {
+                first = false;
+            } else {
+                once << ", ";
+            }
+            once << column;
+        }
+        once << " FROM " << query.getTable();
+
+        bool where = false, join = false, limit = false;
+        for (auto& op : query.getOperations()) {
+            switch (op.getOperation()) {
+            case Database::OperationType::CompareAnd:
+            case Database::OperationType::CompareOr:
+                where = true;
+                break;
+            case Database::OperationType::Join:
+                join = true;
+                break;
+            case Database::OperationType::Limit:
+                limit = true;
+                break;
+            }
+        }
     }
 
     void Postgres_Impl::handleQuery(std::shared_ptr<IEvent> event) {
