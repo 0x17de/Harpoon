@@ -22,6 +22,11 @@ namespace Database {
         bool onEvent(std::shared_ptr<IEvent> event);
         void handleQuery(std::shared_ptr<IEvent> event);
 
+        void query_setupDatabase(const Database::Query& query);
+        void query_insert(const Database::Query& query);
+        void query_fetch(const Database::Query& query);
+        void query_delete(const Database::Query& query);
+
         shared_ptr<soci::session> sqlSession;
         static const std::map<std::string, std::string> typeMap;
         std::list<std::shared_ptr<IEvent>> heldBackQueries;
@@ -52,34 +57,72 @@ namespace Database {
         {"bool", "boolean"}
     };
 
+    void Postgres_Impl::query_setupDatabase(const Database::Query& query) {
+        auto once(sqlSession->once);
+        once << "CREATE TABLE IF NOT EXISTS " << query.getTable() << " "
+             << "(";
+        bool first = true;
+        for (auto& op : query.getOperations()) {
+            if (op.getOperation() != Database::OperationType::Assign)
+                continue;
+            if (!first) {
+                once << ", ";
+                first = false;
+            }
+            once << typeMap.at(op.getLeft()) << " " << op.getRight();
+        }
+        once << ")";
+    }
+
+    void Postgres_Impl::query_insert(const Database::Query& query) {
+        auto once(sqlSession->once);
+        once << "INSERT INTO " << query.getTable() << " "
+             << "(";
+        bool first = true;
+        for (auto& op : query.getOperations()) {
+            if (!first) {
+                once << ", ";
+                first = false;
+            }
+            once << op.getLeft();
+        }
+        once << ") VALUES (";
+        size_t index = 0;
+        for (auto& op : query.getOperations()) {
+            if (index == 0) {
+                once << ", ";
+            }
+            once << ":op" << index;
+            ++index;
+        }
+        once << ")";
+        for (auto& op : query.getOperations())
+            once, soci::use(op.getRight());
+    }
+
+    void Postgres_Impl::query_fetch(const Database::Query& query) {
+#warning Postgres QueryType::Fetch stub
+    }
+
+    void Postgres_Impl::query_delete(const Database::Query& query) {
+#warning Postgres QueryType::Delete stub
+    }
+
     void Postgres_Impl::handleQuery(std::shared_ptr<IEvent> event) {
         auto db = event->as<EventDatabaseQuery>();
         for (const auto& query : db->getQueries()) {
             switch (query.getType()) {
             case Database::QueryType::SetupTable:
-                {
-                    auto once(sqlSession->once);
-                    once << "CREATE TABLE IF NOT EXISTS " << query.getTable() << " "
-                         << "(";
-                    bool first = true;
-                    for (auto& op : query.getOperations()) {
-                        if (op.getOperation() != Database::OperationType::Assign)
-                            continue;
-                        if (!first)
-                            once << ", ";
-                        once << typeMap.at(op.getLeft()) << " " << op.getRight();
-                    }
-                    once << ")";
-                }
+                query_setupDatabase(query);
                 break;
             case Database::QueryType::Fetch:
-#warning Postgres QueryType::Fetch stub
+                query_fetch(query);
                 break;
             case Database::QueryType::Insert:
-#warning Postgres QueryType::Insert stub
+                query_insert(query);
                 break;
             case Database::QueryType::Delete:
-#warning Postgres QueryType::Delete stub
+                query_delete(query);
                 break;
             }
         }
