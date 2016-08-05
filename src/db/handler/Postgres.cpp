@@ -65,9 +65,10 @@ namespace Database {
         for (auto& op : query.getOperations()) {
             if (op.getOperation() != Database::OperationType::Assign)
                 continue;
-            if (!first) {
-                once << ", ";
+            if (first) {
                 first = false;
+            } else {
+                once << ", ";
             }
             once << typeMap.at(op.getLeft()) << " " << op.getRight();
         }
@@ -89,9 +90,10 @@ namespace Database {
         once << ") VALUES (";
         size_t index = 0;
         for (auto& op : query.getOperations()) {
-            if (index == 0) {
+            if (op.getOperation() != Database::OperationType::Assign)
+                continue;
+            if (index == 0)
                 once << ", ";
-            }
             once << ":op" << index;
             ++index;
         }
@@ -102,6 +104,27 @@ namespace Database {
 
     void Postgres_Impl::query_fetch(const Database::Query& query) {
 #warning Postgres QueryType::Fetch stub
+        auto once(sqlSession->once);
+        once << "SELECT ";
+        bool first = true;
+        for (auto& column : query.getColumns()) {
+            if (first) {
+                first = false;
+            } else {
+                once << ", ";
+            }
+            once << column;
+        }
+        once << " FROM " << query.getTable();
+
+        bool where = false, join = false;
+        for (auto& op : query.getOperations()) {
+            if (op.getOperation() == Database::OperationType::CompareAnd
+                || op.getOperation() == Database::OperationType::CompareOr)
+                where = true;
+            if (op.getOperation() == Database::OperationType::Join)
+                join = true;
+        }
     }
 
     void Postgres_Impl::query_delete(const Database::Query& query) {
