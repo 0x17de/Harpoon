@@ -18,7 +18,8 @@ namespace Database {
         CompareAnd,
         CompareOr,
         Assign,
-        Join
+        Join,
+        Limit
     };
 
     class Operation {
