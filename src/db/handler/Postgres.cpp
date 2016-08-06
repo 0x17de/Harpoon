@@ -18,6 +18,7 @@ namespace Database {
 
     struct Postgres_Impl {
         EventQueue* appQueue;
+        shared_ptr<soci::session> sqlSession;
         Postgres_Impl(EventQueue* appQueue) : appQueue{appQueue} {};
         bool onEvent(std::shared_ptr<IEvent> event);
         void handleQuery(std::shared_ptr<IEvent> event);
@@ -27,7 +28,9 @@ namespace Database {
         void query_fetch(const Database::Query& query);
         void query_delete(const Database::Query& query);
 
-        shared_ptr<soci::session> sqlSession;
+        void query_handleWhere(soci::details::once_type& once, const Database::Query& query);
+        void query_handleWhere(soci::details::once_type& once, const Database::Operation& op, size_t& index);
+
         static const std::map<std::string, std::string> typeMap;
         std::list<std::shared_ptr<IEvent>> heldBackQueries;
 
@@ -95,11 +98,10 @@ namespace Database {
             if (index == 0)
                 once << ", ";
             once << ":op" << index;
+            once, soci::use(op.getRight());
             ++index;
         }
         once << ")";
-        for (auto& op : query.getOperations())
-            once, soci::use(op.getRight());
     }
 
     void Postgres_Impl::query_fetch(const Database::Query& query) {
@@ -132,6 +134,13 @@ namespace Database {
                 break;
             }
         }
+
+        if (join) {
+#warning Postgres QueryType::Fetch JOIN stub
+        }
+
+        if (where)
+            query_handleWhere(once, query);
     }
 
     void Postgres_Impl::query_delete(const Database::Query& query) {
@@ -164,6 +173,46 @@ namespace Database {
                 break;
             }
         }
+    }
+
+    void Postgres_Impl::query_handleWhere(soci::details::once_type& once, const Database::Query& query) {
+        once << "WHERE ";
+        for (auto& op : query.getOperations()) {
+            if (op.getOperation() == Database::OperationType::Assign
+                || op.getOperation() == Database::OperationType::CompareAnd
+                || op.getOperation() == Database::OperationType::CompareOr) {
+                size_t index = 0;
+                query_handleWhere(once, op, index);
+                break;
+            }
+        }
+    }
+
+    void Postgres_Impl::query_handleWhere(soci::details::once_type& once, const Database::Operation& op, size_t& index) {
+        if (op.getOperation() == Database::OperationType::Assign) {
+            once << op.getLeft() << " = " << ":where" << index;
+            once, op.getRight();
+            return;
+        }
+
+        auto& subOps = op.getSuboperations();
+        if (subOps.size() == 0) return;
+
+        bool first = true;
+        once << "(";
+        for (auto& subOp : subOps) {
+            if (first) {
+                first = false;
+            } else {
+                if (op.getOperation() == Database::OperationType::CompareOr) {
+                    once << " OR ";
+                } else {
+                    once << " AND ";
+                }
+            }
+            query_handleWhere(once, subOp, index);
+        }
+        once << ")";
     }
 
     void Postgres_Impl::handleQuery(std::shared_ptr<IEvent> event) {
