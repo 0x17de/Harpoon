@@ -28,6 +28,7 @@ namespace Database {
         void query_fetch(const Database::Query& query);
         void query_delete(const Database::Query& query);
 
+        void query_scanOperations(const Database::Query& query, bool& where, bool& join, bool& limit);
         void query_handleWhere(soci::details::once_type& once, const Database::Query& query);
         void query_handleWhere(soci::details::once_type& once, const Database::Operation& op, size_t& index);
 
@@ -120,20 +121,7 @@ namespace Database {
         once << " FROM " << query.getTable();
 
         bool where = false, join = false, limit = false;
-        for (auto& op : query.getOperations()) {
-            switch (op.getOperation()) {
-            case Database::OperationType::CompareAnd:
-            case Database::OperationType::CompareOr:
-                where = true;
-                break;
-            case Database::OperationType::Join:
-                join = true;
-                break;
-            case Database::OperationType::Limit:
-                limit = true;
-                break;
-            }
-        }
+        query_scanOperations(query, where, join, limit);
 
         if (join) {
 #warning Postgres QueryType::Fetch JOIN stub
@@ -159,6 +147,13 @@ namespace Database {
         once << " FROM " << query.getTable();
 
         bool where = false, join = false, limit = false;
+        query_scanOperations(query, where, join, limit);
+
+        if (where)
+            query_handleWhere(once, query);
+    }
+
+    void Postgres_Impl::query_scanOperations(const Database::Query& query, bool& where, bool& join, bool& limit) {
         for (auto& op : query.getOperations()) {
             switch (op.getOperation()) {
             case Database::OperationType::CompareAnd:
