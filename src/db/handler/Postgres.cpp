@@ -28,7 +28,10 @@ namespace Database {
         void query_fetch(const Database::Query& query);
         void query_delete(const Database::Query& query);
 
-        void query_scanOperations(const Database::Query& query, bool& where, bool& join, bool& limit);
+        void query_scanOperations(const Database::Query& query,
+                                  std::list<Database::Operation const *>& join,
+                                  Database::Operation const *& where,
+                                  Database::Operation const *& limit);
         void query_handleWhere(soci::details::once_type& once, const Database::Query& query);
         void query_handleWhere(soci::details::once_type& once, const Database::Operation& op, size_t& index);
 
@@ -85,9 +88,10 @@ namespace Database {
              << "(";
         bool first = true;
         for (auto& op : query.getOperations()) {
-            if (!first) {
-                once << ", ";
+            if (first) {
                 first = false;
+            } else {
+                once << ", ";
             }
             once << op.getLeft();
         }
@@ -120,15 +124,14 @@ namespace Database {
         }
         once << " FROM " << query.getTable();
 
-        bool where = false, join = false, limit = false;
-        query_scanOperations(query, where, join, limit);
+        Database::Operation const *where = 0, *limit = 0;
+        std::list<Database::Operation const *> join;
+        query_scanOperations(query, join, where, limit);
 
-        if (join) {
-#warning Postgres QueryType::Fetch JOIN stub
+        if (where) {
+            size_t index;
+            query_handleWhere(once, *where, index);
         }
-
-        if (where)
-            query_handleWhere(once, query);
     }
 
     void Postgres_Impl::query_delete(const Database::Query& query) {
@@ -146,38 +149,33 @@ namespace Database {
         }
         once << " FROM " << query.getTable();
 
-        bool where = false, join = false, limit = false;
-        query_scanOperations(query, where, join, limit);
+        Database::Operation const *where = 0, *limit = 0;
+        std::list<Database::Operation const *> join;
+        query_scanOperations(query, join, where, limit);
 
-        if (where)
-            query_handleWhere(once, query);
+        if (where) {
+            size_t index;
+            query_handleWhere(once, *where, index);
+        }
     }
 
-    void Postgres_Impl::query_scanOperations(const Database::Query& query, bool& where, bool& join, bool& limit) {
+    void Postgres_Impl::query_scanOperations(const Database::Query& query,
+                                             std::list<Database::Operation const *>& join,
+                                             Database::Operation const *& where,
+                                             Database::Operation const *& limit) {
         for (auto& op : query.getOperations()) {
             switch (op.getOperation()) {
             case Database::OperationType::CompareAnd:
             case Database::OperationType::CompareOr:
-                where = true;
+                if (where == 0)
+                    where = &op;
                 break;
             case Database::OperationType::Join:
-                join = true;
+                join.push_back(&op);
                 break;
             case Database::OperationType::Limit:
-                limit = true;
-                break;
-            }
-        }
-    }
-
-    void Postgres_Impl::query_handleWhere(soci::details::once_type& once, const Database::Query& query) {
-        once << "WHERE ";
-        for (auto& op : query.getOperations()) {
-            if (op.getOperation() == Database::OperationType::Assign
-                || op.getOperation() == Database::OperationType::CompareAnd
-                || op.getOperation() == Database::OperationType::CompareOr) {
-                size_t index = 0;
-                query_handleWhere(once, op, index);
+                if (limit == 0)
+                    limit = &op;
                 break;
             }
         }
