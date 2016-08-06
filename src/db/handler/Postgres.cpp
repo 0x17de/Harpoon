@@ -83,6 +83,25 @@ namespace Database {
     }
 
     void Postgres_Impl::query_insert(const Database::Query& query) {
+        Database::Operation const *where = 0, *limit = 0;
+        std::list<Database::Operation const *> join;
+        query_scanOperations(query, join, where, limit);
+
+        std::vector<size_t> ids;
+        size_t joinIndex = 0;
+        for (auto& op : join) {
+            ids.push_back(0);
+            sqlSession->once << "SELECT id FROM "
+                             << op->getExtra() << " WHERE "
+                             << op->getLeft() << " = :sel" << joinIndex, soci::into(ids.back()), soci::use(op->getRight());
+            if (ids.back() == 0) { // not found
+                sqlSession->once << "INSERT INTO "
+                                 << op->getExtra() << "(" << op->getLeft() << ")"
+                                 << " VALUES (:ins" << joinIndex << ")", soci::use(op->getRight());
+            }
+            ++joinIndex;
+        }
+
         auto once(sqlSession->once);
         once << "INSERT INTO " << query.getTable() << " "
              << "(";
@@ -98,12 +117,18 @@ namespace Database {
         once << ") VALUES (";
         size_t index = 0;
         for (auto& op : query.getOperations()) {
+            string right = op.getRight();
+            if (op.getExtra().size() > 0) {
+                size_t idsIndex;
+                istringstream(op.getExtra()) >> idsIndex;
+                right = ids.at(idsIndex);
+            }
             if (op.getOperation() != Database::OperationType::Assign)
                 continue;
             if (index == 0)
                 once << ", ";
             once << ":op" << index;
-            once, soci::use(op.getRight());
+            once, soci::use(right);
             ++index;
         }
         once << ")";
