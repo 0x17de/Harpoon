@@ -32,8 +32,10 @@ namespace Database {
                                   std::list<Database::Operation const *>& join,
                                   Database::Operation const *& where,
                                   Database::Operation const *& limit);
-        void query_handleWhere(soci::details::once_type& once, const Database::Query& query);
-        void query_handleWhere(soci::details::once_type& once, const Database::Operation& op, size_t& index);
+        void query_handleWhere(soci::details::once_type& once,
+                               const Database::Operation& op,
+                               size_t& index,
+                               std::vector<size_t>* ids = 0);
 
         static const std::map<std::string, std::string> typeMap;
         std::list<std::shared_ptr<IEvent>> heldBackQueries;
@@ -117,18 +119,19 @@ namespace Database {
         once << ") VALUES (";
         size_t index = 0;
         for (auto& op : query.getOperations()) {
-            string right = op.getRight();
-            if (op.getExtra().size() > 0) {
-                size_t idsIndex;
-                istringstream(op.getExtra()) >> idsIndex;
-                right = ids.at(idsIndex);
-            }
             if (op.getOperation() != Database::OperationType::Assign)
                 continue;
             if (index == 0)
                 once << ", ";
             once << ":op" << index;
-            once, soci::use(right);
+            if (op.getExtra().size() > 0) {
+                size_t idsIndex;
+                istringstream(op.getExtra()) >> idsIndex;
+                size_t& id = ids.at(idsIndex); // needs to live till the end of the request
+                once, soci::use(id);
+            } else {
+                once, soci::use(op.getRight());
+            }
             ++index;
         }
         once << ")";
@@ -161,6 +164,23 @@ namespace Database {
 
     void Postgres_Impl::query_delete(const Database::Query& query) {
 #warning Postgres QueryType::Delete stub
+        Database::Operation const *where = 0, *limit = 0;
+        std::list<Database::Operation const *> join;
+        query_scanOperations(query, join, where, limit);
+
+        std::vector<size_t> ids;
+        size_t joinIndex = 0;
+        for (auto& op : join) {
+            ids.push_back(0);
+            sqlSession->once << "SELECT id FROM "
+                             << op->getExtra() << " WHERE "
+                             << op->getLeft() << " = :sel" << joinIndex, soci::into(ids.back()), soci::use(op->getRight());
+            if (ids.back() == 0) { // not found
+                return; // ERR: something went wrong
+            }
+            ++joinIndex;
+        }
+
         auto once(sqlSession->once);
         once << "DELETE ";
         bool first = true;
@@ -174,13 +194,9 @@ namespace Database {
         }
         once << " FROM " << query.getTable();
 
-        Database::Operation const *where = 0, *limit = 0;
-        std::list<Database::Operation const *> join;
-        query_scanOperations(query, join, where, limit);
-
         if (where) {
             size_t index;
-            query_handleWhere(once, *where, index);
+            query_handleWhere(once, *where, index, &ids);
         }
     }
 
@@ -206,10 +222,20 @@ namespace Database {
         }
     }
 
-    void Postgres_Impl::query_handleWhere(soci::details::once_type& once, const Database::Operation& op, size_t& index) {
+    void Postgres_Impl::query_handleWhere(soci::details::once_type& once,
+                                          const Database::Operation& op,
+                                          size_t& index,
+                                          std::vector<size_t>* ids) {
         if (op.getOperation() == Database::OperationType::Assign) {
             once << op.getLeft() << " = " << ":where" << index;
-            once, op.getRight();
+            if (op.getExtra().size() > 0) {
+                size_t idsIndex;
+                istringstream(op.getExtra()) >> idsIndex;
+                size_t& id = ids->at(idsIndex); // needs to live till the end of the request
+                once, soci::use(id);
+            } else {
+                once, soci::use(op.getRight());
+            }
             return;
         }
 
@@ -228,7 +254,7 @@ namespace Database {
                     once << " AND ";
                 }
             }
-            query_handleWhere(once, subOp, index);
+            query_handleWhere(once, subOp, index, ids);
         }
         once << ")";
     }
