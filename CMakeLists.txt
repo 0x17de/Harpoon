@@ -22,7 +22,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
     src/service/irc/IrcConnection.hpp
     src/service/irc/IrcChannelStore.cpp src/service/irc/IrcChannelStore.hpp
     src/service/irc/IrcConnection_Impl.hpp src/service/irc/IrcEvents.cpp
-    src/main.cpp src/queue/EventQueue.cpp src/queue/EventQueue.hpp
+    src/queue/EventQueue.cpp src/queue/EventQueue.hpp
     src/queue/EventQueue_Impl.hpp src/utils/uuid.hpp
     src/utils/Ini.cpp src/utils/Ini.hpp
     src/service/irc/IrcService.cpp src/service/irc/IrcService.hpp
@@ -75,17 +75,10 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
     src/event/irc/EventIrcNickModified.cpp src/event/irc/EventIrcNickModified.hpp
     src/event/irc/EventIrcUserlistReceived.cpp src/event/irc/EventIrcUserlistReceived.hpp
     src/event/irc/EventIrcReconnectServer.cpp src/event/irc/EventIrcReconnectServer.hpp
-    src/event/EventQuit.cpp src/event/EventQuit.hpp
-    )
+    src/event/EventQuit.cpp src/event/EventQuit.hpp)
 
-
-#find_package(Protobuf REQUIRED)
-#include_directories(${PROTOBUF_INCLUDE_DIRS})
-#include_directories(${CMAKE_CURRENT_BINARY_DIR})
-#PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS
-#       src/commands/common.proto
-#       src/commands/server.proto
-#       src/commands/client.proto)
+set(LINK_LIBRARIES "")
+set(INCLUDE_DIRECTORIES "")
 
 
 if(${USE_POSTGRES_DATABASE})
@@ -93,10 +86,9 @@ if(${USE_POSTGRES_DATABASE})
     set(SOURCE_FILES ${SOURCE_FILES}
         src/db/handler/Postgres.hpp
         src/db/handler/Postgres.cpp
-    )
+        )
     add_definitions(-DUSE_POSTGRES_DATABASE)
 endif()
-
 
 if(${USE_WEBSOCKET_SERVER})
     message("Websocket server included")
@@ -109,31 +101,35 @@ if(${USE_WEBSOCKET_SERVER})
         src/server/ws/WebsocketServer_Impl.cpp
         src/server/ws/WebsocketHandler.cpp
         src/server/ws/WebsocketServer.hpp
-        src/server/ws/WebsocketServer_Impl.hpp
-    )
+        src/server/ws/WebsocketServer_Impl.hpp)
     add_definitions(-DUSE_WEBSOCKET_SERVER)
     find_package(Seasocks REQUIRED)
     find_package(JsonCpp REQUIRED)
 endif()
 
 
-add_executable(iirc ${SOURCE_FILES})
-    #${PROTO_SRCS} ${PROTO_HDRS})
+add_executable(iirc src/main.cpp ${SOURCE_FILES})
+if(${BUILD_TEST})
+  set(TEST_SOURCE_FILES
+      src/tests/TestPostgres.cpp)
+  add_executable(iircTest
+                 src/test.cpp src/test.hpp
+                 ${SOURCE_FILES}
+                 ${TEST_SOURCE_FILES})
+endif()
 
-
-#target_link_libraries(iirc ${PROTOBUF_LIBRARIES})
 
 if(${USE_WEBSOCKET_SERVER})
   if(${Seasocks_FOUND})
-    include_directories(iirc ${Seasocks_INCLUDE_DIR})
-    target_link_libraries(iirc ${Seasocks_LIBRARY})
+    list(APPEND INCLUDE_DIRECTORIES ${Seasocks_INCLUDE_DIR})
+    list(APPEND LINK_LIBRARIES ${Seasocks_LIBRARY})
   else()
     message(WARNING "SEASOCKS NOT FOUND")
     set(MISSING_LIB 1)
   endif()
   if(${JsonCpp_FOUND})
-    include_directories(iirc ${JsonCpp_INCLUDE_DIR})
-    target_link_libraries(iirc ${JsonCpp_LIBRARY})
+    list(APPEND INCLUDE_DIRECTORIES ${JsonCpp_INCLUDE_DIR})
+    list(APPEND LINK_LIBRARIES ${JsonCpp_LIBRARY})
   else()
     message(WARNING "JSONCPP NOT FOUND")
     set(MISSING_LIB 1)
@@ -142,8 +138,8 @@ endif()
 
 find_package(OpenSSL REQUIRED)
 if(${OPENSSL_FOUND})
-  include_directories(${OPENSSL_INCLUDE_DIR})
-  target_link_libraries(iirc ${OPENSSL_LIBRARIES})
+  list(APPEND INCLUDE_DIRECTORIES ${OPENSSL_INCLUDE_DIR})
+  list(APPEND LINK_LIBRARIES ${OPENSSL_LIBRARIES})
 else()
   message(WARNING "OPENSSL NOT FOUND")
   set(MISSING_LIB 1)
@@ -151,8 +147,8 @@ endif()
 
 find_package(Soci REQUIRED)
 if(${SOCI_FOUND})
-  include_directories(${SOCI_INCLUDE_DIRS})
-  target_link_libraries(iirc ${SOCI_LIBRARY} ${SOCI_postgresql_PLUGIN})
+  list(APPEND INCLUDE_DIRECTORIES ${SOCI_INCLUDE_DIRS})
+  list(APPEND LINK_LIBRARIES ${SOCI_LIBRARY} ${SOCI_postgresql_PLUGIN})
 else()
   message(WARNING "SOCI NOT FOUND")
   set(MISSING_LIB 1)
@@ -160,11 +156,15 @@ endif()
 
 find_package(LibIrcClient REQUIRED)
 if(${LibIrcClient_FOUND})
-  include_directories(${LibIrcClient_INCLUDE_DIRS})
-  target_link_libraries(iirc ${LibIrcClient_LIBRARY})
+  list(APPEND INCLUDE_DIRECTORIES ${LibIrcClient_INCLUDE_DIRS})
+  list(APPEND LINK_LIBRARIES ${LibIrcClient_LIBRARY})
 else()
   message(WARNING "LibIrcClient NOT FOUND")
   set(MISSING_LIB 1)
 endif()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+target_link_libraries(iirc ${LINK_LIBRARIES})
+target_link_libraries(iircTest ${LINK_LIBRARIES})
+target_include_directories(iirc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
+target_include_directories(iircTest PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
