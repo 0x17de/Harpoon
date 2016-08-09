@@ -83,12 +83,11 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
                                forward_as_tuple(add->getServerId()),
                                forward_as_tuple(appQueue,
                                                 add->getUserId(),
-                                                (IrcServerConfiguration){add->getServerId(), add->getServerName()}));
+                                                IrcServerConfiguration{add->getServerId(), add->getServerName()}));
     } else if (type == EventIrcServerDeleted::uuid) {
         auto del = event->as<EventIrcServerDeleted>();
         auto it = ircConnections.find(del->getServerId());
         if (it != ircConnections.end()) {
-            auto& connection = it->second;
             ircConnections.erase(it);
         }
     } else if (type == EventIrcHostAdded::uuid) {

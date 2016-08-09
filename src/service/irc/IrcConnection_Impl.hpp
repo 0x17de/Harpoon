@@ -26,12 +26,12 @@ public:
     IrcConnection_Impl(EventQueue* appQueue, EventQueue* queue, size_t userId, const IrcServerConfiguration& configuration);
     ~IrcConnection_Impl();
 
-    bool running;
-    irc_session_t* ircSession;
     EventQueue* appQueue;
     EventQueue* queue;
     size_t userId;
     IrcServerConfiguration configuration;
+    bool running;
+    irc_session_t* ircSession;
 
     std::thread ircLoop;
 

@@ -284,7 +284,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                 if (channelMode == '='
                     || channelMode == '*'
                     || channelMode == '@') {
-#pragma warning channel mode stub
+#warning channel mode stub
                 }
 
                 auto it = channelStores.find(channelName);
@@ -309,7 +309,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                     string mode = "";
                     if (userMode == '@'
                         || userMode == '+') {
-#pragma warning user mode stub
+#warning user mode stub
                         mode = "";
                         user = user.substr(1);
                     }
@@ -329,7 +329,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                 auto& users = channelStore.getUsers();
                 for (auto userStorePair : users) {
                     auto& userStore = userStorePair.second;
-#pragma warning submit userlist stub
+#warning submit userlist stub
                 }
             }
         }

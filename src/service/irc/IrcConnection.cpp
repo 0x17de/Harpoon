@@ -8,12 +8,12 @@ using namespace std;
 IrcConnection::IrcConnection(EventQueue* appQueue,
                              size_t userId, const
                              IrcServerConfiguration& configuration)
-    : impl{make_shared<IrcConnection_Impl>(appQueue, getEventQueue(), userId, configuration)}
-    , EventLoop({
+    : EventLoop({
           EventQuit::uuid
       }, {
           EventGuard<IUserEvent>
       })
+    , impl{make_shared<IrcConnection_Impl>(appQueue, getEventQueue(), userId, configuration)}
 {
 }
 

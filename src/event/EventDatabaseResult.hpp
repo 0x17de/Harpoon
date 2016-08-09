@@ -12,8 +12,8 @@ class EventDatabaseResult : public IDatabaseEvent {
     EventQueue* target;
     bool success;
     std::list<std::string> columns;
-    std::list<std::string> results;
     std::shared_ptr<IEvent> eventOrigin;
+    std::list<std::string> results;
 public:
     static UUID uuid;
     virtual UUID getEventUuid() const override;

@@ -11,7 +11,7 @@
 using namespace std;
 
 
-bool doGenUser(bool save) {
+void doGenUser(bool save) {
     string username, password;
 
     cout << "Username: ";
@@ -46,7 +46,7 @@ bool doGenUser(bool save) {
     }
 }
 
-bool doSetup(bool save) {
+void doSetup(bool save) {
     bool usersIniExists;
     {
         Ini users("config/users.ini");

@@ -166,6 +166,9 @@ endif()
 
 
 target_link_libraries(iirc ${LINK_LIBRARIES})
-target_link_libraries(iircTest ${LINK_LIBRARIES})
 target_include_directories(iirc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
-target_include_directories(iircTest PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
+
+if(${BUILD_TEST})
+  target_link_libraries(iircTest ${LINK_LIBRARIES})
+  target_include_directories(iircTest PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
+endif()
