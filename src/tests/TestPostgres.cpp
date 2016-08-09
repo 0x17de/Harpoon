@@ -12,10 +12,9 @@ using namespace std;
 #include "utils/Ini.hpp"
 
 
-struct PostgresChecker : public EventLoop {
-    std::shared_ptr<soci::session> session;
-
-    PostgresChecker() {
+struct DatabaseHelper {
+    shared_ptr<soci::session> session;
+    void login() {
         Ini settings("config/postgres.ini");
         ASSERT_EQUAL(false, settings.isNew());
 
@@ -42,13 +41,58 @@ struct PostgresChecker : public EventLoop {
               << "user=" << username << " "
               << "password=" << password;
 
-        cout << login.str() << endl;;
         ASSERT_NOTHROW(([&]{
             session = make_shared<soci::session>(login.str());
         }));
     }
+    bool  exists(const std::string& table) {
+        session->once << "SELECT * FROM information_schema.tables WHERE table_name = :table_name LIMIT 1", soci::use(table);
+        return session->got_data();
+    }
+    void tryDrop(const std::string& table) {
+        if (exists(table))
+            session->once << "DROP TABLE " << table;
+    }
+    void compareColumns(const std::string& table,
+                        const std::map<std::string, std::string>& mapping) {
+        std::string columnName, dataType;
+        soci::statement s = (session->prepare << "SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'test_postgres'", soci::into(columnName), soci::into(dataType));
+        s.execute();
+        size_t column_count = 0;
+        while (s.fetch()) {
+            auto it = mapping.find(columnName);
+            ASSERT_EQUAL(false, it == mapping.end());
+            ASSERT_EQUAL(it->second, dataType);
+            ++column_count;
+        }
+        ASSERT_EQUAL(mapping.size(), column_count);
+    }
+};
+
+struct PostgresChecker : public EventLoop, public DatabaseHelper {
+    PostgresChecker() {
+        login();
+    }
 
     virtual ~PostgresChecker() {
+    }
+
+    void test1() {
+        tryDrop("test_postgres");
+        ASSERT_NOTHROW(([this]{
+            session->once << "SELECT * FROM information_schema.tables";
+        }));
+        ASSERT_EQUAL(false, exists("test_postgres"));
+        session->once << "CREATE TABLE test_postgres (id serial, key text)";
+        ASSERT_EQUAL(true, exists("test_postgres"));
+
+        compareColumns("test_postgres", {
+            {"id", "integer"}, // serial converts to integer
+            {"key", "text"}
+        });
+
+        session->once << "DROP TABLE test_postgres";
+        ASSERT_EQUAL(false, exists("test_postgres"));
     }
 
     virtual bool onEvent(std::shared_ptr<IEvent> event) override {
@@ -59,5 +103,6 @@ struct PostgresChecker : public EventLoop {
 TEST(Connect,
      ([]{
          PostgresChecker checker;
+         checker.test1();
      }));
 

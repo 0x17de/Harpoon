@@ -49,11 +49,11 @@ public:
                                    test));
     }
 
-    template<class A>
+    template<class A, class B>
     static void assertEqual(const std::string& file,
                             size_t line,
                             A a,
-                            A b) {
+                            B b) {
         if (a != b)
             throw TestError(file, line);
     }
