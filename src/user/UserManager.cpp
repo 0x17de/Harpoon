@@ -20,6 +20,9 @@ UserManager::UserManager(EventQueue* appQueue)
 {
 }
 
+UserManager::~UserManager() {
+}
+
 bool UserManager::onEvent(std::shared_ptr<IEvent> event) {
 	UUID eventType = event->getEventUuid();
 
@@ -73,14 +76,7 @@ bool UserManager::onEvent(std::shared_ptr<IEvent> event) {
 
 	if (eventType == EventQuit::uuid) {
 		cout << "[UM] received QUIT event" << endl;
-		for (auto& user : users) {
-			for (auto p : user.second)
-				p.second->getEventQueue()->sendEvent(event);
-		}
-		for (auto& user : users) {
-			for (auto p : user.second)
-				p.second->join();
-		}
+		users.clear();
 		return false;
 	}
 

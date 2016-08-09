@@ -11,6 +11,8 @@ class LoginDatabase_Ini : public EventLoop {
     Ini usersIni;
 public:
     LoginDatabase_Ini(EventQueue* appQueue);
+    virtual ~LoginDatabase_Ini();
+
     virtual bool onEvent(std::shared_ptr<IEvent> event) override;
 };
 

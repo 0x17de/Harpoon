@@ -17,18 +17,17 @@ bool EventGuard(IEvent* event) {
 class IEvent;
 class EventQueue;
 class EventLoop {
+    bool threaded;
     EventQueue queue;
     std::thread t;
-    static void go(EventLoop* loop);
-    void run();
 protected:
     virtual bool onEvent(std::shared_ptr<IEvent> event) = 0;
 public:
     EventLoop();
-    EventLoop(std::set<UUID> processableEvents, std::list<bool(*)(IEvent*)> = {});
-    ~EventLoop();
+    EventLoop(std::set<UUID> processableEvents, std::list<bool(*)(IEvent*)> = {}, bool threaded = true);
+    virtual ~EventLoop();
+    void run();
     EventQueue* getEventQueue();
-    void join();
 };
 
 

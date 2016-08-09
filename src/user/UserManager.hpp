@@ -13,6 +13,7 @@ class UserManager : public EventLoop {
     std::map<size_t, std::map<size_t, std::shared_ptr<EventLoop>>> users;
 public:
     UserManager(EventQueue* appQueue);
+    virtual ~UserManager();
     virtual bool onEvent(std::shared_ptr<IEvent> event) override;
 };
 

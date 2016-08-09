@@ -166,7 +166,6 @@ int main(int argc, char** argv) {
 
     try {
         Application app;
-        app.join();
     } catch(runtime_error& run) {
         cout << run.what() << endl;
     }

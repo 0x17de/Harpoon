@@ -17,6 +17,21 @@ TestError::TestError(const std::string& file, size_t line)
 {
 }
 
+TestError::TestError(const std::string& file, size_t line, const std::string& reason)
+    : runtime_error(std::string("Error in file \"")+file+"\" at line "+std::to_string(line)+" Reason: "+reason)
+{
+}
+
+void TestRunner::assertNoThrow(const std::string& file,
+                              size_t line,
+                              std::function<void()> func) {
+        try {
+            func();
+        } catch(std::exception& e) {
+            throw TestError(file, line, e.what());
+        }
+}
+
 TestRunner::TestRunner() {
 }
 

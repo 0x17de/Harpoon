@@ -12,6 +12,7 @@ class IrcBacklogService : public EventLoop {
     bool processEvent(std::shared_ptr<IEvent>);
 public:
     IrcBacklogService(EventQueue* appQueue);
+    virtual ~IrcBacklogService();
     virtual bool onEvent(std::shared_ptr<IEvent> event) override;
 };
 
