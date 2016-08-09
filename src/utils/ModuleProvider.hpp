@@ -5,20 +5,19 @@
 #include <map>
 #include <functional>
 
-#define PROVIDE_MODULE(category, name, className)                          \
-    namespace ProvideModule {                                              \
-    static class ProvideModule_##className {                               \
-    public:                                                                \
-        ProvideModule_##className() {                                      \
+#define PROVIDE_MODULE(category, name, className)                       \
+    static class ProvideModule_##className {                            \
+    public:                                                             \
+    ProvideModule_##className() {                                       \
             auto&& func = [](EventQueue* appQueue)->std::shared_ptr<EventLoop>{ \
                 return std::make_shared<className>(appQueue);           \
-            };                                                             \
-            ModuleProvider::getInstance().registerModule(category,         \
-                                                         name,             \
-                                                         func);            \
-        }                                                                  \
-    } provideModule_##className;                                           \
-    }
+            };                                                          \
+            ModuleProvider::getInstance().registerModule(category,      \
+                                                         name,          \
+                                                         func);         \
+        }                                                               \
+    } provideModule_##className
+
 
 class EventQueue;
 class EventLoop;

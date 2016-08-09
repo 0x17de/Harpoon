@@ -35,10 +35,10 @@ Crypto::~Crypto() {
 }
 
 std::string Crypto::genSalt(size_t size) {
-    unsigned char bytes[size];
-    if (!RAND_bytes(bytes, size))
+    vector<unsigned char> bytes(size);
+    if (!RAND_bytes(bytes.data(), size))
         throw runtime_error("Can not generate salt.");
-    return string(reinterpret_cast<char*>(bytes), size);
+    return string(reinterpret_cast<char*>(bytes.data()), size);
 }
 
 std::string Crypto::generateKey(const std::string& salt, const std::string& password, size_t keyLength) {

@@ -18,7 +18,7 @@ namespace Database {
         virtual bool onEvent(std::shared_ptr<IEvent> event) override;
     };
 
-};
+}
 
 
 #endif

@@ -6,9 +6,9 @@ using namespace std;
 
 
 EventLoop::EventLoop()
-    : t{std::thread([this]{ run(); })}
-    , queue{}
+    : queue{}
     , threaded{true}
+    , t{std::thread([this]{ run(); })}
 {
 }
 

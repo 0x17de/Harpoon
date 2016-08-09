@@ -37,7 +37,7 @@ std::string Filesystem_Impl::currentDirectory() {
     while(true) {
         if (getcwd((char*)path.data(), path.size()) != nullptr)
             break;
-        if (errno = ENOMEM)
+        if (errno == ENOMEM)
             path.resize(path.size()*2);
     }
 

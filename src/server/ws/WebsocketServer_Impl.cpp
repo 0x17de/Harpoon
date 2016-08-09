@@ -152,7 +152,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     } else if (eventType == EventLoginResult::uuid) {
         auto result = event->as<EventLoginResult>();
         root["cmd"] = "login";
-        root["success"] = true;
+        root["success"] = result->getSuccess();
     } else if (eventType == EventIrcUserlistReceived::uuid) {
         auto userlist = event->as<EventIrcUserlistReceived>();
         root["cmd"] = "userlist";

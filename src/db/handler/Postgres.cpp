@@ -225,6 +225,8 @@ namespace Database {
                 if (limit == 0)
                     limit = &op;
                 break;
+            default:
+                break;
             }
         }
     }
@@ -281,6 +283,8 @@ namespace Database {
                 break;
             case Database::QueryType::Delete:
                 query_delete(query);
+                break;
+            default:
                 break;
             }
         }

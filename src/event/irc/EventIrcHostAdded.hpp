@@ -9,8 +9,8 @@ class EventIrcHostAdded : public IClientEvent {
     size_t userId;
     size_t serverId;
     std::string host;
-    std::string password;
     int port;
+    std::string password;
     bool ipV6;
     bool ssl;
 public:

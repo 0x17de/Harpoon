@@ -12,9 +12,9 @@ EventDatabaseResult::EventDatabaseResult(EventQueue* target,
                                          bool success,
                                          std::list<std::string> columns)
     : target{target}
-    , eventOrigin{eventOrigin}
     , success{success}
     , columns{columns}
+    , eventOrigin{eventOrigin}
 {
 }
 

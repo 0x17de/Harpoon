@@ -14,8 +14,8 @@ using namespace std;
 
 
 Application::Application()
-    : guard{this}
-    , EventLoop({}, {}, false)
+    : EventLoop({}, {}, false)
+    , guard{this}
 {
     Ini coreIni("config/core.ini");
     if (coreIni.isNew()) {

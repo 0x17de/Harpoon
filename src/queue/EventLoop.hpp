@@ -17,8 +17,8 @@ bool EventGuard(IEvent* event) {
 class IEvent;
 class EventQueue;
 class EventLoop {
-    bool threaded;
     EventQueue queue;
+    bool threaded;
     std::thread t;
 protected:
     virtual bool onEvent(std::shared_ptr<IEvent> event) = 0;
