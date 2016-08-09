@@ -50,3 +50,12 @@ void TestRunner::run() {
         }
     }
 }
+
+template<>
+void TestRunner::assertEqual(const std::string& file,
+                             size_t line,
+                             const char* a,
+                             const std::string& b) {
+    if (std::string(a) != b)
+        throw TestError(file, line, std::string(a)+" != "+b);
+}
