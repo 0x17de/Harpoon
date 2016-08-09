@@ -6,13 +6,20 @@
 #include <list>
 
 
-#define TEST(type, body) struct __REG##type {                \
-        __REG##type() {                                      \
-            TestRunner::getInstance().addTest(__FILE__, #type, body);    \
-        }                                                    \
+#define TEST(type, body)                                                \
+    struct __REG##type {                                                \
+        __REG##type() {                                                 \
+            TestRunner::getInstance().addTest(__FILE__, #type, body);   \
+        }                                                               \
     } __reg##type;
 
-#define ASSERT_EQUAL(left, right)                           \
+#define ASSERT_THROWS(type, body)                                 \
+    TestRunner::assertThrows<type>(__FILE__, __LINE__, body)
+
+#define ASSERT_NOTHROW(body)                              \
+    TestRunner::assertNoThrow(__FILE__, __LINE__, body)
+
+#define ASSERT_EQUAL(left, right)                               \
     TestRunner::assertEqual(__FILE__, __LINE__, left, right)
 
 #define ASSERT(x)                                       \
@@ -22,6 +29,7 @@
 class TestError : public std::runtime_error {
 public:
     TestError(const std::string& file, size_t line);
+    TestError(const std::string& file, size_t line, const std::string& reason);
 };
 
 
@@ -50,6 +58,10 @@ public:
             throw TestError(file, line);
     }
 
+    static void assertNoThrow(const std::string& file,
+                              size_t line,
+                              std::function<void()> func);
+
     template<class Type>
     static void assertThrows(const std::string& file,
                              size_t line,
@@ -59,7 +71,7 @@ public:
         } catch(Type& type) {
             return;
         }
-        throw new TestError(file, line);
+        throw TestError(file, line);
     }
 };
 

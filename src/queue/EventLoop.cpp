@@ -1,25 +1,30 @@
 #include "EventLoop.hpp"
 #include "queue/EventQueue.hpp"
+#include "event/EventQuit.hpp"
 
 using namespace std;
 
 
 EventLoop::EventLoop()
-    : t{std::thread(go, this)}
+    : t{std::thread([this]{ run(); })}
+    , queue{}
+    , threaded{true}
 {
 }
 
-EventLoop::EventLoop(std::set<UUID> processableEvents, std::list<bool(*)(IEvent*)> eventGuards)
+EventLoop::EventLoop(std::set<UUID> processableEvents, std::list<bool(*)(IEvent*)> eventGuards, bool threaded)
     : queue{processableEvents, eventGuards}
-    , t{std::thread(go, this)}
+    , threaded{threaded}
 {
+    if (threaded)
+        t = std::thread([this]{ run(); });
 }
 
 EventLoop::~EventLoop() {
-}
-
-void EventLoop::go(EventLoop* loop) {
-    loop->run();
+    if (threaded) {
+        queue.sendEvent(make_shared<EventQuit>());
+        t.join();
+    }
 }
 
 void EventLoop::run() {
@@ -30,14 +35,11 @@ void EventLoop::run() {
     while ((eventResult = queue.getEvent(1000, event)) >= 0) {
         if (eventResult < 0) break; // error
         if (eventResult == 0) continue; // timeout
+        if (event->getEventUuid() == EventQuit::uuid) break;
         if (!onEvent(event)) break;
     }
 }
 
 EventQueue* EventLoop::getEventQueue() {
     return &queue;
-}
-
-void EventLoop::join() {
-    t.join();
 }

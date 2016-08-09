@@ -15,6 +15,8 @@ class Application : public EventLoop {
     std::list<std::shared_ptr<EventLoop>> eventHandlers;
 public:
     Application();
+    virtual ~Application();
+
     void stop();
     virtual bool onEvent(std::shared_ptr<IEvent> event) override;
 };

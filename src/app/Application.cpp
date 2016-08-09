@@ -15,7 +15,7 @@ using namespace std;
 
 Application::Application()
     : guard{this}
-    , EventLoop()
+    , EventLoop({}, {}, false)
 {
     Ini coreIni("config/core.ini");
     if (coreIni.isNew()) {
@@ -68,6 +68,11 @@ Application::Application()
 
     for (auto& eventHandler : eventHandlers)
         eventHandler->getEventQueue()->sendEvent(make_shared<EventInit>());
+
+    run();
+}
+
+Application::~Application() {
 }
 
 void Application::stop() {
@@ -86,8 +91,7 @@ bool Application::onEvent(std::shared_ptr<IEvent> event) {
 
     if (eventType == EventQuit::uuid) {
         cout << "Received Quit Event" << endl;
-        for (auto& eventHandler : eventHandlers)
-            eventHandler->join();
+        eventHandlers.clear();
         cout << "Submodules were stopped" << endl;
         return false;
     }

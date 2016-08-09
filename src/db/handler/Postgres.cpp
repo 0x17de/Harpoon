@@ -54,6 +54,9 @@ namespace Database {
     {
     }
 
+    Postgres::~Postgres() {
+    }
+
     bool Postgres::onEvent(std::shared_ptr<IEvent> event) {
         return impl->onEvent(event);
     }
@@ -67,6 +70,10 @@ namespace Database {
     };
 
     void Postgres_Impl::query_setupDatabase(const Database::Query& query) {
+        Database::Operation const *where = 0, *limit = 0;
+        std::list<Database::Operation const *> join;
+        query_scanOperations(query, join, where, limit);
+
         auto once(sqlSession->once);
         once << "CREATE TABLE IF NOT EXISTS " << query.getTable() << " "
              << "(";
@@ -108,13 +115,13 @@ namespace Database {
         once << "INSERT INTO " << query.getTable() << " "
              << "(";
         bool first = true;
-        for (auto& op : query.getOperations()) {
+        for (auto& col : query.getColumns()) {
             if (first) {
                 first = false;
             } else {
                 once << ", ";
             }
-            once << op.getLeft();
+            once << col;
         }
         once << ") VALUES (";
         size_t index = 0;

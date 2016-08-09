@@ -178,12 +178,13 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue,
 }
 
 IrcConnection_Impl::~IrcConnection_Impl() {
-    if (ircSession != 0) {
+    running = false;
+    if (ircSession != 0)
         irc_cmd_quit(ircSession, 0);
-        ircLoop.join();
-        activeIrcConnections.erase(ircSession);
+    if (ircLoop.joinable()) ircLoop.join();
+    activeIrcConnections.erase(ircSession);
+    if (ircSession != 0)
         irc_destroy_session(ircSession);
-    }
 }
 
 std::string IrcConnection_Impl::getPureNick(const std::string& nick) {

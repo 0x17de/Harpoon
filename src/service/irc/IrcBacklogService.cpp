@@ -15,6 +15,9 @@ IrcBacklogService::IrcBacklogService(EventQueue* appQueue)
 {
 }
 
+IrcBacklogService::~IrcBacklogService() {
+}
+
 bool IrcBacklogService::onEvent(std::shared_ptr<IEvent> event) {
     return processEvent(event);
 }

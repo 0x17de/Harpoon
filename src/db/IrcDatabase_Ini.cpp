@@ -46,6 +46,9 @@ IrcDatabase_Ini::IrcDatabase_Ini(EventQueue* appQueue) :
 {
 }
 
+IrcDatabase_Ini::~IrcDatabase_Ini() {
+}
+
 bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
     UUID eventType = event->getEventUuid();
     if (eventType == EventQuit::uuid) {

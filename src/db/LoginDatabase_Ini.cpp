@@ -23,6 +23,9 @@ LoginDatabase_Ini::LoginDatabase_Ini(EventQueue* appQueue)
 {
 }
 
+LoginDatabase_Ini::~LoginDatabase_Ini() {
+}
+
 bool LoginDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
     UUID eventType = event->getEventUuid();
     if (eventType == EventQuit::uuid) {

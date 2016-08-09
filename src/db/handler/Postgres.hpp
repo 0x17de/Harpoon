@@ -13,6 +13,8 @@ namespace Database {
         std::shared_ptr<Postgres_Impl> impl;
     public:
         Postgres(EventQueue* appQueue);
+        virtual ~Postgres();
+
         virtual bool onEvent(std::shared_ptr<IEvent> event) override;
     };
 

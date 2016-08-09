@@ -9,6 +9,8 @@ class IrcDatabase_Dummy : public EventLoop {
 	EventQueue* appQueue;
 public:
 	IrcDatabase_Dummy(EventQueue* appQueue);
+    virtual ~IrcDatabase_Dummy();
+
 	virtual bool onEvent(std::shared_ptr<IEvent> event) override;
 };
 

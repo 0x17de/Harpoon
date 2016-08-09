@@ -61,10 +61,7 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
 
     if (type == EventQuit::uuid) {
         cout << "[US] received QUIT" << endl;
-        for (auto& connection : ircConnections)
-            connection.second.getEventQueue()->sendEvent(event);
-        for (auto& connection : ircConnections)
-            connection.second.join();
+        ircConnections.clear();
         return false;
     } else if (type == EventIrcReconnectServer::uuid) {
         auto reconnect = event->as<EventIrcReconnectServer>();
@@ -72,8 +69,6 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
         if (it != ircConnections.end()) {
             auto& connection = it->second;
             IrcServerConfiguration configuration = connection.getServerConfiguration();
-            connection.getEventQueue()->sendEvent(make_shared<EventQuit>());
-            connection.join();
             ircConnections.erase(it);
             // overwrite old irc connection
             ircConnections.emplace(piecewise_construct,
@@ -94,8 +89,6 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
         auto it = ircConnections.find(del->getServerId());
         if (it != ircConnections.end()) {
             auto& connection = it->second;
-            connection.getEventQueue()->sendEvent(make_shared<EventQuit>());
-            connection.join();
             ircConnections.erase(it);
         }
     } else if (type == EventIrcHostAdded::uuid) {

@@ -21,6 +21,9 @@ LoginDatabase_Dummy::LoginDatabase_Dummy(EventQueue* appQueue)
 {
 }
 
+LoginDatabase_Dummy::~LoginDatabase_Dummy() {
+}
+
 bool LoginDatabase_Dummy::onEvent(std::shared_ptr<IEvent> event) {
     UUID eventType = event->getEventUuid();
     if (eventType == EventQuit::uuid) {

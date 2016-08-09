@@ -111,7 +111,8 @@ endif()
 add_executable(iirc src/main.cpp ${SOURCE_FILES})
 if(${BUILD_TEST})
   set(TEST_SOURCE_FILES
-      src/tests/TestPostgres.cpp)
+      src/tests/TestPostgres.cpp
+      src/tests/TestModules.cpp)
   add_executable(iircTest
                  src/test.cpp src/test.hpp
                  ${SOURCE_FILES}

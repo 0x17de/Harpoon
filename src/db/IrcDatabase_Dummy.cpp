@@ -24,6 +24,9 @@ IrcDatabase_Dummy::IrcDatabase_Dummy(EventQueue* appQueue)
 {
 }
 
+IrcDatabase_Dummy::~IrcDatabase_Dummy() {
+}
+
 bool IrcDatabase_Dummy::onEvent(std::shared_ptr<IEvent> event) {
     UUID eventType = event->getEventUuid();
     if (eventType == EventQuit::uuid) {
