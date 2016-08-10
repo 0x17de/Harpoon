@@ -1,6 +1,5 @@
 #include "test.hpp"
 #include <memory>
-#include <iostream>
 #include <sstream>
 #include <soci/soci.h>
 
@@ -8,7 +7,6 @@ using namespace std;
 
 #include "queue/EventLoop.hpp"
 #include "db/handler/Postgres.hpp"
-#include "event/EventQuit.hpp"
 #include "utils/Ini.hpp"
 
 
@@ -77,7 +75,7 @@ struct PostgresChecker : public EventLoop, public DatabaseHelper {
     virtual ~PostgresChecker() {
     }
 
-    void test1() {
+    void testConnect() {
         tryDrop("test_postgres");
         ASSERT_NOTHROW(([this]{
             session->once << "SELECT * FROM information_schema.tables";
@@ -91,8 +89,95 @@ struct PostgresChecker : public EventLoop, public DatabaseHelper {
             {"key", "text"}
         });
 
+        // cleanup
         session->once << "DROP TABLE test_postgres";
         ASSERT_EQUAL(false, exists("test_postgres"));
+    }
+
+    void testWrite() {
+        tryDrop("test_postgres_write");
+        session->once << "CREATE TABLE test_postgres_write (id serial, key text)";
+        ASSERT_EQUAL(true, exists("test_postgres_write"));
+
+        size_t count;
+        size_t id;
+        string key;
+
+        // expect no inserted element yet
+        count = 0;
+        soci::statement stCheck1 = (session->prepare << "SELECT id, key FROM test_postgres_write", soci::into(id), soci::into(key));
+        stCheck1.execute();
+        while (stCheck1.fetch())
+            ++count;
+        ASSERT_EQUAL(0, count);
+
+        // classic insert
+        vector<string> textToInsert = {"test0", "test1"};
+        session->once << "INSERT INTO test_postgres_write (id, key) VALUES (1, :text1), (2, :text2)", soci::use(textToInsert[0]), soci::use(textToInsert[1]);
+
+        // check for inserted elements
+        count = 0;
+        soci::statement stCheck2 = (session->prepare << "SELECT id, key FROM test_postgres_write", soci::into(id), soci::into(key));
+        stCheck2.execute();
+        while (stCheck2.fetch()) {
+            if (id == 1)
+                ASSERT_EQUAL(textToInsert[0], key);
+            else if (id == 2)
+                ASSERT_EQUAL(textToInsert[1], key);
+            else
+                ASSERT_INVALID("Unreachable");
+            ++count;
+        }
+        ASSERT_EQUAL(2, count);
+
+        // cleanup
+        session->once << "DROP TABLE test_postgres_write";
+        ASSERT_EQUAL(false, exists("test_postgres_write"));
+    }
+
+    void testWeirdWrite() {
+        tryDrop("test_postgres_weirdwrite");
+        session->once << "CREATE TABLE test_postgres_weirdwrite (id serial, key text)";
+        ASSERT_EQUAL(true, exists("test_postgres_weirdwrite"));
+
+        vector<string> textToInsert = {"test0", "test1"};
+
+        // weird insert
+        {
+            auto once(session->once);
+            // temporary variable q is required. Query is executed once it is destructed
+            auto q = once << "INSERT INTO test_postgres_weirdwrite (id, key) VALUES ";
+
+            // basic statement
+            for (size_t i = 0; i < textToInsert.size(); ++i) {
+                if (i != 0) q << ", "; // comma to separate inserts
+                q << "(" << (i+1) << ", " << ":key" << i << ")";
+            }
+            // use values from vector
+            for (size_t i = 0; i < textToInsert.size(); ++i)
+                q, soci::use(textToInsert[i]);
+        }
+
+        // check for inserted elements
+        size_t count = 0;
+        size_t id;
+        string key;
+        soci::statement st = (session->prepare << "SELECT id, key FROM test_postgres_weirdwrite", soci::into(id), soci::into(key));
+        st.execute();
+        while (st.fetch()) {
+            if (id == 1)
+                ASSERT_EQUAL(textToInsert[0], key);
+            else if (id == 2)
+                ASSERT_EQUAL(textToInsert[1], key);
+            else
+                ASSERT_INVALID("Unreachable");
+            ++count;
+        }
+        ASSERT_EQUAL(2, count);
+
+        // cleanup
+        session->once << "DROP TABLE test_postgres_weirdwrite";
+        ASSERT_EQUAL(false, exists("test_postgres_weirdwrite"));
     }
 
     virtual bool onEvent(std::shared_ptr<IEvent> event) override {
@@ -100,9 +185,21 @@ struct PostgresChecker : public EventLoop, public DatabaseHelper {
     }
 };
 
-TEST(Connect,
+TEST(PostgresConnect,
      ([]{
          PostgresChecker checker;
-         checker.test1();
+         checker.testConnect();
+     }));
+
+TEST(PostgresWrite,
+     ([]{
+         PostgresChecker checker;
+         checker.testWrite();
+     }));
+
+TEST(PostgresWeirdWrite,
+     ([]{
+         PostgresChecker checker;
+         checker.testWeirdWrite();
      }));
 
