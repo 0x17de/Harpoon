@@ -13,6 +13,9 @@
         }                                                               \
     } __reg##type;
 
+#define ASSERT_INVALID(message)                     \
+    throw TestError(__FILE__, __LINE__, message)
+
 #define ASSERT_THROWS(type, body)                                 \
     TestRunner::assertThrows<type>(__FILE__, __LINE__, body)
 

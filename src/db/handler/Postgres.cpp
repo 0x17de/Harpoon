@@ -32,7 +32,7 @@ namespace Database {
                                   std::list<Database::Operation const *>& join,
                                   Database::Operation const *& where,
                                   Database::Operation const *& limit);
-        void query_handleWhere(soci::details::once_type& once,
+        void query_handleWhere(soci::details::once_temp_type& once,
                                const Database::Operation& op,
                                size_t& index,
                                std::vector<size_t>* ids = 0);
@@ -75,8 +75,7 @@ namespace Database {
         query_scanOperations(query, join, where, limit);
 
         auto once(sqlSession->once);
-        once << "CREATE TABLE IF NOT EXISTS " << query.getTable() << " "
-             << "(";
+        auto q = once << "CREATE TABLE IF NOT EXISTS " << query.getTable() << " " << "(";
         bool first = true;
         for (auto& op : query.getOperations()) {
             if (op.getOperation() != Database::OperationType::Assign)
@@ -84,11 +83,11 @@ namespace Database {
             if (first) {
                 first = false;
             } else {
-                once << ", ";
+                q << ", ";
             }
-            once << typeMap.at(op.getLeft()) << " " << op.getRight();
+            q << typeMap.at(op.getLeft()) << " " << op.getRight();
         }
-        once << ")";
+        q << ")";
     }
 
     void Postgres_Impl::query_insert(const Database::Query& query) {
@@ -112,52 +111,51 @@ namespace Database {
         }
 
         auto once(sqlSession->once);
-        once << "INSERT INTO " << query.getTable() << " "
-             << "(";
+        auto q = once << "INSERT INTO " << query.getTable() << " " << "(";
         bool first = true;
         for (auto& col : query.getColumns()) {
             if (first) {
                 first = false;
             } else {
-                once << ", ";
+                q << ", ";
             }
-            once << col;
+            q << col;
         }
-        once << ") VALUES (";
+        q << ") VALUES (";
         size_t index = 0;
         for (auto& op : query.getOperations()) {
             if (op.getOperation() != Database::OperationType::Assign)
                 continue;
             if (index == 0)
-                once << ", ";
-            once << ":op" << index;
+                q << ", ";
+            q << ":op" << index;
             if (op.getExtra().size() > 0) {
                 size_t idsIndex;
                 istringstream(op.getExtra()) >> idsIndex;
                 size_t& id = ids.at(idsIndex); // needs to live till the end of the request
-                once, soci::use(id);
+                q, soci::use(id);
             } else {
-                once, soci::use(op.getRight());
+                q, soci::use(op.getRight());
             }
             ++index;
         }
-        once << ")";
+        q << ")";
     }
 
     void Postgres_Impl::query_fetch(const Database::Query& query) {
 #warning Postgres QueryType::Fetch stub
         auto once(sqlSession->once);
-        once << "SELECT ";
+        auto q = once << "SELECT ";
         bool first = true;
         for (auto& column : query.getColumns()) {
             if (first) {
                 first = false;
             } else {
-                once << ", ";
+                q << ", ";
             }
-            once << column;
+            q << column;
         }
-        once << " FROM " << query.getTable();
+        q << " FROM " << query.getTable();
 
         Database::Operation const *where = 0, *limit = 0;
         std::list<Database::Operation const *> join;
@@ -165,7 +163,7 @@ namespace Database {
 
         if (where) {
             size_t index;
-            query_handleWhere(once, *where, index);
+            query_handleWhere(q, *where, index);
         }
     }
 
@@ -189,21 +187,21 @@ namespace Database {
         }
 
         auto once(sqlSession->once);
-        once << "DELETE ";
+        auto q = once << "DELETE ";
         bool first = true;
         for (auto& column : query.getColumns()) {
             if (first) {
                 first = false;
             } else {
-                once << ", ";
+                q << ", ";
             }
-            once << column;
+            q << column;
         }
-        once << " FROM " << query.getTable();
+        q << " FROM " << query.getTable();
 
         if (where) {
             size_t index;
-            query_handleWhere(once, *where, index, &ids);
+            query_handleWhere(q, *where, index, &ids);
         }
     }
 
@@ -231,19 +229,19 @@ namespace Database {
         }
     }
 
-    void Postgres_Impl::query_handleWhere(soci::details::once_type& once,
+    void Postgres_Impl::query_handleWhere(soci::details::once_temp_type& q,
                                           const Database::Operation& op,
                                           size_t& index,
                                           std::vector<size_t>* ids) {
         if (op.getOperation() == Database::OperationType::Assign) {
-            once << op.getLeft() << " = " << ":where" << index;
+            q << op.getLeft() << " = " << ":where" << index;
             if (op.getExtra().size() > 0) {
                 size_t idsIndex;
                 istringstream(op.getExtra()) >> idsIndex;
                 size_t& id = ids->at(idsIndex); // needs to live till the end of the request
-                once, soci::use(id);
+                q, soci::use(id);
             } else {
-                once, soci::use(op.getRight());
+                q, soci::use(op.getRight());
             }
             return;
         }
@@ -252,20 +250,20 @@ namespace Database {
         if (subOps.size() == 0) return;
 
         bool first = true;
-        once << "(";
+        q << "(";
         for (auto& subOp : subOps) {
             if (first) {
                 first = false;
             } else {
                 if (op.getOperation() == Database::OperationType::CompareOr) {
-                    once << " OR ";
+                    q << " OR ";
                 } else {
-                    once << " AND ";
+                    q << " AND ";
                 }
             }
-            query_handleWhere(once, subOp, index, ids);
+            query_handleWhere(q, subOp, index, ids);
         }
-        once << ")";
+        q << ")";
     }
 
     void Postgres_Impl::handleQuery(std::shared_ptr<IEvent> event) {
