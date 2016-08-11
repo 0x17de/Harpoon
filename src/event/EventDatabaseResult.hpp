@@ -9,19 +9,15 @@
 
 class EventQueue;
 class EventDatabaseResult : public IDatabaseEvent {
-    EventQueue* target;
     bool success;
-    std::list<std::string> columns;
     std::shared_ptr<IEvent> eventOrigin;
     std::list<std::string> results;
 public:
     static UUID uuid;
     virtual UUID getEventUuid() const override;
 
-    EventDatabaseResult(EventQueue* target,
-                        std::shared_ptr<IEvent> eventOrigin,
-                        bool success,
-                        std::list<std::string> columns);
+    EventDatabaseResult(std::shared_ptr<IEvent> eventOrigin);
+    void setSuccess(bool success);
     void addResult(const std::string& result);
     bool getSuccess() const;
     const std::list<std::string>& getResults() const;

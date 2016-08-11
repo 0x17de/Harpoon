@@ -20,6 +20,7 @@ class EventLoop {
     EventQueue queue;
     bool threaded;
     std::thread t;
+    bool destruction;
 protected:
     virtual bool onEvent(std::shared_ptr<IEvent> event) = 0;
 public:

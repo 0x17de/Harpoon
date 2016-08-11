@@ -1,11 +1,18 @@
 #include "test.hpp"
 #include <memory>
 #include <sstream>
+#include <mutex>
+#include <iostream>
+#include <condition_variable>
 #include <soci/soci.h>
 
 using namespace std;
 
 #include "queue/EventLoop.hpp"
+#include "event/EventInit.hpp"
+#include "event/EventDatabaseQuery.hpp"
+#include "event/EventDatabaseResult.hpp"
+#include "db/DatabaseQuery.hpp"
 #include "db/handler/Postgres.hpp"
 #include "utils/Ini.hpp"
 
@@ -50,11 +57,12 @@ struct DatabaseHelper {
     void tryDrop(const std::string& table) {
         if (exists(table))
             session->once << "DROP TABLE " << table;
+        ASSERT_EQUAL(false, exists(table));
     }
     void compareColumns(const std::string& table,
                         const std::map<std::string, std::string>& mapping) {
         std::string columnName, dataType;
-        soci::statement s = (session->prepare << "SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'test_postgres'", soci::into(columnName), soci::into(dataType));
+        soci::statement s = (session->prepare << "SELECT column_name, data_type FROM information_schema.columns WHERE table_name = :table_name", soci::into(columnName), soci::into(dataType), soci::use(table));
         s.execute();
         size_t column_count = 0;
         while (s.fetch()) {
@@ -185,6 +193,107 @@ struct PostgresChecker : public EventLoop, public DatabaseHelper {
     }
 };
 
+struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
+    Database::Postgres handler;
+    std::condition_variable setupWaitCondition;
+    std::list<std::shared_ptr<IEvent>> results;
+
+    PostgresHandlerChecker()
+        : handler{getEventQueue()}
+    {
+        login();
+        handler.getEventQueue()->sendEvent(make_shared<EventInit>());
+    }
+
+    bool waitForEvent() {
+        std::mutex setupWaitMutex;
+        std::unique_lock<mutex> setupWait(setupWaitMutex);
+        if (std::cv_status::timeout == setupWaitCondition.wait_for(setupWait, std::chrono::seconds(3)))
+            return false;
+        return true;
+    }
+
+    void test1() {
+        tryDrop("test_postgreshandler");
+
+        // create table
+        {
+            auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
+                                                          "test_postgreshandler"));
+            query.add(Database::OperationType::Assign, "id", "id");
+            query.add(Database::OperationType::Assign, "key", "text");
+
+            handler.getEventQueue()->sendEvent(eventSetup);
+        }
+
+        // wait till table is created
+        ASSERT_EQUAL(true, waitForEvent());
+
+        // check result
+        ASSERT_EQUAL(true, results.back()->as<EventDatabaseResult>()->getSuccess());
+        results.clear();
+
+        // check table columns
+        ASSERT_EQUAL(true, exists("test_postgreshandler"));
+        compareColumns("test_postgreshandler", {
+            {"id", "integer"}, // serial converts to integer
+            {"key", "text"}
+        });
+
+        // insert test elements
+        {
+            auto eventInsert = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            auto& query = eventInsert->add(Database::Query(Database::QueryType::Insert,
+                                                           "test_postgreshandler",
+                                                           std::list<string>{"id", "key"}));
+            query.add(Database::OperationType::Assign, "1");
+            query.add(Database::OperationType::Assign, "test0");
+            query.add(Database::OperationType::Assign, "2");
+            query.add(Database::OperationType::Assign, "test1");
+
+            handler.getEventQueue()->sendEvent(eventInsert);
+        }
+
+        ASSERT_EQUAL(true, waitForEvent());
+
+        // check result
+        ASSERT_EQUAL(true, results.back()->as<EventDatabaseResult>()->getSuccess());
+        results.clear();
+
+        // check for inserted elements
+        size_t count = 0;
+        size_t id;
+        string key;
+        soci::statement st = (session->prepare << "SELECT id, key FROM test_postgreshandler", soci::into(id), soci::into(key));
+        st.execute();
+        while (st.fetch()) {
+            if (id == 1)
+                ASSERT_EQUAL("test0", key);
+            else if (id == 2)
+                ASSERT_EQUAL("test1", key);
+            else
+                ASSERT_INVALID("Unreachable");
+            ++count;
+        }
+        ASSERT_EQUAL(2, count);
+
+        
+        // cleanup
+        session->once << "DROP TABLE test_postgreshandler";
+        ASSERT_EQUAL(false, exists("test_postgreshandler"));
+    }
+
+    virtual bool onEvent(std::shared_ptr<IEvent> event) override {
+        UUID eventUuid = event->getEventUuid();
+        if (eventUuid == EventDatabaseResult::uuid) {
+            results.push_back(event);
+            setupWaitCondition.notify_one();
+        }
+        return true;
+    }
+};
+
 TEST(PostgresConnect,
      ([]{
          PostgresChecker checker;
@@ -203,3 +312,8 @@ TEST(PostgresWeirdWrite,
          checker.testWeirdWrite();
      }));
 
+TEST(PostgresHandler,
+     ([]{
+         PostgresHandlerChecker checker;
+         checker.test1();
+     }));
