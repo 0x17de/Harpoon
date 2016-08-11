@@ -13,9 +13,17 @@ EventDatabaseQuery::EventDatabaseQuery(EventQueue* target, std::shared_ptr<IEven
 {
 }
 
-Database::Query& EventDatabaseQuery::addQuery(Database::Query&& query) {
+Database::Query& EventDatabaseQuery::add(Database::Query&& query) {
     queries.push_back(query);
     return queries.back();
+}
+
+EventQueue* EventDatabaseQuery::getTarget() const {
+    return target;
+}
+
+std::shared_ptr<IEvent> EventDatabaseQuery::getEventOrigin() const {
+    return eventOrigin;
 }
 
 const std::list<Database::Query>& EventDatabaseQuery::getQueries() const {

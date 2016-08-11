@@ -17,7 +17,9 @@ public:
     virtual UUID getEventUuid() const override;
 
     EventDatabaseQuery(EventQueue* target, std::shared_ptr<IEvent> eventOrigin);
-    Database::Query& addQuery(Database::Query&& query);
+    Database::Query& add(Database::Query&& query);
+    EventQueue* getTarget() const;
+    std::shared_ptr<IEvent> getEventOrigin() const;
     const std::list<Database::Query>& getQueries() const;
 };
 

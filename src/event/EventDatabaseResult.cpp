@@ -7,15 +7,14 @@ UUID EventDatabaseResult::getEventUuid() const {
     return this->uuid;
 }
 
-EventDatabaseResult::EventDatabaseResult(EventQueue* target,
-                                         std::shared_ptr<IEvent> eventOrigin,
-                                         bool success,
-                                         std::list<std::string> columns)
-    : target{target}
-    , success{success}
-    , columns{columns}
+EventDatabaseResult::EventDatabaseResult(std::shared_ptr<IEvent> eventOrigin)
+    : success{false}
     , eventOrigin{eventOrigin}
 {
+}
+
+void EventDatabaseResult::setSuccess(bool lsuccess) {
+    success = lsuccess;
 }
 
 void EventDatabaseResult::addResult(const std::string& result) {

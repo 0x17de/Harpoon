@@ -29,13 +29,13 @@ namespace Database {
         std::list<Operation> suboperations;
     public:
         Operation(OperationType operation,
-                  const std::string& left,
-                  const std::string& right,
+                  const std::string& left = "",
+                  const std::string& right = "",
                   const std::string& extra = "");
 
         Operation& add(OperationType operation,
-                       const std::string& left,
-                       const std::string& right,
+                       const std::string& left = "",
+                       const std::string& right = "",
                        const std::string& extra = "");
 
         OperationType getOperation() const;
@@ -53,11 +53,11 @@ namespace Database {
     public:
         Query(QueryType type,
               const std::string& table,
-              std::list<std::string>&& columns);
+              std::list<std::string>&& columns = {});
 
         Operation& add(OperationType operation,
-                       const std::string& left,
-                       const std::string& right,
+                       const std::string& left =  "",
+                       const std::string& right = "",
                        const std::string& extra = "");
 
         QueryType getType() const;
