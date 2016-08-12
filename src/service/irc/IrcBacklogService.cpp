@@ -31,7 +31,7 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
 
     if (!databaseInitialized) {
         if (eventType == EventInit::uuid) {
-#warning IrcBacklogService stub init
+#pragma message "IrcBacklogService stub init"
         } else if(eventType == EventDatabaseResult::uuid) {
             for (auto e : heldBackEvents)
                 processEvent(e);
@@ -40,7 +40,7 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
             heldBackEvents.push_back(event);
         }
     } else {
-#warning IrcBacklogService stub
+#pragma message "IrcBacklogService stub"
     }
 
     return true;

@@ -153,7 +153,7 @@ namespace Database {
     }
 
     void Postgres_Impl::query_fetch(const Database::Query& query, EventDatabaseResult* result) {
-#warning Postgres QueryType::Fetch stub
+#pragma message "Postgres QueryType::Fetch stub"
         auto q = sqlSession->once << "SELECT ";
         bool first = true;
         for (auto& column : query.getColumns()) {
@@ -180,7 +180,7 @@ namespace Database {
     }
 
     void Postgres_Impl::query_delete(const Database::Query& query, EventDatabaseResult* result) {
-#warning Postgres QueryType::Delete stub
+#pragma message "Postgres QueryType::Delete stub"
         Database::Operation const *where = 0, *limit = 0;
         std::list<Database::Operation const *> join;
         query_scanOperations(query, join, where, limit);
@@ -323,7 +323,7 @@ namespace Database {
             dbIni.getEntry(auth, "password", password);
             dbIni.getEntry(auth, "database", database);
 
-#warning check if values are 'evil'
+#pragma message "check if values are 'evil'"
             stringstream login;
             login << "postgresql://";
             if (host.size() > 0)

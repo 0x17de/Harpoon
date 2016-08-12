@@ -3,7 +3,7 @@ project(iirc)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
+
 
 set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
     src/app/ApplicationGuard.cpp src/app/ApplicationGuard.hpp
@@ -81,6 +81,7 @@ set(LINK_LIBRARIES "")
 set(INCLUDE_DIRECTORIES "")
 
 
+
 if(${USE_POSTGRES_DATABASE})
     message("Postgres included")
     set(SOURCE_FILES ${SOURCE_FILES}
@@ -89,6 +90,8 @@ if(${USE_POSTGRES_DATABASE})
         )
     add_definitions(-DUSE_POSTGRES_DATABASE)
 endif()
+
+
 
 if(${USE_WEBSOCKET_SERVER})
     message("Websocket server included")
@@ -108,6 +111,7 @@ if(${USE_WEBSOCKET_SERVER})
 endif()
 
 
+
 add_executable(iirc src/main.cpp ${SOURCE_FILES})
 if(${BUILD_TEST})
   set(TEST_SOURCE_FILES
@@ -118,6 +122,7 @@ if(${BUILD_TEST})
                  ${SOURCE_FILES}
                  ${TEST_SOURCE_FILES})
 endif()
+
 
 
 if(${USE_WEBSOCKET_SERVER})
@@ -137,6 +142,8 @@ if(${USE_WEBSOCKET_SERVER})
   endif()
 endif()
 
+
+
 find_package(OpenSSL REQUIRED)
 if(${OPENSSL_FOUND})
   list(APPEND INCLUDE_DIRECTORIES ${OPENSSL_INCLUDE_DIR})
@@ -146,6 +153,8 @@ else()
   set(MISSING_LIB 1)
 endif()
 
+
+
 find_package(Soci REQUIRED)
 if(${SOCI_FOUND})
   list(APPEND INCLUDE_DIRECTORIES ${SOCI_INCLUDE_DIRS})
@@ -154,6 +163,8 @@ else()
   message(WARNING "SOCI NOT FOUND")
   set(MISSING_LIB 1)
 endif()
+
+
 
 find_package(LibIrcClient REQUIRED)
 if(${LibIrcClient_FOUND})
@@ -165,10 +176,13 @@ else()
 endif()
 
 
+
 target_link_libraries(iirc ${LINK_LIBRARIES})
 target_include_directories(iirc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
+set_target_properties(iirc PROPERTIES COMPILE_FLAGS "-std=c++11 -pedantic -Wall")
 
 if(${BUILD_TEST})
   target_link_libraries(iircTest ${LINK_LIBRARIES})
   target_include_directories(iircTest PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
+  set_target_properties(iircTest PROPERTIES COMPILE_FLAGS "-std=c++11 -pedantic -Wall")
 endif()

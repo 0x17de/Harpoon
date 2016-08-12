@@ -173,7 +173,7 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue,
                 this_thread::sleep_for(chrono::seconds(1));
             }
         }
-#warning IrcConnection_Impl: send disconnected event to appqueue
+#pragma message "IrcConnection_Impl: send disconnected event to appqueue"
     });
 }
 
@@ -284,7 +284,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                 if (channelMode == '='
                     || channelMode == '*'
                     || channelMode == '@') {
-#warning channel mode stub
+#pragma message "channel mode stub"
                 }
 
                 auto it = channelStores.find(channelName);
@@ -309,7 +309,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                     string mode = "";
                     if (userMode == '@'
                         || userMode == '+') {
-#warning user mode stub
+#pragma message "user mode stub"
                         mode = "";
                         user = user.substr(1);
                     }
@@ -329,7 +329,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                 auto& users = channelStore.getUsers();
                 for (auto userStorePair : users) {
                     auto& userStore = userStorePair.second;
-#warning submit userlist stub
+#pragma message "submit userlist stub"
                 }
             }
         }
