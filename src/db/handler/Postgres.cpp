@@ -154,8 +154,7 @@ namespace Database {
 
     void Postgres_Impl::query_fetch(const Database::Query& query, EventDatabaseResult* result) {
 #warning Postgres QueryType::Fetch stub
-        auto once(sqlSession->once);
-        auto q = once << "SELECT ";
+        auto q = sqlSession->once << "SELECT ";
         bool first = true;
         for (auto& column : query.getColumns()) {
             if (first) {
@@ -172,6 +171,7 @@ namespace Database {
         query_scanOperations(query, join, where, limit);
 
         if (where) {
+            q << " WHERE ";
             size_t index;
             query_handleWhere(q, *where, index);
         }
@@ -198,20 +198,10 @@ namespace Database {
             ++joinIndex;
         }
 
-        auto once(sqlSession->once);
-        auto q = once << "DELETE ";
-        bool first = true;
-        for (auto& column : query.getColumns()) {
-            if (first) {
-                first = false;
-            } else {
-                q << ", ";
-            }
-            q << column;
-        }
-        q << " FROM " << query.getTable();
+        auto q = sqlSession->once << "DELETE FROM " << query.getTable();
 
         if (where) {
+            q << " WHERE ";
             size_t index;
             query_handleWhere(q, *where, index, &ids);
         }
@@ -225,6 +215,7 @@ namespace Database {
                                              Database::Operation const *& limit) {
         for (auto& op : query.getOperations()) {
             switch (op.getOperation()) {
+            case Database::OperationType::Assign:
             case Database::OperationType::CompareAnd:
             case Database::OperationType::CompareOr:
                 if (where == 0)
