@@ -261,24 +261,54 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
         ASSERT_EQUAL(true, results.back()->as<EventDatabaseResult>()->getSuccess());
         results.clear();
 
-        // check for inserted elements
-        size_t count = 0;
-        size_t id;
-        string key;
-        soci::statement st = (session->prepare << "SELECT id, key FROM test_postgreshandler", soci::into(id), soci::into(key));
-        st.execute();
-        while (st.fetch()) {
-            if (id == 1)
-                ASSERT_EQUAL("test0", key);
-            else if (id == 2)
-                ASSERT_EQUAL("test1", key);
-            else
-                ASSERT_INVALID("Unreachable");
-            ++count;
+        {
+            // check for inserted elements
+            size_t count = 0;
+            size_t id;
+            string key;
+            soci::statement st = (session->prepare << "SELECT id, key FROM test_postgreshandler", soci::into(id), soci::into(key));
+            st.execute();
+            while (st.fetch()) {
+                if (id == 1)
+                    ASSERT_EQUAL("test0", key);
+                else if (id == 2)
+                    ASSERT_EQUAL("test1", key);
+                else
+                    ASSERT_INVALID("Unreachable");
+                ++count;
+            }
+            ASSERT_EQUAL(2, count);
         }
-        ASSERT_EQUAL(2, count);
 
-        
+        // insert test elements
+        {
+            auto eventDelete = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            auto& query = eventDelete->add(Database::Query(Database::QueryType::Delete,
+                                                           "test_postgreshandler"));
+            query.add(Database::OperationType::Assign, "id", "2");
+
+            handler.getEventQueue()->sendEvent(eventDelete);
+        }
+
+        ASSERT_EQUAL(true, waitForEvent());
+
+        {
+            // check for inserted elements
+            size_t count = 0;
+            size_t id;
+            string key;
+            soci::statement st = (session->prepare << "SELECT id, key FROM test_postgreshandler", soci::into(id), soci::into(key));
+            st.execute();
+            while (st.fetch()) {
+                if (id == 1)
+                    ASSERT_EQUAL("test0", key);
+                else
+                    ASSERT_INVALID("Unreachable");
+                ++count;
+            }
+            ASSERT_EQUAL(1, count);
+        }
+
         // cleanup
         session->once << "DROP TABLE test_postgreshandler";
         ASSERT_EQUAL(false, exists("test_postgreshandler"));
