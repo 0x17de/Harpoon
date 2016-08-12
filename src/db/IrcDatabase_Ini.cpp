@@ -73,7 +73,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             appQueue->sendEvent(make_shared<EventIrcServerAdded>(add->getUserId(), serverId, add->getName()));
         } else {
             cout << "IMPL ERROR: SERVER ALREADY EXISTS" << endl;
-#warning EventIrcAddServer: handle server already exists case
+#pragma message "EventIrcAddServer: handle server already exists case"
         }
     } else if (eventType == EventIrcDeleteServer::uuid) {
         auto del = event->as<EventIrcDeleteServer>();
@@ -96,7 +96,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
                 }
             }
         }
-#warning EventIrcDeleteServer: Cleanup directories
+#pragma message "EventIrcDeleteServer: Cleanup directories"
     } else if (eventType == EventIrcModifyNick::uuid) {
         auto modify = event->as<EventIrcModifyNick>();
         if (modify->getServerId() > 0) {
@@ -176,7 +176,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
                                                                add->getSsl()));
         } else {
             cout << "IMPL ERROR: HOST ALREADY EXISTS" << endl;
-#warning EventIrcAddHost: handle host already exists case
+#pragma message "EventIrcAddHost: handle host already exists case"
         }
     } else if (eventType == EventIrcDeleteHost::uuid) {
         auto del = event->as<EventIrcDeleteHost>();
@@ -193,7 +193,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             hostsConfig.deleteCategory(hostKey.str());
             appQueue->sendEvent(make_shared<EventIrcHostDeleted>(del->getUserId(), del->getServerId(), del->getHost(), del->getPort()));
         }
-#warning EventIrcDeleteServer: Cleanup directories
+#pragma message "EventIrcDeleteServer: Cleanup directories"
     } else if (eventType == EventIrcJoinChannel::uuid) {
         auto join = event->as<EventIrcJoinChannel>();
 

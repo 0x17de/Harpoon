@@ -11,7 +11,7 @@
         __REG##type() {                                                 \
             TestRunner::getInstance().addTest(__FILE__, #type, body);   \
         }                                                               \
-    } __reg##type;
+    } __reg##type
 
 #define ASSERT_INVALID(message)                     \
     throw TestError(__FILE__, __LINE__, message)

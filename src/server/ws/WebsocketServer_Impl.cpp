@@ -186,7 +186,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["oldnick"] = modified->getOldNick();
         root["newnick"] = modified->getNewNick();
     } else if (eventType == EventIrcSettingsListing::uuid) {
-#warning EventIrcSettingsListing stub
+#pragma message "EventIrcSettingsListing stub"
         auto settings = event->as<EventIrcSettingsListing>();
         root["cmd"] = "settings";
         root["type"] = "irc";

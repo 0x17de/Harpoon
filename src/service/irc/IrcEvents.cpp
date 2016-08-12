@@ -223,7 +223,7 @@ void IrcConnection_Impl::onCtcpReq(irc_session_t* session,
                                    const std::vector<std::string>& params,
                                    std::shared_ptr<IEvent>& resultEvent)
 {
-#warning stub onCtcpReq
+#pragma message "stub onCtcpReq"
 }
 
 void IrcConnection_Impl::onCtcpRep(irc_session_t* session,
@@ -232,7 +232,7 @@ void IrcConnection_Impl::onCtcpRep(irc_session_t* session,
                                    const std::vector<std::string>& params,
                                    std::shared_ptr<IEvent>& resultEvent)
 {
-#warning stub onCtcpRep
+#pragma message "stub onCtcpRep"
 }
 
 void IrcConnection_Impl::onCtcpAction(irc_session_t* session,

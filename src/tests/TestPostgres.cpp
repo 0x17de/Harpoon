@@ -117,7 +117,7 @@ struct PostgresChecker : public EventLoop, public DatabaseHelper {
         stCheck1.execute();
         while (stCheck1.fetch())
             ++count;
-        ASSERT_EQUAL(0, count);
+        ASSERT_EQUAL(true, count == 0);
 
         // classic insert
         vector<string> textToInsert = {"test0", "test1"};
@@ -136,7 +136,7 @@ struct PostgresChecker : public EventLoop, public DatabaseHelper {
                 ASSERT_INVALID("Unreachable");
             ++count;
         }
-        ASSERT_EQUAL(2, count);
+        ASSERT_EQUAL(true, count == 2);
 
         // cleanup
         session->once << "DROP TABLE test_postgres_write";
@@ -181,7 +181,7 @@ struct PostgresChecker : public EventLoop, public DatabaseHelper {
                 ASSERT_INVALID("Unreachable");
             ++count;
         }
-        ASSERT_EQUAL(2, count);
+        ASSERT_EQUAL(true, count == 2);
 
         // cleanup
         session->once << "DROP TABLE test_postgres_weirdwrite";
@@ -277,7 +277,7 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
                     ASSERT_INVALID("Unreachable");
                 ++count;
             }
-            ASSERT_EQUAL(2, count);
+            ASSERT_EQUAL(true, count == 2);
         }
 
         // insert test elements
@@ -306,7 +306,7 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
                     ASSERT_INVALID("Unreachable");
                 ++count;
             }
-            ASSERT_EQUAL(1, count);
+            ASSERT_EQUAL(true, count == 1);
         }
 
         // cleanup
