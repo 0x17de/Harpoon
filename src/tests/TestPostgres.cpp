@@ -231,6 +231,7 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
         ASSERT_EQUAL(true, waitForEvent());
 
         // check result
+        ASSERT_EQUAL(true, results.size() == 1);
         ASSERT_EQUAL(true, results.back()->as<EventDatabaseResult>()->getSuccess());
         results.clear();
 
@@ -258,6 +259,7 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
         ASSERT_EQUAL(true, waitForEvent());
 
         // check result
+        ASSERT_EQUAL(true, results.size() == 1);
         ASSERT_EQUAL(true, results.back()->as<EventDatabaseResult>()->getSuccess());
         results.clear();
 
@@ -280,7 +282,37 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             ASSERT_EQUAL(true, count == 2);
         }
 
-        // insert test elements
+        {
+            // fetch first element
+            auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
+                                                          "test_postgreshandler",
+                                                          std::list<string>{"id", "key"}));
+            query.add(Database::OperationType::Assign, "id", "1");
+
+            handler.getEventQueue()->sendEvent(eventFetch);
+        }
+
+        ASSERT_EQUAL(true, waitForEvent());
+
+        // check result
+        {
+            ASSERT_EQUAL(true, results.size() == 1);
+            auto result = results.back()->as<EventDatabaseResult>();
+            ASSERT_EQUAL(true, result != nullptr);
+            ASSERT_EQUAL(true, result->getSuccess());
+
+            auto& resultList = result->getResults();
+            ASSERT_EQUAL(true, resultList.size() == 2);
+            auto it = resultList.begin();
+            ASSERT_EQUAL("1", *it++);
+            ASSERT_EQUAL("test0", *it);
+
+            // cleanup
+            results.clear();
+        }
+
+        // delete test elements
         {
             auto eventDelete = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
             auto& query = eventDelete->add(Database::Query(Database::QueryType::Delete,
@@ -291,6 +323,11 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
         }
 
         ASSERT_EQUAL(true, waitForEvent());
+
+        // check result
+        ASSERT_EQUAL(true, results.size() == 1);
+        ASSERT_EQUAL(true, results.back()->as<EventDatabaseResult>()->getSuccess());
+        results.clear();
 
         {
             // check for inserted elements
