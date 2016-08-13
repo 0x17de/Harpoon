@@ -7,6 +7,7 @@
 #include "utils/Ini.hpp"
 
 #include <iostream>
+#include <type_traits>
 #include <soci/soci.h>
 
 using namespace std;
@@ -33,7 +34,8 @@ namespace Database {
                                   std::list<Database::Operation const *>& join,
                                   Database::Operation const *& where,
                                   Database::Operation const *& limit);
-        void query_handleWhere(soci::details::once_temp_type& once,
+        template<class T>
+        void query_handleWhere(T& temp_type,
                                const Database::Operation& op,
                                size_t& index,
                                std::vector<size_t>* ids = 0);
@@ -154,7 +156,10 @@ namespace Database {
 
     void Postgres_Impl::query_fetch(const Database::Query& query, EventDatabaseResult* result) {
 #pragma message "Postgres QueryType::Fetch stub"
-        auto q = sqlSession->once << "SELECT ";
+        auto& columns = query.getColumns();
+        vector<string> temp(columns.size());
+
+        auto q = sqlSession->prepare << "SELECT ";
         bool first = true;
         for (auto& column : query.getColumns()) {
             if (first) {
@@ -174,6 +179,16 @@ namespace Database {
             q << " WHERE ";
             size_t index;
             query_handleWhere(q, *where, index);
+        }
+
+        for (size_t i = 0; i < columns.size(); ++i)
+            q, soci::into(temp[i]);
+
+        soci::statement st = q;
+        st.execute();
+        while (st.fetch()) {
+            for (auto& s : temp)
+                result->addResult(s);
         }
 
         result->setSuccess(true);
@@ -234,10 +249,14 @@ namespace Database {
         }
     }
 
-    void Postgres_Impl::query_handleWhere(soci::details::once_temp_type& q,
+    template<class T>
+    void Postgres_Impl::query_handleWhere(T& q,
                                           const Database::Operation& op,
                                           size_t& index,
                                           std::vector<size_t>* ids) {
+        static_assert(is_same<T, soci::details::once_temp_type>::value
+                      || is_same<T, soci::details::prepare_temp_type>::value,
+                      "Type must be once_temp_type or prepare_temp_type");
         if (op.getOperation() == Database::OperationType::Assign) {
             q << op.getLeft() << " = " << ":where" << index;
             if (op.getExtra().size() > 0) {
