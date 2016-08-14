@@ -55,7 +55,7 @@ namespace Database {
                           const std::string& left,
                           const std::string& right,
                           const std::string& extra) {
-        operations.emplace_back(operation, left, right);
+        operations.emplace_back(operation, left, right, extra);
         return operations.back();
     }
 
@@ -74,5 +74,6 @@ namespace Database {
     const std::list<Operation>& Query::getOperations() const {
         return operations;
     }
+
 
 }

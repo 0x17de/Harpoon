@@ -351,6 +351,91 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
         ASSERT_EQUAL(false, exists("test_postgreshandler"));
     }
 
+    void test2() {
+        tryDrop("test_postgresjoin");
+        tryDrop("test_postgresjoin_name");
+
+        // create table
+        {
+            auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
+                                                          "test_postgresjoin"));
+            query.add(Database::OperationType::Assign, "id", "id");
+            query.add(Database::OperationType::Assign, "key", "text");
+            query.add(Database::OperationType::Join, "name", "text", "test_postgresjoin_name");
+
+            handler.getEventQueue()->sendEvent(eventSetup);
+        }
+
+        // wait till table is created
+        ASSERT_EQUAL(true, waitForEvent());
+
+        // check result
+        ASSERT_EQUAL(true, results.size() == 1);
+        ASSERT_EQUAL(true, results.back()->as<EventDatabaseResult>()->getSuccess());
+        results.clear();
+
+        // check table columns
+        ASSERT_EQUAL(true, exists("test_postgresjoin"));
+        ASSERT_EQUAL(true, exists("test_postgresjoin_name"));
+        compareColumns("test_postgresjoin", {
+            {"id", "integer"}, // serial converts to integer
+            {"key", "text"},
+            {"name_ref", "integer"}
+        });
+        compareColumns("test_postgresjoin_name", {
+            {"name_id", "integer"}, // serial converts to integer
+            {"name", "text"}
+        });
+
+        // insert test elements
+        {
+            auto eventInsert = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            auto& query = eventInsert->add(Database::Query(Database::QueryType::Insert,
+                                                           "test_postgresjoin",
+                                                           std::list<string>{"id", "key", "name_ref"}));
+            query.add(Database::OperationType::Assign, "1");
+            query.add(Database::OperationType::Assign, "test0");
+            query.add(Database::OperationType::Assign, "", "", "$1");
+            query.add(Database::OperationType::Join, "name", "testname", "test_postgresjoin_name");
+
+            handler.getEventQueue()->sendEvent(eventInsert);
+        }
+
+        ASSERT_EQUAL(true, waitForEvent());
+
+        // check result
+        ASSERT_EQUAL(true, results.size() == 1);
+        ASSERT_EQUAL(true, results.back()->as<EventDatabaseResult>()->getSuccess());
+        results.clear();
+
+        {
+            // check for inserted elements
+            size_t count = 0;
+            size_t id;
+            string key;
+            string name;
+            soci::statement st = (session->prepare << "SELECT id, key, name FROM test_postgresjoin LEFT JOIN test_postgresjoin_name ON name_ref = name_id WHERE id = '1'", soci::into(id), soci::into(key), soci::into(name));
+            st.execute();
+            ASSERT_EQUAL(true, st.got_data());
+            while (st.fetch()) {
+                if (id == 1) {
+                    ASSERT_EQUAL("test0", key);
+                    ASSERT_EQUAL("testname", name);
+                } else
+                    ASSERT_INVALID("Unreachable");
+                ++count;
+            }
+            ASSERT_EQUAL(true, count == 1);
+        }
+
+        // cleanup
+        session->once << "DROP TABLE test_postgresjoin";
+        session->once << "DROP TABLE test_postgresjoin_name";
+        ASSERT_EQUAL(false, exists("test_postgresjoin"));
+        ASSERT_EQUAL(false, exists("test_postgresjoin_name"));
+    }
+
     virtual bool onEvent(std::shared_ptr<IEvent> event) override {
         UUID eventUuid = event->getEventUuid();
         if (eventUuid == EventDatabaseResult::uuid) {
@@ -383,4 +468,10 @@ TEST(PostgresHandler,
      ([]{
          PostgresHandlerChecker checker;
          checker.test1();
+     }));
+
+TEST(PostgresHandlerJoin,
+     ([]{
+         PostgresHandlerChecker checker;
+         checker.test2();
      }));

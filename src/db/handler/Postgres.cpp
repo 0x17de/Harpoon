@@ -77,19 +77,37 @@ namespace Database {
         std::list<Database::Operation const *> join;
         query_scanOperations(query, join, where, limit);
 
-        auto q = sqlSession->once << "CREATE TABLE IF NOT EXISTS " << query.getTable() << " " << "(";
-        bool first = true;
-        for (auto& op : query.getOperations()) {
-            if (op.getOperation() != Database::OperationType::Assign)
-                continue;
-            if (first) {
-                first = false;
-            } else {
-                q << ", ";
-            }
-            q << op.getLeft() << " " << typeMap.at(op.getRight());
+        for (auto& op : join) {
+            auto q = sqlSession->once << "CREATE TABLE IF NOT EXISTS "
+                                      << op->getExtra() << " ("
+                                      << op->getLeft() << "_id serial, "
+                                      << op->getLeft() << " " << typeMap.at(op->getRight())
+                                      << ")";
         }
-        q << ")";
+
+        {
+            auto q = sqlSession->once << "CREATE TABLE IF NOT EXISTS " << query.getTable() << " (";
+            bool first = true;
+            for (auto& op : query.getOperations()) {
+                if (op.getOperation() != Database::OperationType::Assign)
+                    continue;
+                if (first) {
+                    first = false;
+                } else {
+                    q << ", ";
+                }
+                q << op.getLeft() << " " << typeMap.at(op.getRight());
+            }
+            for (auto& op : join) {
+                if (first) {
+                    first = false;
+                } else {
+                    q << ", ";
+                }
+                q << op->getLeft() << "_ref integer";
+            }
+            q << ")";
+        }
 
         result->setSuccess(true);
     }
@@ -103,53 +121,58 @@ namespace Database {
         size_t joinIndex = 0;
         for (auto& op : join) {
             ids.push_back(0);
-            sqlSession->once << "SELECT id FROM "
+            sqlSession->once << "SELECT " << op->getLeft() << "_id FROM "
                              << op->getExtra() << " WHERE "
                              << op->getLeft() << " = :sel" << joinIndex, soci::into(ids.back()), soci::use(op->getRight());
-            if (ids.back() == 0) { // not found
+            if (!sqlSession->got_data()) { // not found
                 sqlSession->once << "INSERT INTO "
                                  << op->getExtra() << "(" << op->getLeft() << ")"
                                  << " VALUES (:ins" << joinIndex << ")", soci::use(op->getRight());
+                long lastId;
+                if (sqlSession->get_last_insert_id(op->getExtra(), lastId))
+                    ids.back() = lastId;
             }
             ++joinIndex;
         }
 
-        auto q = sqlSession->once << "INSERT INTO " << query.getTable() << " " << "(";
-        bool first = true;
-        for (auto& col : query.getColumns()) {
-            if (first) {
-                first = false;
-            } else {
-                q << ", ";
+        {
+            auto q = sqlSession->once << "INSERT INTO " << query.getTable() << " " << "(";
+            bool first = true;
+            for (auto& col : query.getColumns()) {
+                if (first) {
+                    first = false;
+                } else {
+                    q << ", ";
+                }
+                q << col;
             }
-            q << col;
-        }
-        q << ") VALUES (";
+            q << ") VALUES (";
 
-        auto& operations = query.getOperations();
-        size_t columnCount = query.getColumns().size();
-        size_t index = 0;
-        for (auto& op : operations) {
-            if (op.getOperation() != Database::OperationType::Assign)
-                continue;
-            if (index > 0 && index % columnCount == 0)
-                q << ")";
-            if (index != 0)
-                q << ", ";
-            if (index > 0 && index % columnCount == 0)
-                q << "(";
-            q << ":op" << index;
-            if (op.getExtra().size() > 0) {
-                size_t idsIndex;
-                istringstream(op.getExtra()) >> idsIndex;
-                size_t& id = ids.at(idsIndex); // needs to live till the end of the request
-                q, soci::use(id);
-            } else {
-                q, soci::use(op.getLeft());
+            auto& operations = query.getOperations();
+            size_t columnCount = query.getColumns().size();
+            size_t index = 0;
+            for (auto& op : operations) {
+                if (op.getOperation() != Database::OperationType::Assign)
+                    continue;
+                if (index > 0 && index % columnCount == 0)
+                    q << ")";
+                if (index != 0)
+                    q << ", ";
+                if (index > 0 && index % columnCount == 0)
+                    q << "(";
+                q << ":op" << index;
+                if (op.getExtra().size() > 0) {
+                    size_t idsIndex;
+                    istringstream(op.getExtra()) >> idsIndex;
+                    size_t& id = ids.at(idsIndex); // needs to live till the end of the request
+                    q, soci::use(id);
+                } else {
+                    q, soci::use(op.getLeft());
+                }
+                ++index;
             }
-            ++index;
+            q << ")";
         }
-        q << ")";
 
         result->setSuccess(true);
     }
