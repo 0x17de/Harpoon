@@ -76,7 +76,6 @@ bool UserManager::onEvent(std::shared_ptr<IEvent> event) {
 
 	if (eventType == EventQuit::uuid) {
 		cout << "[UM] received QUIT event" << endl;
-		users.clear();
 		return false;
 	}
 

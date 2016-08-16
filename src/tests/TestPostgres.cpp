@@ -483,6 +483,28 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
         ASSERT_EQUAL(false, exists("test_postgresjoin_name"));
     }
 
+    void test3() {
+        tryDrop("test_postgrestypes");
+
+        // create table
+        {
+            auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
+                                                          "test_postgrestypes"));
+            query.add(Database::OperationType::Assign, "id", "id");
+            query.add(Database::OperationType::Assign, "key", "text");
+            query.add(Database::OperationType::Assign, "time", "time");
+            query.add(Database::OperationType::Assign, "number", "int");
+
+            handler.getEventQueue()->sendEvent(eventSetup);
+        }
+
+        ASSERT_EQUAL(true, waitForEvent());
+
+        session->once << "DROP TABLE test_postgrestypes";
+        ASSERT_EQUAL(false, exists("test_postgrestypes"));
+    }
+
     virtual bool onEvent(std::shared_ptr<IEvent> event) override {
         UUID eventUuid = event->getEventUuid();
         if (eventUuid == EventDatabaseResult::uuid) {
@@ -521,4 +543,10 @@ TEST(PostgresHandlerJoin,
      ([]{
          PostgresHandlerChecker checker;
          checker.test2();
+     }));
+
+TEST(PostgresHandlerTypes,
+     ([]{
+         PostgresHandlerChecker checker;
+         checker.test3();
      }));

@@ -66,7 +66,7 @@ namespace Database {
 
     const map<string, string> Postgres_Impl::typeMap {
         {"id", "serial"},
-        {"timestamp", "timestamp"},
+        {"time", "timestamp"},
         {"int", "integer"},
         {"text", "text"},
         {"bool", "boolean"}
@@ -327,6 +327,7 @@ namespace Database {
         EventDatabaseQuery* query = event->as<EventDatabaseQuery>();
         auto result = make_shared<EventDatabaseResult>(query->getEventOrigin());
         auto db = event->as<EventDatabaseQuery>();
+
         for (const auto& query : db->getQueries()) {
             switch (query.getType()) {
             case Database::QueryType::SetupTable:
@@ -345,6 +346,7 @@ namespace Database {
                 break;
             }
         }
+
         query->getTarget()->sendEvent(result);
     }
 
