@@ -120,18 +120,28 @@ namespace Database {
         std::vector<size_t> ids;
         size_t joinIndex = 0;
         for (auto& op : join) {
-            ids.push_back(0);
+            size_t id = 0;
             sqlSession->once << "SELECT " << op->getLeft() << "_id FROM "
                              << op->getExtra() << " WHERE "
-                             << op->getLeft() << " = :sel" << joinIndex, soci::into(ids.back()), soci::use(op->getRight());
+                             << op->getLeft() << " = :sel" << joinIndex, soci::into(id), soci::use(op->getRight());
             if (!sqlSession->got_data()) { // not found
-                sqlSession->once << "INSERT INTO "
-                                 << op->getExtra() << "(" << op->getLeft() << ")"
-                                 << " VALUES (:ins" << joinIndex << ")", soci::use(op->getRight());
-                long lastId;
-                if (sqlSession->get_last_insert_id(op->getExtra(), lastId))
-                    ids.back() = lastId;
+                long lid;
+                stringstream ss;
+                ss << op->getExtra() << "_" << op->getLeft() <<  "_id_seq";
+                if (sqlSession->get_next_sequence_value(ss.str(), lid)) {
+                    sqlSession->once << "INSERT INTO "
+                                     << op->getExtra() << "(" << op->getLeft() << "_id, " << op->getLeft() << ")"
+                                     << " VALUES (:insId" << joinIndex << ", :ins" << joinIndex << ")", soci::use(lid), soci::use(op->getRight());
+                    id = lid;
+                } else {
+                    sqlSession->once << "INSERT INTO "
+                                     << op->getExtra() << "(" << op->getLeft() << ")"
+                                     << " VALUES (:ins" << joinIndex << ")", soci::use(op->getRight());
+                    if (sqlSession->get_last_insert_id(op->getExtra(), lid))
+                        id = lid;
+                }
             }
+            ids.push_back(id);
             ++joinIndex;
         }
 
