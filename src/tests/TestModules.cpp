@@ -17,7 +17,9 @@
 class SimpleLoop : public EventLoop {
 public:
     virtual ~SimpleLoop() {}
-    virtual bool onEvent(std::shared_ptr<IEvent> event) override {}
+    virtual bool onEvent(std::shared_ptr<IEvent> event) override {
+        return true;
+    }
 };
 TEST(ModulesInitDeinit,
      ([]{
