@@ -396,7 +396,7 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
                                                            std::list<string>{"id", "key", "name_ref"}));
             query.add(Database::OperationType::Assign, "1");
             query.add(Database::OperationType::Assign, "test0");
-            query.add(Database::OperationType::Assign, "", "", "$1");
+            query.add(Database::OperationType::Assign, "", "", "0");
             query.add(Database::OperationType::Join, "name", "testname", "test_postgresjoin_name");
 
             handler.getEventQueue()->sendEvent(eventInsert);
@@ -413,12 +413,59 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             // check for inserted elements
             size_t count = 0;
             size_t id;
+            string name;
+            soci::indicator id_ind, name_ind;
+            soci::statement st = (session->prepare << "SELECT name_id, name FROM test_postgresjoin_name", soci::into(id, id_ind), soci::into(name, name_ind));
+            st.execute();
+            while (st.fetch()) {
+                ASSERT_EQUAL(true, id_ind == soci::i_ok);
+                ASSERT_EQUAL(true, name_ind == soci::i_ok);
+                if (id == 1) {
+                    ASSERT_EQUAL(true, id == 1);
+                    ASSERT_EQUAL("testname", name);
+                } else
+                    ASSERT_INVALID("Unreachable");
+                ++count;
+            }
+            ASSERT_EQUAL(true, count == 1);
+        }
+
+        {
+            // check for inserted elements
+            size_t count = 0;
+            size_t id;
+            string key;
+            size_t name_ref;
+            soci::indicator id_ind, key_ind, name_ref_ind;
+            soci::statement st = (session->prepare << "SELECT id, key, name_ref FROM test_postgresjoin WHERE id = '1'", soci::into(id, id_ind), soci::into(key, key_ind), soci::into(name_ref, name_ref_ind));
+            st.execute();
+            while (st.fetch()) {
+                ASSERT_EQUAL(true, id_ind == soci::i_ok);
+                ASSERT_EQUAL(true, key_ind == soci::i_ok);
+                ASSERT_EQUAL(true, name_ref_ind == soci::i_ok);
+                if (id == 1) {
+                    ASSERT_EQUAL("test0", key);
+                    ASSERT_EQUAL(true, name_ref != 0);
+                } else
+                    ASSERT_INVALID("Unreachable");
+                ++count;
+            }
+            ASSERT_EQUAL(true, count == 1);
+        }
+
+        {
+            // check for inserted elements
+            size_t count = 0;
+            size_t id;
             string key;
             string name;
-            soci::statement st = (session->prepare << "SELECT id, key, name FROM test_postgresjoin LEFT JOIN test_postgresjoin_name ON name_ref = name_id WHERE id = '1'", soci::into(id), soci::into(key), soci::into(name));
+            soci::indicator id_ind, key_ind, name_ind;
+            soci::statement st = (session->prepare << "SELECT id, key, name FROM test_postgresjoin LEFT JOIN test_postgresjoin_name ON name_ref = name_id WHERE id = '1'", soci::into(id, id_ind), soci::into(key, key_ind), soci::into(name, name_ind));
             st.execute();
-            ASSERT_EQUAL(true, st.got_data());
             while (st.fetch()) {
+                ASSERT_EQUAL(true, id_ind == soci::i_ok);
+                ASSERT_EQUAL(true, key_ind == soci::i_ok);
+                ASSERT_EQUAL(true, name_ind == soci::i_ok);
                 if (id == 1) {
                     ASSERT_EQUAL("test0", key);
                     ASSERT_EQUAL("testname", name);
