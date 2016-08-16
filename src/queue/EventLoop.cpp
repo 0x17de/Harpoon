@@ -25,7 +25,7 @@ EventLoop::EventLoop(std::set<UUID> processableEvents, std::list<bool(*)(IEvent*
 EventLoop::~EventLoop() {
     destruction = true;
     if (threaded) {
-        queue.sendEvent(make_shared<EventQuit>());
+        queue.stop();
         t.join();
     }
 }
