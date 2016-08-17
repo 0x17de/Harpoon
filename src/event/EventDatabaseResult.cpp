@@ -25,6 +25,10 @@ bool EventDatabaseResult::getSuccess() const {
     return success;
 }
 
+std::shared_ptr<IEvent> EventDatabaseResult::getEventOrigin() const {
+    return eventOrigin;
+}
+
 const std::list<std::string>& EventDatabaseResult::getResults() const {
     return results;
 }

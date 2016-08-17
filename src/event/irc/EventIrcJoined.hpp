@@ -2,10 +2,11 @@
 #define EVENTIRCJOINED_H
 
 #include "../IClientEvent.hpp"
+#include "IIrcLoggable.hpp"
 #include <string>
 
 
-class EventIrcJoined : public IClientEvent {
+class EventIrcJoined : public IClientEvent, public IIrcLoggable {
     size_t userId;
     size_t serverId;
     std::string username;

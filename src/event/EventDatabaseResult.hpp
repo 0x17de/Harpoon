@@ -20,6 +20,7 @@ public:
     void setSuccess(bool success);
     void addResult(const std::string& result);
     bool getSuccess() const;
+    std::shared_ptr<IEvent> getEventOrigin() const;
     const std::list<std::string>& getResults() const;
 };
 
