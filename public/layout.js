@@ -32,19 +32,29 @@ class Layout {
                         constProp = ['left', 'width'];
                     }
                     var dynamicCount = size;
-                    var sizeRequests = children.attr('data-layout-size').map((attr)=>{
-                        if (!attr) return null;
-                        var size = attr.split(":", 2)
-                        // apply clipping
-                        if (size[0] === 'fixed') {
-                            clipped[splitProp[1]] -= size[1];
-                            dynamicCount -= 1;
-                        }
-                        return size;
-                    }).map((attr)=>{
-                        if (attr) return attr;
-                        // set relative size
-                        return ['dynamic', 1.0/dynamicCount];
+                    var sizeRequests = children.attr('data-layout-size').map((attrStr)=>{
+                        return attrStr ? attrStr.split(":", 2) : null;
+                    });
+                    var fixedRequests = sizeRequests.filter((e)=>e&&e[0] === 'fixed');
+                    var initialpxRequests = sizeRequests.filter((e)=>e&&e[0] === 'initialpx');
+                    fixedRequests.forEach((attr)=>{
+                        clipped[splitProp[1]] -= attr[1]; // apply clipping
+                        dynamicCount -= 1;
+                    });
+                    var initClipped = {top:clipped.top,
+                                       left:clipped.left,
+                                       width:clipped.width,
+                                       height:clipped.height};
+                    initialpxRequests.forEach((attr)=>{
+                        attr[0] = 'dynamic';
+                        initClipped[splitProp[1]] -= attr[1];
+                        attr[1] = attr[1]/clipped[splitProp[1]];
+                        dynamicCount -= 1;
+                    });
+                    sizeRequests.forEach((attr, i, arr)=>{
+                        if (attr) return;
+                        var dyn = initClipped[splitProp[1]]/clipped[splitProp[1]];
+                        arr[i] = ['dynamic', dyn/dynamicCount]; // set relative size
                     });
 
                     // save back

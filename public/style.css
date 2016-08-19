@@ -1,6 +1,7 @@
 body, html {
     width:100vw; height:100vh;
     margin:0; padding:0;
+    overflow:hidden;
 }
 .layout-root {
     position:absolute;
@@ -12,7 +13,6 @@ body, html {
 }
 .layout {
     position:absolute;
-    /*word-break:break-all;*/
     word-wrap:break-word;
 }
 #message {
