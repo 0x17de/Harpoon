@@ -2,6 +2,8 @@ body, html {
     width:100vw; height:100vh;
     margin:0; padding:0;
     overflow:hidden;
+    background:#f0f0f0;
+    font-family:"Lucida Console",Monaco,monospace;
 }
 .layout-root {
     position:absolute;
@@ -20,4 +22,41 @@ body, html {
     margin:0; padding:4px;
     background:#fff;
     border:1px solid #000;
+}
+.header {
+    background:#f16745;
+    font-size:12pt;
+}
+.header-margin {
+    padding:3px 0 0 5px;
+    font-weight:bold;
+}
+#channellist, #userlist {
+    box-sizing:border-box;
+    font-size:10pt;
+}
+#channellist {
+    border-right:1px solid #000;
+}
+.server {
+    background:#ddd;
+    padding:1px 5px;
+}
+.server:hover {
+    background:#fff;
+}
+.channel {
+    padding-left:12px !important;
+}
+.channel:nth-child(2n+1) {
+    background:#e4e4e4;
+}
+#userlist {
+    border-left:1px solid #000;
+}
+#userlist > div {
+    padding:1px 5px;
+}
+#userlist > div:nth-child(2n+1) {
+    background:#e4e4e4;
 }

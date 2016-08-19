@@ -11,21 +11,29 @@
     <div data-layout="root">
       <div data-layout="hbox">
         <div data-layout="vbox" data-layout-size="initialpx:200">
-          <div data-layout-size="fixed:26">CHATS</div>
+          <div data-layout-size="fixed:24" class="header">
+            <div class="header-margin">CHATS</div>
+          </div>
           <div data-layout="scroll">
-            ...
+            <div id="channellist">
+            </div>
           </div>
         </div>
         <div data-layout="vbox">
-          <div data-layout-size="fixed:26">[BACKLOG]</div>
+          <div data-layout-size="fixed:24" class="header">
+            <div class="header-margin">[BACKLOG]</div>
+          </div>
           <div data-layout="scroll">
           </div>
-          <div data-layout-size="fixed:26"><input id="message" /></div>
+          <div data-layout-size="fixed:24"><input id="message" /></div>
         </div>
         <div data-layout="vbox" data-layout-size="initialpx:200">
-          <div data-layout-size="fixed:26">USERS</div>
+          <div data-layout-size="fixed:24" class="header">
+            <div class="header-margin">USERS</div>
+          </div>
           <div data-layout="scroll">
-            ...
+            <div id="userlist">
+            </div>
           </div>
         </div>
       </div>
