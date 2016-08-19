@@ -25,6 +25,12 @@ class _q {
     eq(index) {
         return q(get(index));
     }
+    remove() {
+        return q(this.e.map((e)=>{
+            e.parentNode.removeChild(e);
+            return e;
+        }));
+    }
     children() {
         var children = [];
         this.e.forEach((e)=>{

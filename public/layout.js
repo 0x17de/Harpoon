@@ -1,12 +1,13 @@
 class Layout {
     constructor() {
+        this.handles = q('#layout-handles');
         this.layout()
         window.onresize = ()=>this.layout();
     }
     layout() {
-        var l = q('div[data-layout]');
-        console.dir(l);
-        l.each((e)=>{
+        this.handles.children().remove();
+
+        q('div[data-layout]').each((e)=>{
             var layout = e.attr('data-layout')[0];
             var children = e.children();
 
@@ -79,7 +80,6 @@ class Layout {
                             extent = clipped[splitProp[1]] * req[1];
                         props[splitProp[1]] = extent+"px";
                         position += +extent;
-                        console.log(extent, req[1], JSON.stringify(clipped), JSON.stringify(props));
 
                         pane.css(props);
                     });
