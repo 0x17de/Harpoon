@@ -8,8 +8,16 @@ class _q {
     }
     query(val) {
         if ('string' === typeof val) {
-            var elements = this.e.map((e)=>Array.prototype.slice.apply(e.querySelectorAll(val)));
-            this.e = Array.prototype.concat.apply([], elements);
+            if (val.length == 0)
+                return this;
+            if (val[0] === '<') {
+                var m = val.match(/^<([^>]+)\/?>?$/);
+                if (!m) throw new Error("Invalid element requested: "+val);
+                this.e = [window.document.createElement(m[1])];
+            } else {
+                var elements = this.e.map((e)=>Array.prototype.slice.apply(e.querySelectorAll(val)));
+                this.e = Array.prototype.concat.apply([], elements);
+            }
         } else if (val instanceof Element) {
             this.e = [val];
         } else if (val instanceof Array) {
@@ -24,6 +32,9 @@ class _q {
     }
     eq(index) {
         return q(get(index));
+    }
+    add(e) {
+        this.get(0).appendChild(e instanceof _q ? e.get(0) : e);
     }
     remove() {
         return q(this.e.map((e)=>{
@@ -53,12 +64,21 @@ class _q {
         });
         return this;
     }
+    screenOffset() {
+        return this.e.map((e)=>{
+            var rect = e.getBoundingClientRect();
+            return {top:rect.top,
+                    left:rect.left,
+                    width:rect.width,
+                    height:rect.height};
+        });
+    }
     attr(name, opt_val) {
         if (opt_val === void 0)
             return this.e.map((e)=>e.getAttribute(name));
         if (this.e.length != 1)
             throw new Error("Can't modify attributes on multiple results.");
-        this.e[0].setAttribute(name, opt_val);
+        this.get(0).setAttribute(name, opt_val);
         return this;
     }
     addClass() {
@@ -74,6 +94,7 @@ class _q {
                 for (var i in val)
                     e.style[i] = val[i];
             });
+            return this;
         } else {
             return this.e.map((e)=>e.style[val]);
         }

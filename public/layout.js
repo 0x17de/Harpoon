@@ -83,6 +83,24 @@ class Layout {
 
                         pane.css(props);
                     });
+
+                    // create handles
+                    children.each((pane, i)=>{
+                        if (i == 0)
+                            return;
+                        if (sizeRequests[i-1][0] === 'fixed' || sizeRequests[i][0] === 'fixed')
+                            return;
+                        var offset = pane.screenOffset()[0];
+                        var prop = {};
+                        offset[splitProp[0]] -= 5;
+                        prop.left = offset.left+'px';
+                        prop.top = offset.top+'px';
+                        prop[splitProp[1]] = '10px';
+                        prop[constProp[1]] = offset[constProp[1]]+'px';
+                        this.handles.add(q('<div>')
+                                         .addClass("handle", "noselect")
+                                         .css(prop));
+                    });
                 }
             }
         });
