@@ -1,11 +1,14 @@
+var dragInfo = null;
+
 class Layout {
     constructor() {
         this.handles = q('#layout-handles');
         this.layout()
-        window.onresize = ()=>this.layout();
+        q(window).on('resize', ()=>this.layout());
     }
-    layout() {
-        this.handles.children().remove();
+    layout(opt_bKeepHandles) {
+        if (!opt_bKeepHandles)
+            this.handles.children().remove();
 
         q('div[data-layout]').each((e)=>{
             var layout = e.attr('data-layout')[0];
@@ -64,6 +67,7 @@ class Layout {
                                sizeRequests[i][0] + ":" + sizeRequests[i][1]);
                     });
 
+                    var positions = [0];
                     var position = 0;
                     // apply size to elements
                     children.each((pane, i)=>{
@@ -80,29 +84,80 @@ class Layout {
                             extent = clipped[splitProp[1]] * req[1];
                         props[splitProp[1]] = extent+"px";
                         position += +extent;
+                        positions.push(position);
 
                         pane.css(props);
                     });
 
-                    // create handles
-                    children.each((pane, i)=>{
-                        if (i == 0)
-                            return;
-                        if (sizeRequests[i-1][0] === 'fixed' || sizeRequests[i][0] === 'fixed')
-                            return;
-                        var offset = pane.screenOffset()[0];
-                        var prop = {};
-                        offset[splitProp[0]] -= 5;
-                        prop.left = offset.left+'px';
-                        prop.top = offset.top+'px';
-                        prop[splitProp[1]] = '10px';
-                        prop[constProp[1]] = offset[constProp[1]]+'px';
-                        this.handles.add(q('<div>')
-                                         .addClass("handle", "noselect")
-                                         .css(prop));
-                    });
+                    if (!opt_bKeepHandles) {
+                        // create handles
+                        children.each((pane, i)=>{
+                            if (i == 0)
+                                return;
+                            if (sizeRequests[i-1][0] === 'fixed' || sizeRequests[i][0] === 'fixed')
+                                return;
+                            var offset = pane.screenOffset()[0];
+                            var prop = {};
+                            offset[splitProp[0]] -= 5;
+                            prop.left = offset.left+'px';
+                            prop.top = offset.top+'px';
+                            prop[splitProp[1]] = '10px';
+                            prop[constProp[1]] = offset[constProp[1]]+'px';
+                            var handle = q('<div>')
+                                .addClass("handle", "noselect")
+                                .css(prop);
+                            handle.on('mousedown', ()=>{
+                                dragInfo = {
+                                    handle: handle,
+                                    topOrLeft: splitProp[0],
+                                    children: children,
+                                    clippedWidth: clipped[splitProp[1]],
+                                    sizeRequests: sizeRequests,
+                                    start: positions[i],
+                                    i: i+0
+                                };
+                            });
+                            this.handles.add(handle);
+                        });
+                    }
                 }
             }
         });
     }
 }
+q(window).on('mousemove', (event)=>{
+    if (!dragInfo) return;
+    var mousePosition = q.cursor[dragInfo.topOrLeft];
+    var i = dragInfo.i;
+    var start = dragInfo.start;
+    var sizeRequests = dragInfo.sizeRequests;
+
+    // move handle
+    var prop = {};
+    prop[dragInfo.topOrLeft] = mousePosition-5 +'px';
+    dragInfo.handle.css(prop);
+
+    var width = dragInfo.clippedWidth;
+    var newRel1 = (width*sizeRequests[i-1][1] - start + mousePosition) / width;
+    var newRel2 = (width*sizeRequests[i][1] + start - mousePosition) / width;
+
+    // limit movement
+    if (newRel1 <= 0 || newRel1 >= 1
+        || newRel2 <= 0 || newRel2 >= 1) return;
+
+    sizeRequests[i-1][1] = newRel1;
+    sizeRequests[i][1] = newRel2;
+
+    // save back
+    dragInfo.children.each((c, i)=>{
+        c.attr('data-layout-size',
+               sizeRequests[i][0] + ":" + sizeRequests[i][1]);
+    });
+
+    dragInfo.start = mousePosition; // changes are relative
+    layout.layout(true);
+});
+q(window).on('mouseup', ()=>{
+    dragInfo = null;
+    layout.layout(); // recreate handles
+});

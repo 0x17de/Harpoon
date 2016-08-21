@@ -1,6 +1,7 @@
 function q() {
     return new (Function.prototype.bind.apply(_q, [null].concat(Array.prototype.slice.call(arguments))));
 }
+q.cursor = {left:0, top:0};
 class _q {
     constructor(val) {
         this.e = [window.document];
@@ -18,7 +19,7 @@ class _q {
                 var elements = this.e.map((e)=>Array.prototype.slice.apply(e.querySelectorAll(val)));
                 this.e = Array.prototype.concat.apply([], elements);
             }
-        } else if (val instanceof Element) {
+        } else if (val instanceof Element || val instanceof Window) {
             this.e = [val];
         } else if (val instanceof Array) {
             this.e = val;
@@ -35,6 +36,16 @@ class _q {
     }
     add(e) {
         this.get(0).appendChild(e instanceof _q ? e.get(0) : e);
+    }
+    on(type, fn) {
+        this.e.forEach((e)=>{
+            if (e.addEventListener) {
+                e.addEventListener(type, fn);
+            } else {
+                e.attachEvent("on"+type, fn);
+            }
+        });
+        return this;
     }
     remove() {
         return q(this.e.map((e)=>{
@@ -108,3 +119,7 @@ class _q {
         });
     }
 }
+q(window).on('mousemove', (event)=>{
+    q.cursor.left = event.clientX;
+    q.cursor.top = event.clientY;
+});
