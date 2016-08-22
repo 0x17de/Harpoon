@@ -80,3 +80,25 @@ body, html {
     cursor:grab;
     background:#ddd;
 }
+
+.backlog {
+    padding:3px 8px;
+}
+.backlog-time, .backlog-nick, .backlog-message {
+    padding:3px 0;
+    vertical-align:top;
+    display:inline-block;
+    font-size:10pt;
+}
+.backlog-time {
+    color:#aaa;
+    width:85px;
+}
+.backlog-nick {
+    text-align:right;
+    padding-right:10px;
+    width:120px;
+}
+.backlog-message {
+    width:calc(100% - 130px - 85px);
+}

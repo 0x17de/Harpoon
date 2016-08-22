@@ -15,14 +15,6 @@ class ChannelBase {
         this.channelEntry.remove();
         delete this.server.channels[this.name];
     }
-    test() {
-        this.userlist
-            .add(q('<div>').text('User1'))
-            .add(q('<div>').text('User2'))
-            .add(q('<div>').text('User3'));
-        this.backlog
-            .add(q('<div>').text('TEXT'));
-    }
 }
 
 class ServerBase {
