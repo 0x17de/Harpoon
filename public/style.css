@@ -31,12 +31,15 @@ body, html {
     padding:3px 0 0 5px;
     font-weight:bold;
 }
-#channellist, #userlist {
+#chat-channellist, .userlist {
     box-sizing:border-box;
     font-size:10pt;
 }
-#channellist {
+#chat-channellist {
     border-right:1px solid #000;
+}
+.serverPadding {
+    padding-top:10px;
 }
 .server {
     background:#ddd;
@@ -51,13 +54,13 @@ body, html {
 .channel:nth-child(2n+1) {
     background:#e4e4e4;
 }
-#userlist {
+.userlist {
     border-left:1px solid #000;
 }
-#userlist > div {
+.userlist > div {
     padding:1px 5px;
 }
-#userlist > div:nth-child(2n+1) {
+.userlist > div:nth-child(2n+1) {
     background:#e4e4e4;
 }
 .noselect {

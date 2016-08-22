@@ -36,6 +36,7 @@ class _q {
     }
     add(e) {
         this.get(0).appendChild(e instanceof _q ? e.get(0) : e);
+        return this;
     }
     on(type, fn) {
         this.e.forEach((e)=>{
@@ -90,6 +91,12 @@ class _q {
         if (this.e.length != 1)
             throw new Error("Can't modify attributes on multiple results.");
         this.get(0).setAttribute(name, opt_val);
+        return this;
+    }
+    text(val) {
+        this.e.forEach((e)=>{
+            e.innerText = val;
+        });
         return this;
     }
     addClass() {
