@@ -1,4 +1,23 @@
+class IrcUtils {
+    static stripName(userName) {
+        var exclamationPosition = userName.indexOf('!');
+        return exclamationPosition >= 0 ? userName.substr(0, exclamationPosition) : userName;
+    }
+    static formatTime(time) {
+        var date = new Date(time);
+        return '[' + this.to2digits(date.getHours()) +':'+ this.to2digits(date.getMinutes()) +':'+ this.to2digits(date.getSeconds()) + ']';
+    }
+    static to2digits(number) {
+        return number > 9 ? ''+number : '0'+number;
+    }
+}
+
 class IrcUser extends UserBase {
+    name() {
+        if (!this.details.shortName)
+            this.details.shortName = IrcUtils.stripName(this.details.name);
+        return this.details.shortName;
+    }
 }
 
 class IrcChannel extends ChannelBase {
@@ -7,6 +26,9 @@ class IrcChannel extends ChannelBase {
         this.backlogSplitHandle = q('<div>');
         q('#backlog-handles').add(this.backlogSplitHandle);
     }
+    get(userName) {
+        this.users[IrcUtils.stripName(userName)];
+    }
     addMessage(time, nick, msg) {
         var line = q('<div>');
         var time = q('<div>').text(time).addClass('backlog-time');
@@ -14,33 +36,6 @@ class IrcChannel extends ChannelBase {
         var nick = q('<div>').text(nick).addClass('backlog-nick');
         line.add(time).add(nick).add(msg);
         this.backlog.add(line);
-    }
-    test() {
-        this.userlist.add(q('<div>').text('User1'));
-        this.addMessage('[22:03:45]', 'nick1', 'message1');
-        this.addMessage('[22:03:45]', 'nick2', 'message2');
-        this.addMessage('[22:03:45]', 'nick3', 'message3isverylongmessage3isverylongmessage3isverylongmessage3isverylongmessage3isverylongmessage3isverylongmessage3isverylongmessage3isverylongmessage3isverylongmessage3isverylong');
-        this.addMessage('[22:03:45]', 'nick4', 'message4 is very long message4 is very long message4 is very long message4 is very long message4 is very long message4 is very long');
-        this.addMessage('[22:03:45]', 'nick5', 'message5');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
-        this.addMessage('[22:03:45]', 'nick', 'message');
     }
 }
 
@@ -72,7 +67,7 @@ class IrcService extends ServiceBase {
             this.handleJoin(json); break;
         case 'part':
             this.handlePart(json); break;
-        case 'message':
+        case 'chat':
             this.handleChat(json); break;
         case 'settings':
             this.handleSettings(json); break;
@@ -89,8 +84,21 @@ class IrcService extends ServiceBase {
         }
     }
     handlePart(json) {
+        var channel = this.getById(json.server).get(json.channel);
+        if (!channel) return;
+        if (json.nick.length === 0) {
+            channel.remove();
+        } else {
+            var user = channel.get(json.nick);
+            if (!user) return;
+            user.remove();
+        }
     }
     handleChat(json) {
+        var channel = this.getById(json.server).get(json.channel);
+        if (!channel)
+            return console.log('Channel not created: '+json.server+' '+json.channel);
+        channel.addMessage(IrcUtils.formatTime(json.time), '<'+IrcUtils.stripName(json.nick)+'>', json.msg);
     }
     handleSettings(json) {
         this.loadSettings(json.data);

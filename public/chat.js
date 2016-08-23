@@ -2,12 +2,12 @@ class UserBase {
     constructor(details, channel) {
         this.details = details;
         this.channel = channel;
-        this.channel.users[name()] = this;
+        this.channel.users[this.name()] = this;
         this.userEntry = this.createEntry();
         this.channel.userlist.add(this.userEntry);
     }
     createEntry() {
-        return q('<div>').text(name());
+        return q('<div>').text(this.name());
     }
     name() {
         return this.details.name;
@@ -28,9 +28,14 @@ class ChannelBase {
         this.backlog = q('<div>').addClass('backlog');
         this.userlist = q('<div>').addClass('userlist');
         this.users = {};
+        if (!this.server.service.chat.activeChannel)
+            this.activate();
     }
     createEntry() {
         return q('<div>').text(this.name).addClass('channel');
+    }
+    get(userName) {
+        return this.users[userName];
     }
     activate() {
         this.server.service.chat.activate(this);
@@ -62,7 +67,7 @@ class ServerBase {
         delete this.service.servers[this.name];
     }
     get(channelName) {
-        return this.channels[channel];
+        return this.channels[channelName];
     }
 }
 
@@ -98,10 +103,14 @@ class Chat {
         this.ws = null;
         this.pingInterval = null;
     }
-    activate(channel) {
+    deactivate() {
         this.backlog.children().remove();
-        this.backlog.add(channel.backlog);
         this.userlist.children().remove();
+        this.activeChannel = null;
+    }
+    activate(channel) {
+        this.deactivate();
+        this.backlog.add(channel.backlog);
         this.userlist.add(channel.userlist);
         this.activeChannel = channel;
     }
