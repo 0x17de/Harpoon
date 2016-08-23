@@ -47,7 +47,11 @@ class IrcServer extends ServerBase {
     loadChannels(channels) {
         for (var channelName in channels) {
             var channelData = channels[channelName];
-            new IrcChannel(channelName, this);
+            var channel = new IrcChannel(channelName, this);
+
+            var users = channelData.users;
+            for (var userName in users)
+                new IrcUser({name:userName}, channel);
         }
         return this;
     }
