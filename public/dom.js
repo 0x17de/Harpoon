@@ -99,6 +99,18 @@ class _q {
         });
         return this;
     }
+    val(opt_val) {
+        if (opt_val !== void 0) {
+            this.e.forEach((e)=>{
+                e.value = opt_val;
+            });
+            return this;
+        } else {
+            return this.e.map((e)=>{
+                return e.value;
+            });
+        }
+    }
     addClass() {
         var args = Array.prototype.slice.call(arguments);
         this.e.forEach(function(e) {

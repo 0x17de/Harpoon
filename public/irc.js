@@ -40,6 +40,10 @@ class IrcChannel extends ChannelBase {
 }
 
 class IrcServer extends ServerBase {
+    constructor(id, name, service) {
+        super(name, service);
+        this.id = id;
+    }
     loadChannels(channels) {
         for (var channelName in channels) {
             var channelData = channels[channelName];
@@ -60,6 +64,14 @@ class IrcService extends ServiceBase {
     }
     getById(id) {
         return this.servers[this.serverIdNameMap[id]];
+    }
+    sendMessage(msg, server, channel) {
+        this.chat.send({
+            cmd:'chat',
+            server:server.id,
+            channel:channel.name,
+            msg:msg
+        });
     }
 
     handleCommand(json) {
@@ -111,7 +123,7 @@ class IrcService extends ServiceBase {
         var servers = json.servers;
         for (var i in servers) {
             this.serverIdNameMap[i] = servers[i].name;
-            new IrcServer(servers[i].name, this)
+            new IrcServer(i, servers[i].name, this)
                 .loadChannels(servers[i].channels);
         }
     }

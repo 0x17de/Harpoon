@@ -100,6 +100,8 @@ class Chat {
         this.channellist = q('#chat-channellist');
         this.backlog = q('#chat-backlog');
         this.userlist = q('#chat-userlist');
+        this.message = q('#message');
+        this.message.on('keydown', (event)=>this.messageKey(event));
 
         this.activeChannel = null;
 
@@ -156,6 +158,20 @@ class Chat {
             reader.readAsText(msg.data);
         } else {
             handleCommand(msg.data);
+        }
+    }
+    messageKey(event) {
+        if (event.keyCode == 13 && !event.shiftKey) {
+            event.preventDefault();
+
+            var channel = this.activeChannel;
+            if (!channel) return;
+            var server = channel.server;
+            var service = server.service;
+
+            var msg = this.message.val()[0];
+            this.message.val('');
+            service.sendMessage(msg, server, channel);
         }
     }
     send(val) {
