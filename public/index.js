@@ -4,10 +4,7 @@ var layout
 function init() {
     layout = new Layout();
     chat = new Chat();
+    new IrcService(chat);
 
-    var service = new ServiceBase('irc', chat);
-    var server = new ServerBase('TestServer', service);
-    var channel = gc = new IrcChannel('#test', server);
-    channel.activate();
-    channel.test();
+    chat.login('user', 'password'); // TODO: use login dialog
 }

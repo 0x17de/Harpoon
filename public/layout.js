@@ -103,6 +103,7 @@ class Layout {
                             prop.top = offset.top+'px';
                             prop[splitProp[1]] = '10px';
                             prop[constProp[1]] = offset[constProp[1]]+'px';
+                            prop.cursor = splitProp[0] === 'left' ? 'ew-resize' : 'ns-resize';
                             var handle = q('<div>')
                                 .addClass("handle", "noselect")
                                 .css(prop);
