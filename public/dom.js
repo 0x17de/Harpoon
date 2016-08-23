@@ -106,6 +106,13 @@ class _q {
         });
         return this;
     }
+    removeClass() {
+        var args = Array.prototype.slice.call(arguments);
+        this.e.forEach(function(e) {
+            e.classList.remove.apply(e.classList, args);
+        });
+        return this;
+    }
     css(val) {
         if (val instanceof Object) {
             this.e.forEach((e)=>{

@@ -32,7 +32,10 @@ class ChannelBase {
             this.activate();
     }
     createEntry() {
-        return q('<div>').text(this.name).addClass('channel');
+        return q('<div>')
+            .text(this.name)
+            .addClass('channel')
+            .on('click', ()=>this.activate());
     }
     get(userName) {
         return this.users[userName];
@@ -106,13 +109,22 @@ class Chat {
     deactivate() {
         this.backlog.children().remove();
         this.userlist.children().remove();
-        this.activeChannel = null;
+        if (this.activeChannel) {
+            this.activeChannel.channelEntry.removeClass('active');
+            this.activeChannel = null;
+        }
     }
     activate(channel) {
         this.deactivate();
         this.backlog.add(channel.backlog);
         this.userlist.add(channel.userlist);
         this.activeChannel = channel;
+        channel.channelEntry.addClass('active');
+        channel.channelEntry.removeClass('message', 'highlight');
+    }
+    highlight(channel, type) {
+        if (this.activeChannel === channel) return;
+        channel.channelEntry.addClass(type);
     }
     get(serviceName) {
         return this.services[serviceName];

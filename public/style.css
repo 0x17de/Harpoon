@@ -54,6 +54,15 @@ body, html {
 .channel:nth-child(2n+1) {
     background:#e4e4e4;
 }
+.channel.message {
+    background:#ffc65d;
+}
+.channel.highlight {
+    background:#f364ad;
+}
+.channel.active {
+    background:#f16745;
+}
 .userlist {
     border-left:1px solid #000;
 }

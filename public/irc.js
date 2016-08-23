@@ -53,6 +53,7 @@ class IrcService extends ServiceBase {
     constructor(chat) {
         super('irc', chat);
         this.serverIdNameMap = {};
+        this.activeNick = 'iirc';
     }
     loadSettings(settings) {
         this.settings = settings;
@@ -99,6 +100,9 @@ class IrcService extends ServiceBase {
         if (!channel)
             return console.log('Channel not created: '+json.server+' '+json.channel);
         channel.addMessage(IrcUtils.formatTime(json.time), '<'+IrcUtils.stripName(json.nick)+'>', json.msg);
+        this.chat.highlight(channel, 'message');
+        if (json.msg.indexOf(this.activeNick) >= 0)
+            this.chat.highlight(channel, 'highlight');
     }
     handleSettings(json) {
         this.loadSettings(json.data);
