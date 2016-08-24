@@ -6,6 +6,9 @@ class UserBase {
         this.userEntry = this.createEntry();
         this.channel.userlist.add(this.userEntry);
     }
+    clear() {
+        this.remove();
+    }
     createEntry() {
         return q('<div>').text(this.name());
     }
@@ -31,6 +34,11 @@ class ChannelBase {
         this.scrollPosition = 'bottom';
         if (!this.server.service.chat.activeChannel)
             this.activate();
+    }
+    clear() {
+        for (var i in this.users)
+            this.users[i].clear();
+        this.remove();
     }
     createEntry() {
         return q('<div>')
@@ -59,6 +67,11 @@ class ServerBase {
         this.service.serviceEntry.add(this.serverEntry);
         this.channels = {};
     }
+    clear() {
+        for (var i in this.channels)
+            this.channels[i].clear();
+        this.remove();
+    }
     createEntry() {
         return q('<div>')
             .addClass('serverPadding')
@@ -83,6 +96,10 @@ class ServiceBase {
         this.serviceEntry = this.createEntry();
         this.chat.channellist.add(this.serviceEntry);
         this.servers = {};
+    }
+    clear() {
+        for (var i in this.servers)
+            this.servers[i].clear();
     }
     createEntry() {
         return q('<div>');
@@ -116,6 +133,11 @@ class Chat {
 
         this.ws = null;
         this.pingInterval = null;
+    }
+    clear() {
+        this.deactivate();
+        for (var i in this.services)
+            this.services[i].clear();
     }
     deactivate() {
         this.backlog.children().remove();
@@ -163,12 +185,13 @@ class Chat {
         var username = "user"; // TODO: till login form exists
         var password = "password";
 
+        this.clear();
         this.send("LOGIN "+username+" "+password+"\n");
     }
     onWsClose(username, password) {
         if (this.pingInterval !== null)
             clearInterval(this.pingInterval);
-        setTimeout(()=>login(username, password), 1000);
+        setTimeout(()=>this.login(username, password), 1000);
     }
     onMessage(msg) {
         if (msg.data instanceof Blob || msg.data instanceof ArrayBuffer) {
