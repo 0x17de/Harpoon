@@ -136,6 +136,27 @@ class _q {
             return this.e.map((e)=>e.style[val]);
         }
     }
+    scroll(opt_where) {
+        if (opt_where) {
+            switch (opt_where) {
+            case 'bottom':
+                this.e.forEach((e)=>{
+                    e.scrollTop = e.scrollHeight - e.clientHeight;
+                });
+                break;
+            default:
+                throw new Error("Unknown scroll direction: "+opt_where);
+            }
+            return this;
+        } else {
+            return this.e.map((e)=>{
+                return {top: e.scrollTop,
+                        left: e.scrollLeft,
+                        width: e.scrollWidth,
+                        height: e.scrollHeight}
+            });
+        }
+    }
     bounds() {
         return this.e.map((e)=>{
             return {top: e.offsetTop,

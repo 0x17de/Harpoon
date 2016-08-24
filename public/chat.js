@@ -124,6 +124,15 @@ class Chat {
         channel.channelEntry.addClass('active');
         channel.channelEntry.removeClass('message', 'highlight');
     }
+    checkScroll() {
+        var scroll = this.backlog.scroll()[0];
+        var bounds = this.backlog.bounds()[0];
+        return scroll.height - bounds.height <= scroll.top + 10;
+    }
+    doScroll() {
+        this.backlog.scroll('bottom');
+    }
+
     highlight(channel, type) {
         if (this.activeChannel === channel) return;
         channel.channelEntry.addClass(type);

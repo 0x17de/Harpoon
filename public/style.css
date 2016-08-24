@@ -90,6 +90,9 @@ body, html {
     background:#ddd;
 }
 
+#chat-backlog {
+    background-color:#f8f8f8;
+}
 .backlog {
     padding:3px 8px;
 }

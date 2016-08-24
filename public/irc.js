@@ -35,7 +35,10 @@ class IrcChannel extends ChannelBase {
         var msg = q('<div>').text(msg).addClass('backlog-message');
         var nick = q('<div>').text(nick).addClass('backlog-nick');
         line.add(time).add(nick).add(msg);
+        var chat = this.server.service.chat;
+        var scroll = chat.activeChannel === this && chat.checkScroll();
         this.backlog.add(line);
+        if (scroll) chat.doScroll();
     }
 }
 
