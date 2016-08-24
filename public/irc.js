@@ -92,6 +92,8 @@ class IrcService extends ServiceBase {
             this.handleJoin(json); break;
         case 'part':
             this.handlePart(json); break;
+        case 'quit':
+            this.handleQuit(json); break;
         case 'chat':
             this.handleChat(json); break;
         case 'action':
@@ -123,6 +125,20 @@ class IrcService extends ServiceBase {
             if (!user) return;
             user.remove();
             channel.addMessage(IrcUtils.formatTime(json.time), '<--', IrcUtils.stripName(json.nick) + ' has left ' + channel.name);
+        }
+    }
+    handleQuit(json) {
+        var server = this.getById(json.server);
+        if (json.nick.length === 0) {
+            // TODO: handle quit
+        } else {
+            for (var channelName in server.channels) {
+                var channel = server.get(channelName);
+                var user = channel.get(json.nick);
+                if (!user) continue;
+                user.remove();
+                channel.addMessage(IrcUtils.formatTime(json.time), '<--', IrcUtils.stripName(json.nick) + ' has quit ' + channel.name);
+            }
         }
     }
     handleAction(json) {
