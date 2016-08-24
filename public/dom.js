@@ -138,14 +138,25 @@ class _q {
     }
     scroll(opt_where) {
         if (opt_where) {
-            switch (opt_where) {
-            case 'bottom':
+            switch(typeof opt_where) {
+            case 'string':
+                switch (opt_where) {
+                case 'bottom':
+                    this.e.forEach((e)=>{
+                        e.scrollTop = e.scrollHeight - e.clientHeight;
+                    });
+                    break;
+                default:
+                    throw new Error("Unknown scroll direction: "+opt_where);
+                }
+                break;
+            case 'number':
                 this.e.forEach((e)=>{
-                    e.scrollTop = e.scrollHeight - e.clientHeight;
+                    e.scrollTop = opt_where;
                 });
                 break;
             default:
-                throw new Error("Unknown scroll direction: "+opt_where);
+                throw new Error("Invalid scroll parameter: "+opt_where);
             }
             return this;
         } else {

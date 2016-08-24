@@ -28,6 +28,7 @@ class ChannelBase {
         this.backlog = q('<div>').addClass('backlog');
         this.userlist = q('<div>').addClass('userlist');
         this.users = {};
+        this.scrollPosition = 'bottom';
         if (!this.server.service.chat.activeChannel)
             this.activate();
     }
@@ -104,6 +105,14 @@ class Chat {
         this.message.on('keydown', (event)=>this.messageKey(event));
 
         this.activeChannel = null;
+        this.backlog.on('scroll', (e)=>{
+            if (!this.activeChannel) return;
+            if (this.checkScroll()) {
+                this.activeChannel.scrollPosition = 'bottom';
+            } else {
+                this.activeChannel.scrollPosition = this.backlog.scroll()[0].top;
+            }
+        });
 
         this.ws = null;
         this.pingInterval = null;
@@ -121,8 +130,10 @@ class Chat {
         this.backlog.add(channel.backlog);
         this.userlist.add(channel.userlist);
         this.activeChannel = channel;
+        var scrollPosition = channel.scrollPosition;
         channel.channelEntry.addClass('active');
         channel.channelEntry.removeClass('message', 'highlight');
+        this.backlog.scroll(scrollPosition);
     }
     checkScroll() {
         var scroll = this.backlog.scroll()[0];
@@ -130,7 +141,7 @@ class Chat {
         return scroll.height - bounds.height <= scroll.top + 10;
     }
     doScroll() {
-        this.backlog.scroll('bottom');
+        this.backlog.scroll(this.activeChannel.scrollPosition);
     }
 
     highlight(channel, type) {
