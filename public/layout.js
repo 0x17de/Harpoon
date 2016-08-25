@@ -159,6 +159,8 @@ q(window).on('mousemove', (event)=>{
     layout.layout(true);
 });
 q(window).on('mouseup', ()=>{
-    dragInfo = null;
-    layout.layout(); // recreate handles
+    if (dragInfo) {
+        dragInfo = null;
+        layout.layout(); // recreate handles
+    }
 });

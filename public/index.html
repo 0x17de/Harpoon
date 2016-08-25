@@ -40,5 +40,48 @@
     </div>
     <div id="layout-handles"></div>
     <div id="backlog-handles"></div>
+    <div id="settings" data-layout="vbox">
+      <div data-layout-size="fixed:24" class="header">
+        <div class="header-margin">
+          Settings
+        </div>
+      </div>
+      <div data-layout="scroll">
+        <div class="content-margin">
+          <h1>View settings of service:</h1>
+          <select id="services"></select>
+          <br/><br/>
+          <h1>IRC</h1>
+          <h2>Servers</h2>
+          <div style="position:relative;width:100%;height:120px" data-layout="hbox">
+            <div class="listview">
+            </div>
+            <div data-layout="vbox" data-layout-size="fixed:120">
+              <button>Add</button>
+              <button>Remove</button>
+              <button>Edit</button>
+              <div data-layout="hbox">
+                <button>&#8679;</button>
+                <button>&#8681;</button>
+              </div>
+            </div>
+          </div>
+          <h2>Nicks</h2>
+          <div style="position:relative;width:100%;height:120px" data-layout="hbox">
+            <div class="listview">
+            </div>
+            <div data-layout="vbox" data-layout-size="fixed:120">
+              <button>Add</button>
+              <button>Remove</button>
+              <button>Edit</button>
+              <div data-layout="hbox">
+                <button>&#8679;</button>
+                <button>&#8681;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

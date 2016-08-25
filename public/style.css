@@ -31,6 +31,9 @@ body, html {
     padding:3px 0 0 5px;
     font-weight:bold;
 }
+.content-margin {
+    padding:5px 8px;
+}
 #chat-channellist, .userlist {
     box-sizing:border-box;
     font-size:10pt;
@@ -113,4 +116,41 @@ body, html {
 }
 .backlog-message {
     width:calc(100% - 130px - 85px);
+}
+
+/* SETTINGS */
+#settings {
+    display:none;
+    position:absolute;
+    left:40px; top:40px;
+    width:calc(100% - 80px); height:calc(100% - 80px);
+    background:#eee;
+    border:1px solid; box-sizing:border-box;
+}
+
+#settings h1 {
+    margin:0; padding:3px 5px;
+    background:#f16745;
+    font-size:12pt; font-weight:bold;
+}
+#settings h2 {
+    margin:0; padding:3px 5px;
+    background:#ffc65d;
+    font-size:10pt; font-weight:bold;
+}
+#settings #services {
+    width:100%;
+    padding:3px 5px;
+    background:#fff;
+    border:1px solid; box-sizing:border-box;
+}
+#settings button {
+    font-family:"Lucida Console",Monaco,monospace;
+    background:#dadada;
+    border:1px solid; box-sizing:border-box;
+}
+#settings .listview {
+    width:100%; height:90px;
+    border:1px solid; box-sizing:border-box;
+    background:#fff;
 }
