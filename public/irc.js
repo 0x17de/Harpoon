@@ -73,12 +73,41 @@ class IrcService extends ServiceBase {
         return this.servers[this.serverIdNameMap[id]];
     }
     sendMessage(msg, server, channel) {
-        this.chat.send({
-            cmd:'chat',
-            server:server.id,
-            channel:channel.name,
-            msg:msg
-        });
+        if (msg.indexOf('/') === 0) {
+            var split = msg.substr(1).split(' ');
+            var cmd = split[0];
+
+            switch(cmd) {
+            case 'join':
+                if (split.length >= 2) {
+                    if (!split[2]) split[2] = '';
+                    this.chat.send({
+                        type:'irc',
+                        cmd:'join',
+                        server:server.id,
+                        channel:split[1],
+                        password:split[2]
+                    });
+                }
+                break;
+            case 'part':
+                var channel = split[1] || this.chat.activeChannel.name;
+                this.chat.send({
+                    type:'irc',
+                    cmd:'part',
+                    server:server.id,
+                    channel:channel
+                });
+                break;
+            }
+        } else {
+            this.chat.send({
+                cmd:'chat',
+                server:server.id,
+                channel:channel.name,
+                msg:msg
+            });
+        }
     }
     highlight(channel, message) {
         this.chat.highlight(channel, 'message');
@@ -107,7 +136,7 @@ class IrcService extends ServiceBase {
 
     handleJoin(json) {
         if (json.nick.length === 0) {
-            new IrcChannel(json.channel, this.getById(json.server));
+            new IrcChannel(json.channel, this.getById(json.server)).activate();
         } else {
             var channel = this.getById(json.server).get(json.channel);
             if (!channel) return console.log('Channel not created: '+json.server+' '+json.channel);
@@ -118,7 +147,7 @@ class IrcService extends ServiceBase {
     handlePart(json) {
         var channel = this.getById(json.server).get(json.channel);
         if (!channel) return console.log('Channel not created: '+json.server+' '+json.channel);
-        if (json.nick.length === 0) {
+        if (IrcUtils.stripName(json.nick) === this.activeNick) {
             channel.remove();
         } else {
             var user = channel.get(json.nick);
@@ -129,7 +158,7 @@ class IrcService extends ServiceBase {
     }
     handleQuit(json) {
         var server = this.getById(json.server);
-        if (json.nick.length === 0) {
+        if (IrcUtils.stripName(json.nick) === this.activeNick) {
             // TODO: handle quit
         } else {
             for (var channelName in server.channels) {
