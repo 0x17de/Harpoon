@@ -19,6 +19,7 @@ public:
     virtual ~IrcConnection();
     virtual bool onEvent(std::shared_ptr<IEvent> event) override;
 
+    std::string getActiveNick() const;
     size_t getServerId() const;
     std::string getServerName() const;
     std::mutex& getChannelLoginDataMutex() const;

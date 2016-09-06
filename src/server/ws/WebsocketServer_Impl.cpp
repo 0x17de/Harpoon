@@ -221,6 +221,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         Json::Value& serverList = root["servers"] = Json::objectValue;
         for (auto& serverData : listing->getServerList()) {
             Json::Value& server = serverList[to_string(serverData.getServerId())];
+            server["nick"] = serverData.getActiveNick();
             server["name"] = serverData.getServerName();
             Json::Value& channelList = server["channels"] = Json::objectValue;
             for (auto& channelData : serverData.getChannels()) {

@@ -24,6 +24,10 @@ bool IrcConnection::onEvent(std::shared_ptr<IEvent> event) {
     return impl->onEvent(event);
 }
 
+std::string IrcConnection::getActiveNick() const {
+    return impl->nick;
+}
+
 size_t IrcConnection::getServerId() const {
     return impl->configuration.getServerId();
 }

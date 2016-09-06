@@ -124,7 +124,8 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
 
         for (auto& cxnPair : ircConnections) {
             auto& connection = cxnPair.second;
-            IrcServerListing& server = listing->addServer(connection.getServerId(),
+            IrcServerListing& server = listing->addServer(connection.getActiveNick(),
+                                                          connection.getServerId(),
                                                           connection.getServerName());
             for (auto& channelPair : connection.getChannelStore()) {
                 string channelName = channelPair.first;

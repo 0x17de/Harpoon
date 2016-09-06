@@ -28,13 +28,17 @@ public:
 };
 
 class IrcServerListing {
+    std::string activeNick;
     size_t serverId;
     std::string serverName;
     std::list<IrcChannelListing> channels;
 public:
-    IrcServerListing(size_t serverId, const std::string& serverName);
+    IrcServerListing(std::string activeNick,
+                     size_t serverId,
+                     const std::string& serverName);
     IrcChannelListing& addChannel(std::string channelName);
 
+    std::string getActiveNick() const;
     size_t getServerId() const;
     std::string getServerName() const;
     const std::list<IrcChannelListing>& getChannels() const;
@@ -49,7 +53,9 @@ public:
     virtual UUID getEventUuid() const override;
 
     EventIrcChatListing(size_t userId, void* data);
-    IrcServerListing& addServer(size_t serverId, std::string serverName);
+    IrcServerListing& addServer(std::string activeNick,
+                                size_t serverId,
+                                std::string serverName);
 
     virtual size_t getUserId() const override;
     const std::list<IrcServerListing>& getServerList() const;
