@@ -43,8 +43,9 @@ class IrcChannel extends ChannelBase {
 }
 
 class IrcServer extends ServerBase {
-    constructor(id, name, service) {
+    constructor(id, activeNick, name, service) {
         super(name, service);
+        this.activeNick = activeNick;
         this.id = id;
     }
     loadChannels(channels) {
@@ -64,7 +65,6 @@ class IrcService extends ServiceBase {
     constructor(chat) {
         super('irc', chat);
         this.serverIdNameMap = {};
-        this.activeNick = 'iirc';
     }
     loadSettings(settings) {
         this.settings = settings;
@@ -91,13 +91,36 @@ class IrcService extends ServiceBase {
                 }
                 break;
             case 'part':
-                var channel = split[1] || this.chat.activeChannel.name;
+                var partChannel = split[1] || this.chat.activeChannel.name;
                 this.chat.send({
                     type:'irc',
                     cmd:'part',
                     server:server.id,
-                    channel:channel
+                    channel:partChannel
                 });
+                break;
+            case 'nick':
+                if (split[1] != '') {
+                    this.chat.send({
+                        type:'irc',
+                        cmd:'nick',
+                        server:server.id,
+                        channel:channel.name,
+                        nick:split[1]
+                    });
+                }
+                break;
+            case 'me':
+                var message = msg.substr(msg.indexOf(' ')+1);
+                if (message != '') {
+                    this.chat.send({
+                        type:'irc',
+                        cmd:'me',
+                        server:server.id,
+                        channel:channel.name,
+                        msg:message
+                    });
+                }
                 break;
             }
         } else {
@@ -111,7 +134,7 @@ class IrcService extends ServiceBase {
     }
     highlight(channel, message) {
         this.chat.highlight(channel, 'message');
-        if (message.indexOf(this.activeNick) >= 0)
+        if (message.indexOf(channel.server.activeNick) >= 0)
             this.chat.highlight(channel, 'highlight');
     }
 
@@ -131,9 +154,24 @@ class IrcService extends ServiceBase {
             this.handleSettings(json); break;
         case 'chatlist':
             this.handleChatList(json); break;
+        case 'nickchange':
+            this.handleNickChange(json); break;
         }
     }
 
+    handleNickChange(json) {
+        var server = this.getById(json.server);
+        if (IrcUtils.stripName(json.nick) === server.activeNick) {
+            server.activeNick = json.newNick;
+        }
+        for (var channelName in server.channels) {
+            var channel = server.get(channelName);
+            var user = channel.get(json.nick);
+            if (!user) continue;
+            user.rename(json.newNick);
+            channel.addMessage(IrcUtils.formatTime(json.time), '<->', IrcUtils.stripName(json.nick) + ' is now known as ' + json.newNick);
+        }
+    }
     handleJoin(json) {
         if (json.nick.length === 0) {
             new IrcChannel(json.channel, this.getById(json.server)).activate();
@@ -147,7 +185,7 @@ class IrcService extends ServiceBase {
     handlePart(json) {
         var channel = this.getById(json.server).get(json.channel);
         if (!channel) return console.log('Channel not created: '+json.server+' '+json.channel);
-        if (IrcUtils.stripName(json.nick) === this.activeNick) {
+        if (IrcUtils.stripName(json.nick) === channel.server.activeNick) {
             channel.remove();
         } else {
             var user = channel.get(json.nick);
@@ -158,7 +196,7 @@ class IrcService extends ServiceBase {
     }
     handleQuit(json) {
         var server = this.getById(json.server);
-        if (IrcUtils.stripName(json.nick) === this.activeNick) {
+        if (IrcUtils.stripName(json.nick) === server.activeNick) {
             // TODO: handle quit
         } else {
             for (var channelName in server.channels) {
@@ -188,8 +226,9 @@ class IrcService extends ServiceBase {
     handleChatList(json) {
         var servers = json.servers;
         for (var i in servers) {
-            this.serverIdNameMap[i] = servers[i].name;
-            new IrcServer(i, servers[i].name, this)
+            var server = servers[i];
+            this.serverIdNameMap[i] = server.name;
+            new IrcServer(i, server.nick, server.name, this)
                 .loadChannels(servers[i].channels);
         }
     }

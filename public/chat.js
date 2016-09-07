@@ -12,6 +12,11 @@ class UserBase {
     createEntry() {
         return q('<div>').text(this.name());
     }
+    rename(newName) {
+        this.channel._rename(this.details.name, newName);
+        this.details.name = newName;
+        this.userEntry.text(newName);
+    }
     name() {
         return this.details.name;
     }
@@ -45,6 +50,11 @@ class ChannelBase {
             .text(this.name)
             .addClass('channel')
             .on('click', ()=>this.activate());
+    }
+    _rename(userName, newUserName) {
+        var user = this.users[userName];
+        this.users[newUserName] = user;
+        delete this.users[userName];
     }
     get(userName) {
         return this.users[userName];
