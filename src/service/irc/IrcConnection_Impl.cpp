@@ -9,7 +9,9 @@
 #include "event/irc/EventIrcNickChanged.hpp"
 #include "event/irc/EventIrcPartChannel.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"
+#include "event/irc/EventIrcSendAction.hpp"
 #include "event/irc/EventIrcMessage.hpp"
+#include "event/irc/EventIrcAction.hpp"
 #include "event/irc/EventIrcNumeric.hpp"
 #include "event/irc/EventIrcModifyNick.hpp"
 #include "event/irc/EventIrcNickModified.hpp"
@@ -349,6 +351,11 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
         auto message = event->as<EventIrcSendMessage>();
         if (!irc_cmd_msg(ircSession, message->getChannel().c_str(), message->getMessage().c_str())) {
             appQueue->sendEvent(make_shared<EventIrcMessage>(message->getUserId(), message->getServerId(), nick, message->getChannel(), message->getMessage()));
+        }
+    } else if (type == EventIrcSendAction::uuid) {
+        auto aaction = event->as<EventIrcSendAction>();
+        if (!irc_cmd_me(ircSession, aaction->getChannel().c_str(), aaction->getMessage().c_str())) {
+            appQueue->sendEvent(make_shared<EventIrcAction>(aaction->getUserId(), aaction->getServerId(), nick, aaction->getChannel(), aaction->getMessage()));
         }
     }
     return true;

@@ -115,7 +115,7 @@ class IrcService extends ServiceBase {
                 if (message != '') {
                     this.chat.send({
                         type:'irc',
-                        cmd:'me',
+                        cmd:'action',
                         server:server.id,
                         channel:channel.name,
                         msg:message
@@ -126,6 +126,7 @@ class IrcService extends ServiceBase {
         } else {
             this.chat.send({
                 cmd:'chat',
+                type:'irc',
                 server:server.id,
                 channel:channel.name,
                 msg:msg

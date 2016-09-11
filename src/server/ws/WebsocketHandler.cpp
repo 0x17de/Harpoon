@@ -4,6 +4,7 @@
 #include "event/EventLogout.hpp"
 #include "event/EventQuerySettings.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"
+#include "event/irc/EventIrcSendAction.hpp"
 #include "event/irc/EventIrcAddServer.hpp"
 #include "event/irc/EventIrcDeleteServer.hpp"
 #include "event/irc/EventIrcAddHost.hpp"
@@ -67,17 +68,23 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
             string cmd = root.get("cmd", "").asString();
             string type = root.get("type", "").asString();
             if (type == "") {
-                if (cmd == "chat") {
-                    size_t serverId;
-                    stringstream(root.get("server", "").asString()) >> serverId;
-                    string channel = root.get("channel", "").asString();
-                    string message = root.get("msg", "").asString();
-                    appQueue->sendEvent(make_shared<EventIrcSendMessage>(clientData.userId, serverId, channel, message));
-                } else if (cmd == "querysettings") {
+                if (cmd == "querysettings") {
                     appQueue->sendEvent(make_shared<EventQuerySettings>(clientData.userId, connection));
                 }
             } else if (type == "irc") {
-                if (cmd == "join") {
+                if (cmd == "chat") {
+                    size_t serverId;
+                    stringstream(root.get("server", "0").asString()) >> serverId;
+                    string channel = root.get("channel", "").asString();
+                    string message = root.get("msg", "").asString();
+                    appQueue->sendEvent(make_shared<EventIrcSendMessage>(clientData.userId, serverId, channel, message));
+                } else if (cmd == "action") {
+                    size_t serverId;
+                    stringstream(root.get("server", "0").asString()) >> serverId;
+                    string channel = root.get("channel", "").asString();
+                    string message = root.get("msg", "").asString();
+                    appQueue->sendEvent(make_shared<EventIrcSendAction>(clientData.userId, serverId, channel, message));
+                } else if (cmd == "join") {
                     size_t serverId;
                     istringstream(root.get("server", "0").asString()) >> serverId;
                     string channel = root.get("channel", "").asString();
