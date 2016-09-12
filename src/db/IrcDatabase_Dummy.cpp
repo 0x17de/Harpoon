@@ -50,8 +50,8 @@ bool IrcDatabase_Dummy::onEvent(std::shared_ptr<IEvent> event) {
         loginConfiguration.addNick("iirc");
         loginConfiguration.addNick("iirc2");
         loginConfiguration.addNick("iirc3");
-        loginConfiguration.addChannelLoginData(1, "#test", "");
-        loginConfiguration.addChannelLoginData(2, "#test2", "");
+        loginConfiguration.addChannelLoginData(1, "#test", "", true);
+        loginConfiguration.addChannelLoginData(2, "#test2", "", false);
 
         appQueue->sendEvent(login);
     }

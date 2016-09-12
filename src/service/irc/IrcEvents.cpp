@@ -29,11 +29,13 @@ void IrcConnection_Impl::onConnect(irc_session_t* session,
     for (auto& joinDataPair : channelStores) {
         string channelName = joinDataPair.first;
         string channelPassword = joinDataPair.second.getChannelPassword();
-        irc_cmd_join(ircSession,
-                     channelName.c_str(),
-                     channelPassword.empty()
-                     ? 0
-                     : channelPassword.c_str());
+        if (!joinDataPair.second.getDisabled()) {
+            irc_cmd_join(ircSession,
+                         channelName.c_str(),
+                         channelPassword.empty()
+                         ? 0
+                         : channelPassword.c_str());
+        }
     }
     resultEvent = make_shared<EventIrcConnected>(userId, configuration.getServerId());
 }

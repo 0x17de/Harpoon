@@ -52,6 +52,8 @@ class IrcServer extends ServerBase {
         for (var channelName in channels) {
             var channelData = channels[channelName];
             var channel = new IrcChannel(channelName, this);
+            if (channelData.disabled)
+                channel.setDisabled(channelData.disabled);
 
             var users = channelData.users;
             for (var userName in users)
@@ -179,6 +181,7 @@ class IrcService extends ServiceBase {
         } else {
             var channel = this.getById(json.server).get(json.channel);
             if (!channel) return console.log('Channel not created: '+json.server+' '+json.channel);
+            channel.setDisabled(false);
             new IrcUser({name:json.nick}, channel);
             channel.addMessage(IrcUtils.formatTime(json.time), '-->', IrcUtils.stripName(json.nick) + ' has joined ' + channel.name);
         }
@@ -187,7 +190,7 @@ class IrcService extends ServiceBase {
         var channel = this.getById(json.server).get(json.channel);
         if (!channel) return console.log('Channel not created: '+json.server+' '+json.channel);
         if (IrcUtils.stripName(json.nick) === channel.server.activeNick) {
-            channel.remove();
+            channel.setDisabled(true);
         } else {
             var user = channel.get(json.nick);
             if (!user) return;

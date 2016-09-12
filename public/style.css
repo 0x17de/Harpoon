@@ -66,6 +66,9 @@ body, html {
 .channel.active {
     background:#f16745;
 }
+.channel.disabled {
+    color:#888;
+}
 .userlist {
     border-left:1px solid #000;
 }

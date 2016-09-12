@@ -36,8 +36,14 @@ const std::list<std::string>& IrcServerConfiguration::getNicks() const {
     return nicks;
 }
 
-void IrcServerConfiguration::addChannelLoginData(size_t channelId, const std::string& channelName, const std::string& channelPassword) {
-    channels.emplace_back(channelId, channelName, channelPassword);
+void IrcServerConfiguration::addChannelLoginData(size_t channelId,
+                                                 const std::string& channelName,
+                                                 const std::string& channelPassword,
+                                                 bool channelDisabled) {
+    channels.emplace_back(channelId,
+                          channelName,
+                          channelPassword,
+                          channelDisabled);
 }
 
 const std::list<IrcChannelLoginData>& IrcServerConfiguration::getChannelLoginData() const {

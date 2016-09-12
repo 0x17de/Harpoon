@@ -213,8 +213,11 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             if (!channelsConfig.getEntry(channelEntry, "id", channelId)) {
                 channelId = to_string(IdProvider::getInstance().generateNewId("channel"));
                 channelsConfig.setEntry(channelEntry, "id", channelId);
+                channelsConfig.setEntry(channelEntry, "password", loginData.password);
             }
-            channelsConfig.setEntry(channelEntry, "password", loginData.password);
+            channelsConfig.setEntry(channelEntry, "disabled", "no");
+            if (loginData.passwordSpecified)
+                channelsConfig.setEntry(channelEntry, "password", loginData.password);
         }
     } else if (eventType == EventIrcPartChannel::uuid) {
         auto part = event->as<EventIrcPartChannel>();
@@ -229,8 +232,11 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
         Ini channelsConfig(serverChannelsConfigFilename.str());
 
         // save data from join event to ini
-        for (const auto& channelName : part->getChannels())
-            channelsConfig.deleteCategory(channelName); // no need to remember (this is no backlog)
+        for (const auto& channelName : part->getChannels()) {
+            auto* categoryEntry = channelsConfig.getEntry(channelName);
+            if (categoryEntry)
+                channelsConfig.setEntry(*categoryEntry, "disabled", "yes");
+        }
     } else if (eventType == EventInit::uuid) {
         std::cout << "IrcDB received INIT event" << std::endl;
 
@@ -320,13 +326,15 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
 
                     // read channel settings
                     size_t channelId;
-                    string channelIdStr, channelPassword;
+                    string channelIdStr, channelPassword, channelDisabled;
                     channelsConfig.getEntry(channel, "id", channelIdStr);
                     channelsConfig.getEntry(channel, "password", channelPassword);
+                    if (!channelsConfig.getEntry(channel, "disabled", channelDisabled))
+                        channelDisabled = "no";
                     istringstream(channelIdStr) >> channelId;
 
                     // add channel to event
-                    loginConfiguration.addChannelLoginData(channelId, channelName, channelPassword);
+                    loginConfiguration.addChannelLoginData(channelId, channelName, channelPassword, channelDisabled == "yes");
                 }
 
                 // add nicks

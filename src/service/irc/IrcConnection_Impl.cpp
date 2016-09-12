@@ -130,7 +130,9 @@ IrcConnection_Impl::IrcConnection_Impl(EventQueue* appQueue,
                 for (auto& channel : this->configuration.getChannelLoginData()) {
                     string channelLower = channel.getChannelName();
                     transform(channelLower.begin(), channelLower.end(), channelLower.begin(), ::tolower);
-                    channelStores.emplace(channelLower, channel.getChannelPassword());
+                    channelStores.emplace(piecewise_construct,
+                                          forward_as_tuple(channelLower),
+                                          forward_as_tuple(channel.getChannelPassword(), channel.getDisabled()));
                 }
 
                 auto& hostConfigurations = this->configuration.getHostConfigurations();
@@ -215,13 +217,23 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
             transform(channelLower.begin(), channelLower.end(), channelLower.begin(), ::tolower);
 
             auto it = channelStores.find(channelLower);
-            if (it != channelStores.end())
+            if (it != channelStores.end()) {
+                if (it->second.getDisabled()) {
+                    // TODO: check if password specified
+                    irc_cmd_join(ircSession,
+                                 channelLower.c_str(),
+                                 it->second.getChannelPassword().c_str());
+                    it->second.setDisabled(false);
+                }
                 continue;
+            }
             string channelPassword = entry.password;
             irc_cmd_join(ircSession,
                          channelLower.c_str(),
                          channelPassword.c_str());
-            channelStores.emplace(channelLower, channelPassword);
+            channelStores.emplace(piecewise_construct,
+                                  forward_as_tuple(channelLower),
+                                  forward_as_tuple(channelPassword, false));
             appQueue->sendEvent(make_shared<EventIrcJoined>(joinCommand->getUserId(),
                                                             joinCommand->getServerId(),
                                                             "",
@@ -295,7 +307,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                 if (it == channelStores.end()) {
                     auto insertResult = channelStores.emplace(piecewise_construct,
                                                               forward_as_tuple(channelName),
-                                                              forward_as_tuple(""));
+                                                              forward_as_tuple("", false));
                     channelStore = &insertResult.first->second;
                 } else {
                     channelStore = &it->second;
@@ -345,7 +357,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
             if (it == channelStores.end())
                 continue;
             irc_cmd_part(ircSession, channelLower.c_str());
-            channelStores.erase(it);
+            it->second.setDisabled(true);
         }
     } else if (type == EventIrcSendMessage::uuid) {
         auto message = event->as<EventIrcSendMessage>();

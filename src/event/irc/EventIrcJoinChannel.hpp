@@ -7,9 +7,11 @@
 
 
 struct IrcChannelJoinData {
+    IrcChannelJoinData(const std::string& name);
     IrcChannelJoinData(const std::string& name, const std::string& password);
 
     std::string name;
+    bool passwordSpecified;
     std::string password;
 };
 

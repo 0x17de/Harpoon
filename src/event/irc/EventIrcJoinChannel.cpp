@@ -3,8 +3,15 @@
 #include "service/irc/IrcChannelLoginData.hpp"
 
 
+IrcChannelJoinData::IrcChannelJoinData(const std::string& name)
+    : name{name}
+    , passwordSpecified{false}
+{
+}
+
 IrcChannelJoinData::IrcChannelJoinData(const std::string& name, const std::string& password)
     : name{name}
+    , passwordSpecified{true}
     , password{password}
 {
 }

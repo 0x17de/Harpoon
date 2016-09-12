@@ -25,8 +25,10 @@ std::string IrcUserStore::getMode() const {
     return mode;
 }
 
-IrcChannelStore::IrcChannelStore(const std::string& channelPassword)
+IrcChannelStore::IrcChannelStore(const std::string& channelPassword,
+                                 bool disabled)
     : channelPassword{channelPassword}
+    , disabled{disabled}
 {
 }
 
@@ -79,3 +81,10 @@ std::string IrcChannelStore::getChannelPassword() const {
     return channelPassword;
 }
 
+bool IrcChannelStore::getDisabled() const {
+    return disabled;
+}
+
+void IrcChannelStore::setDisabled(bool ldisabled) {
+    disabled = ldisabled;
+}

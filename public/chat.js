@@ -37,6 +37,7 @@ class ChannelBase {
         this.userlist = q('<div>').addClass('userlist');
         this.users = {};
         this.scrollPosition = 'bottom';
+        this.disabled = false;
         if (!this.server.service.chat.activeChannel)
             this.activate();
     }
@@ -44,6 +45,16 @@ class ChannelBase {
         for (var i in this.users)
             this.users[i].clear();
         this.remove();
+    }
+    setDisabled(disabled) {
+        if (disabled)
+            this.channelEntry.addClass('disabled');
+        else
+            this.channelEntry.removeClass('disabled');
+        this.disabled = disabled;
+    }
+    getDisabled() {
+        return this.disabled;
     }
     createEntry() {
         return q('<div>')

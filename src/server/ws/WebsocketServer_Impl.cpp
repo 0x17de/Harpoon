@@ -226,6 +226,8 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
             Json::Value& channelList = server["channels"] = Json::objectValue;
             for (auto& channelData : serverData.getChannels()) {
                 Json::Value& channel = channelList[channelData.getChannelName()] = Json::objectValue;
+                if (channelData.getDisabled())
+                    channel["disabled"] = true;
                 Json::Value& users = channel["users"] = Json::objectValue;
                 for (auto& user : channelData.getUsers()) {
                     users[user.getNick()] = user.getMode();
