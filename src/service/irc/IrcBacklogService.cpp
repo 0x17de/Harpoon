@@ -6,6 +6,8 @@
 #include "event/irc/EventIrcMessage.hpp"
 #include "event/irc/EventIrcJoined.hpp"
 #include "event/irc/EventIrcParted.hpp"
+#include "event/irc/EventIrcQuit.hpp"
+#include "event/irc/EventIrcKicked.hpp"
 #include "utils/ModuleProvider.hpp"
 
 #include <iostream>
@@ -130,6 +132,36 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
             query.add(Database::OperationType::Assign, "", "", "1");
             query.add(Database::OperationType::Join, "channel", parted->getChannel(), "harpoon_irc_channel");
             query.add(Database::OperationType::Join, "sender", parted->getUsername(), "harpoon_irc_sender");
+
+            appQueue->sendEvent(eventInsert);
+        } else if (eventType == EventIrcQuit::uuid) {
+            auto quit = event->as<EventIrcQuit>();
+            auto eventInsert = std::make_shared<EventDatabaseQuery>(getEventQueue(), event);
+            auto& query = eventInsert->add(Database::Query(Database::QueryType::Insert,
+                                                           "harpoon_irc_backlog",
+                                                           std::list<std::string>{"time", "type", "flags", "sender_ref"}));
+            query.add(Database::OperationType::Assign, convertTimestamp(quit->getTimestamp()));
+            query.add(Database::OperationType::Assign, "3");
+            query.add(Database::OperationType::Assign, "0");
+            query.add(Database::OperationType::Assign, "", "", "0");
+            query.add(Database::OperationType::Assign, "", "", "1");
+            query.add(Database::OperationType::Join, "sender", quit->getWho(), "harpoon_irc_sender");
+
+            appQueue->sendEvent(eventInsert);
+        } else if (eventType == EventIrcKicked::uuid) {
+            auto kicked = event->as<EventIrcKicked>();
+            auto eventInsert = std::make_shared<EventDatabaseQuery>(getEventQueue(), event);
+            auto& query = eventInsert->add(Database::Query(Database::QueryType::Insert,
+                                                           "harpoon_irc_backlog",
+                                                           std::list<std::string>{"time", "message", "type", "flags", "channel_ref", "sender_ref"}));
+            query.add(Database::OperationType::Assign, convertTimestamp(kicked->getTimestamp()));
+            query.add(Database::OperationType::Assign, kicked->getTarget());
+            query.add(Database::OperationType::Assign, "4");
+            query.add(Database::OperationType::Assign, "0");
+            query.add(Database::OperationType::Assign, "", "", "0");
+            query.add(Database::OperationType::Assign, "", "", "1");
+            query.add(Database::OperationType::Join, "channel", kicked->getChannel(), "harpoon_irc_channel");
+            query.add(Database::OperationType::Join, "sender", kicked->getUsername(), "harpoon_irc_sender");
 
             appQueue->sendEvent(eventInsert);
         }

@@ -6,6 +6,7 @@
 #include "event/irc/EventIrcJoinChannel.hpp"
 #include "event/irc/EventIrcJoined.hpp"
 #include "event/irc/EventIrcParted.hpp"
+#include "event/irc/EventIrcKicked.hpp"
 #include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcNickChanged.hpp"
 #include "event/irc/EventIrcPartChannel.hpp"
@@ -262,6 +263,16 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
         if (it != channelStores.end()) {
             IrcChannelStore& channelStore = it->second;
             channelStore.removeUser(getPureNick(part->getUsername()));
+        }
+    } else if (type == EventIrcKicked::uuid) {
+        auto kick = event->as<EventIrcKicked>();
+        string channelName = kick->getChannel();
+
+        lock_guard<mutex> lock(channelLoginDataMutex);
+        auto it = channelStores.find(channelName);
+        if (it != channelStores.end()) {
+            IrcChannelStore& channelStore = it->second;
+            channelStore.removeUser(getPureNick(kick->getTarget()));
         }
     } else if (type == EventIrcQuit::uuid) {
         auto part = event->as<EventIrcQuit>();

@@ -2,10 +2,11 @@
 #define EVENTIRCKICKED_H
 
 #include "../IClientEvent.hpp"
+#include "IIrcLoggable.hpp"
 #include <string>
 
 
-class EventIrcKicked : public IClientEvent {
+class EventIrcKicked : public IClientEvent, public IIrcLoggable {
     size_t userId;
     size_t serverId;
     std::string username;
