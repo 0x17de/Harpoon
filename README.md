@@ -32,6 +32,7 @@ This program is still work in progress. It will require a server.
      - LibIrcClient (>=1.6-r2)
    - Backlog (optional, via USE_*_DATABASE flags)
      - SOCI (>=3.2.2)
+     - PostgreSQL (optional via USE_POSTGRES_DATABASE)
  - Client Protocols
    - WebChat (optional via USE_WEBSOCKET_SERVER)
      - Seasocks (>=1.2.4)
@@ -40,7 +41,7 @@ This program is still work in progress. It will require a server.
 ### Generate Makefiles
 For building the source CMake is required. Run the following in the project's build folder:
 ```
-cmake .. -DCMAKE_BUILD_TYPE=Debug -DUSE_WEBSOCKET_SERVER=1 -DUSE_WEBSOCKET_SERVER_VERBOSE=1
+cmake .. -DCMAKE_BUILD_TYPE=Debug -DUSE_WEBSOCKET_SERVER=1 -DUSE_WEBSOCKET_SERVER_VERBOSE=0 -DUSE_POSTGRES_DATABASE=1
 ```
 Run ```make``` afterwards.
 
