@@ -88,3 +88,11 @@ bool IrcChannelStore::getDisabled() const {
 void IrcChannelStore::setDisabled(bool ldisabled) {
     disabled = ldisabled;
 }
+
+std::string IrcChannelStore::getTopic() const {
+    return channelTopic;
+}
+
+void IrcChannelStore::setTopic(const std::string& topic) {
+    channelTopic = topic;
+}

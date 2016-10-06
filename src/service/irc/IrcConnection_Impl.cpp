@@ -14,6 +14,7 @@
 #include "event/irc/EventIrcSendAction.hpp"
 #include "event/irc/EventIrcMessage.hpp"
 #include "event/irc/EventIrcAction.hpp"
+#include "event/irc/EventIrcTopic.hpp"
 #include "event/irc/EventIrcNumeric.hpp"
 #include "event/irc/EventIrcModifyNick.hpp"
 #include "event/irc/EventIrcNickModified.hpp"
@@ -263,6 +264,17 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
         if (it != channelStores.end()) {
             IrcChannelStore& channelStore = it->second;
             channelStore.removeUser(getPureNick(part->getUsername()));
+        }
+    } else if (type == EventIrcTopic::uuid) {
+        auto topic = event->as<EventIrcTopic>();
+        string topicText = topic->getTopic();
+        string channelName = topic->getChannel();
+
+        lock_guard<mutex> lock(channelLoginDataMutex);
+        auto it = channelStores.find(channelName);
+        if (it != channelStores.end()) {
+            IrcChannelStore& channelStore = it->second;
+            channelStore.setTopic(topicText);
         }
     } else if (type == EventIrcKicked::uuid) {
         auto kick = event->as<EventIrcKicked>();

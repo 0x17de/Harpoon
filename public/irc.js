@@ -151,6 +151,8 @@ class IrcService extends ServiceBase {
             this.handleQuit(json); break;
         case 'chat':
             this.handleChat(json); break;
+        case 'topic':
+            this.handleTopic(json); break;
         case 'action':
             this.handleAction(json); break;
         case 'settings':
@@ -162,6 +164,11 @@ class IrcService extends ServiceBase {
         }
     }
 
+    handleTopic(json) {
+        var channel = this.getById(json.server).get(json.channel);
+        if (!channel) return console.log('Channel not created: '+json.server+' '+json.channel);
+        channel.addMessage(IrcUtils.formatTime(json.time), '*', IrcUtils.stripName(json.nick) + ' changed the topic: ' + json.topic);
+    }
     handleNickChange(json) {
         var server = this.getById(json.server);
         if (IrcUtils.stripName(json.nick) === server.activeNick) {

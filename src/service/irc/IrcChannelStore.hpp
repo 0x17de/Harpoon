@@ -18,6 +18,7 @@ public:
 
 class IrcChannelStore {
     std::string channelPassword;
+    std::string channelTopic;
     std::map<std::string, IrcUserStore> users;
     bool disabled;
 public:
@@ -32,6 +33,8 @@ public:
     std::string getChannelPassword() const;
     bool getDisabled() const;
     void setDisabled(bool ldisabled);
+    std::string getTopic() const;
+    void setTopic(const std::string& topic);
 };
 
 #endif

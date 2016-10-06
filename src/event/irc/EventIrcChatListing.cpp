@@ -23,8 +23,10 @@ std::string IrcChannelUser::getMode() const {
 }
 
 IrcChannelListing::IrcChannelListing(const std::string& channelName,
+                                     const std::string& channelTopic,
                                      bool disabled)
     : channelName{channelName}
+    , channelTopic{channelTopic}
     , disabled{disabled}
 {
 }
@@ -42,6 +44,10 @@ std::string IrcChannelListing::getChannelName() const {
     return channelName;
 }
 
+std::string IrcChannelListing::getChannelTopic() const {
+    return channelTopic;
+}
+
 bool IrcChannelListing::getDisabled() const {
     return disabled;
 }
@@ -55,8 +61,12 @@ IrcServerListing::IrcServerListing(std::string activeNick,
 {
 }
 
-IrcChannelListing& IrcServerListing::addChannel(std::string channelName, bool disabled) {
-    channels.emplace_back(channelName, disabled);
+IrcChannelListing& IrcServerListing::addChannel(const std::string& channelName,
+                                                const std::string& channelTopic,
+                                                bool disabled) {
+    channels.emplace_back(channelName,
+                          channelTopic,
+                          disabled);
     return channels.back();
 }
 

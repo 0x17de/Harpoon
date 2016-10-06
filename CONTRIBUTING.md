@@ -7,6 +7,8 @@ Try to adopt to the currently used style. Examples:
   - Variables are in camelCase.
   - No hungarian notation.
   - Don't be afraid to ask nor to do PRs.
+  - Avoid leaks (no new/delete). Don't use malloc/free.
+  - Readability over performance.
 
 ## Commits
 

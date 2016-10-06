@@ -186,7 +186,6 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["oldnick"] = modified->getOldNick();
         root["newnick"] = modified->getNewNick();
     } else if (eventType == EventIrcSettingsListing::uuid) {
-#pragma message "EventIrcSettingsListing stub"
         auto settings = event->as<EventIrcSettingsListing>();
         root["cmd"] = "settings";
         root["type"] = "irc";
@@ -228,6 +227,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
                 Json::Value& channel = channelList[channelData.getChannelName()] = Json::objectValue;
                 if (channelData.getDisabled())
                     channel["disabled"] = true;
+                channel["topic"] = channelData.getChannelTopic();
                 Json::Value& users = channel["users"] = Json::objectValue;
                 for (auto& user : channelData.getUsers()) {
                     users[user.getNick()] = user.getMode();
