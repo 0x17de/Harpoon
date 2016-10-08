@@ -4,6 +4,8 @@
 #include "event/EventDatabaseQuery.hpp"
 #include "event/EventDatabaseResult.hpp"
 #include "event/irc/EventIrcMessage.hpp"
+#include "event/irc/EventIrcNoticed.hpp"
+#include "event/irc/EventIrcAction.hpp"
 #include "event/irc/EventIrcJoined.hpp"
 #include "event/irc/EventIrcParted.hpp"
 #include "event/irc/EventIrcQuit.hpp"
@@ -102,6 +104,38 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
             query.add(Database::OperationType::Assign, "", "", "1");
             query.add(Database::OperationType::Join, "channel", message->getChannel(), "harpoon_irc_channel");
             query.add(Database::OperationType::Join, "sender", message->getFrom(), "harpoon_irc_sender");
+
+            appQueue->sendEvent(eventInsert);
+        } else if (eventType == EventIrcNoticed::uuid) {
+            auto noticed = event->as<EventIrcNoticed>();
+            auto eventInsert = std::make_shared<EventDatabaseQuery>(getEventQueue(), event);
+            auto& query = eventInsert->add(Database::Query(Database::QueryType::Insert,
+                                                           "harpoon_irc_backlog",
+                                                           std::list<std::string>{"time", "message", "type", "flags", "channel_ref", "sender_ref"}));
+            query.add(Database::OperationType::Assign, convertTimestamp(noticed->getTimestamp()));
+            query.add(Database::OperationType::Assign, noticed->getMessage());
+            query.add(Database::OperationType::Assign, "5");
+            query.add(Database::OperationType::Assign, "0");
+            query.add(Database::OperationType::Assign, "", "", "0");
+            query.add(Database::OperationType::Assign, "", "", "1");
+            query.add(Database::OperationType::Join, "channel", noticed->getTarget(), "harpoon_irc_channel");
+            query.add(Database::OperationType::Join, "sender", noticed->getUsername(), "harpoon_irc_sender");
+
+            appQueue->sendEvent(eventInsert);
+        } else if (eventType == EventIrcAction::uuid) {
+            auto action = event->as<EventIrcAction>();
+            auto eventInsert = std::make_shared<EventDatabaseQuery>(getEventQueue(), event);
+            auto& query = eventInsert->add(Database::Query(Database::QueryType::Insert,
+                                                           "harpoon_irc_backlog",
+                                                           std::list<std::string>{"time", "message", "type", "flags", "channel_ref", "sender_ref"}));
+            query.add(Database::OperationType::Assign, convertTimestamp(action->getTimestamp()));
+            query.add(Database::OperationType::Assign, action->getMessage());
+            query.add(Database::OperationType::Assign, "6");
+            query.add(Database::OperationType::Assign, "0");
+            query.add(Database::OperationType::Assign, "", "", "0");
+            query.add(Database::OperationType::Assign, "", "", "1");
+            query.add(Database::OperationType::Join, "channel", action->getChannel(), "harpoon_irc_channel");
+            query.add(Database::OperationType::Join, "sender", action->getUsername(), "harpoon_irc_sender");
 
             appQueue->sendEvent(eventInsert);
         } else if (eventType == EventIrcJoined::uuid) {

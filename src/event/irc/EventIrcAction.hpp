@@ -2,10 +2,11 @@
 #define EVENTIRCACTION_H
 
 #include "../IClientEvent.hpp"
+#include "IIrcLoggable.hpp"
 #include <string>
 
 
-class EventIrcAction : public IClientEvent {
+class EventIrcAction : public IClientEvent, public IIrcLoggable {
     size_t userId;
     size_t serverId;
     std::string username;
