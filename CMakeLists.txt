@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.3)
 project(iirc)
+include(ExternalProject)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 
@@ -108,7 +109,12 @@ if(${USE_WEBSOCKET_SERVER})
         src/server/ws/WebsocketServer.hpp
         src/server/ws/WebsocketServer_Impl.hpp)
     add_definitions(-DUSE_WEBSOCKET_SERVER)
-    find_package(Seasocks REQUIRED)
+    if(${Seasocks_GIT})
+        message("Using Seasocks from GIT")
+    else()
+        message("Using local Seasocks")
+        find_package(Seasocks REQUIRED)
+    endif()
     find_package(JsonCpp REQUIRED)
 endif()
 
@@ -128,12 +134,20 @@ endif()
 
 
 if(${USE_WEBSOCKET_SERVER})
-  if(${Seasocks_FOUND})
-    list(APPEND INCLUDE_DIRECTORIES ${Seasocks_INCLUDE_DIR})
-    list(APPEND LINK_LIBRARIES ${Seasocks_LIBRARY})
+  if(${Seasocks_GIT})
+    ExternalProject_Add(Seasocks
+      GIT_REPOSITORY "https://github.com/mattgodbolt/seasocks"
+      GIT_TAG "master"
+      UPDATE_COMMAND ""
+      INSTALL_COMMAND "")
   else()
-    message(WARNING "SEASOCKS NOT FOUND")
-    set(MISSING_LIB 1)
+    if(${Seasocks_FOUND})
+      list(APPEND INCLUDE_DIRECTORIES ${Seasocks_INCLUDE_DIR})
+      list(APPEND LINK_LIBRARIES ${Seasocks_LIBRARY})
+    else()
+      message(WARNING "SEASOCKS NOT FOUND")
+      set(MISSING_LIB 1)
+    endif()
   endif()
   if(${JsonCpp_FOUND})
     list(APPEND INCLUDE_DIRECTORIES ${JsonCpp_INCLUDE_DIR})
