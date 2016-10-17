@@ -3,12 +3,12 @@
 
 #include "../IEvent.hpp"
 #include "../IClientEvent.hpp"
-#include "IIrcLoggable.hpp"
+#include "IrcLoggable.hpp"
 #include <cstdlib>
 #include <string>
 
 
-class EventIrcQuit : public IClientEvent, public IIrcLoggable {
+class EventIrcQuit : public IClientEvent, public IrcLoggable {
     size_t userId;
     size_t serverId;
     std::string who;

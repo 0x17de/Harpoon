@@ -2,11 +2,11 @@
 #define EVENTIRCNOTICED_H
 
 #include "../IClientEvent.hpp"
-#include "IIrcLoggable.hpp"
+#include "IrcLoggable.hpp"
 #include <string>
 
 
-class EventIrcNoticed : public IClientEvent, public IIrcLoggable {
+class EventIrcNoticed : public IClientEvent, public IrcLoggable {
     size_t userId;
     size_t serverId;
     std::string username;

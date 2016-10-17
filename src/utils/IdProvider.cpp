@@ -18,6 +18,8 @@ IdProvider& IdProvider::getInstance() {
 }
 
 size_t IdProvider::generateNewId(const std::string& entry) {
+    std::lock_guard<std::mutex> lock(idMutex);
+
     string entryIdString;
     size_t entryId;
     if (idIni.getEntry(idMap, entry, entryIdString)) {
@@ -28,6 +30,20 @@ size_t IdProvider::generateNewId(const std::string& entry) {
 
     entryId += 1;
     idIni.setEntry(idMap, entry, to_string(entryId));
+
+    return entryId;
+}
+
+size_t IdProvider::getLastId(const std::string& entry) {
+    std::lock_guard<std::mutex> lock(idMutex);
+
+    string entryIdString;
+    size_t entryId;
+    if (idIni.getEntry(idMap, entry, entryIdString)) {
+        istringstream(entryIdString) >> entryId;
+    } else {
+        entryId = 0;
+    }
 
     return entryId;
 }

@@ -2,11 +2,11 @@
 #define EVENTIRCPARTED_H
 
 #include "../IClientEvent.hpp"
-#include "IIrcLoggable.hpp"
+#include "IrcLoggable.hpp"
 #include <string>
 
 
-class EventIrcParted : public IClientEvent, public IIrcLoggable {
+class EventIrcParted : public IClientEvent, public IrcLoggable {
     size_t userId;
     size_t serverId;
     std::string username;

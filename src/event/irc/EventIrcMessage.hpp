@@ -2,11 +2,11 @@
 #define EVENTIRCMESSAGE_H
 
 #include "../IClientEvent.hpp"
-#include "IIrcLoggable.hpp"
+#include "IrcLoggable.hpp"
 #include <string>
 
 
-class EventIrcMessage : public IClientEvent, public IIrcLoggable {
+class EventIrcMessage : public IClientEvent, public IrcLoggable {
     size_t userId;
     size_t serverId;
     std::string from;

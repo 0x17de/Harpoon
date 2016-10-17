@@ -26,7 +26,7 @@ IrcBacklogService::IrcBacklogService(EventQueue* appQueue)
                   , EventQuit::uuid
                 },
                 {
-                    &EventGuard<IIrcLoggable>
+                    &EventGuard<IrcLoggable>
                 })
     , appQueue{appQueue}
     , databaseInitialized{false}
