@@ -8,6 +8,7 @@
 namespace Database {
 
     enum class QueryType {
+        LastId,
         Fetch,
         Insert,
         Delete,
@@ -15,6 +16,7 @@ namespace Database {
     };
 
     enum class OperationType {
+        Order,
         CompareAnd,
         CompareOr,
         Assign,

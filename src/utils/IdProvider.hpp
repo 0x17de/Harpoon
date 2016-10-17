@@ -16,6 +16,7 @@ public:
     static IdProvider& getInstance();
     size_t generateNewId(const std::string& key);
     size_t getLastId(const std::string& key);
+    void setLowestId(const std::string& key, size_t value);
     void save();
 };
 

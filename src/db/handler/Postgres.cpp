@@ -28,6 +28,7 @@ namespace Database {
         void query_setupTable(const Database::Query& query, EventDatabaseResult* result);
         void query_insert(const Database::Query& query, EventDatabaseResult* result);
         void query_fetch(const Database::Query& query, EventDatabaseResult* result);
+        void query_lastId(const Database::Query& query, EventDatabaseResult* result);
         void query_delete(const Database::Query& query, EventDatabaseResult* result);
 
         void query_scanOperations(const Database::Query& query,
@@ -187,8 +188,27 @@ namespace Database {
         result->setSuccess(true);
     }
 
+    void Postgres_Impl::query_lastId(const Database::Query& query, EventDatabaseResult* result) {
+        auto& columns = query.getColumns();
+        if (columns.size() == 0) return;
+
+        std::string outId;
+
+        soci::statement st = (sqlSession->prepare
+                              << "SELECT " << columns.front()
+                              << " FROM " << query.getTable()
+                              << " ORDER BY " << columns.front()
+                              << " DESC LIMIT 1", soci::into(outId));
+
+        st.execute();
+        if (st.fetch())
+            result->addResult(outId);
+        else
+            result->addResult("0");
+        result->setSuccess(true);
+    }
+
     void Postgres_Impl::query_fetch(const Database::Query& query, EventDatabaseResult* result) {
-#pragma message "Postgres QueryType::Fetch stub"
         auto& columns = query.getColumns();
         vector<string> temp(columns.size());
 
@@ -228,7 +248,6 @@ namespace Database {
     }
 
     void Postgres_Impl::query_delete(const Database::Query& query, EventDatabaseResult* result) {
-#pragma message "Postgres QueryType::Delete stub"
         Database::Operation const *where = 0, *limit = 0;
         std::list<Database::Operation const *> join;
         query_scanOperations(query, join, where, limit);
@@ -335,6 +354,9 @@ namespace Database {
                 break;
             case Database::QueryType::Fetch:
                 query_fetch(query, result.get());
+                break;
+            case Database::QueryType::LastId:
+                query_lastId(query, result.get());
                 break;
             case Database::QueryType::Insert:
                 query_insert(query, result.get());
