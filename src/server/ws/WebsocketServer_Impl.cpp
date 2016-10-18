@@ -139,11 +139,15 @@ void WebsocketServer_Impl::removeClient(seasocks::WebSocket* socket) {
 std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     Json::Value root{Json::objectValue};
 
+    auto loggable = event->as<IrcLoggable>();
+    auto id = loggable == nullptr ? 0 : loggable->getLogEntryId();
+
     UUID eventType = event->getEventUuid();
     if (eventType == EventIrcMessage::uuid) {
         auto message = event->as<EventIrcMessage>();
         root["cmd"] = "chat";
         root["type"] = "irc";
+        root["id"] = to_string(id);
         // jsonpp has no clue of size_t and clients only need to store it
         root["server"] = to_string(message->getServerId());
         root["channel"] = message->getChannel();
@@ -238,6 +242,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         auto join = event->as<EventIrcJoined>();
         root["cmd"] = "join";
         root["type"] = "irc";
+        root["id"] = to_string(id);
         root["server"] = to_string(join->getServerId());
         root["nick"] = join->getUsername();
         root["channel"] = join->getChannel();
@@ -245,6 +250,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         auto part = event->as<EventIrcParted>();
         root["cmd"] = "part";
         root["type"] = "irc";
+        root["id"] = to_string(id);
         root["server"] = to_string(part->getServerId());
         root["nick"] = part->getUsername();
         root["channel"] = part->getChannel();
@@ -252,6 +258,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         auto quit = event->as<EventIrcQuit>();
         root["cmd"] = "quit";
         root["type"] = "irc";
+        root["id"] = to_string(id);
         root["server"] = to_string(quit->getServerId());
         root["nick"] = quit->getWho();
         root["reason"] = quit->getReason();
@@ -274,6 +281,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         auto action = event->as<EventIrcAction>();
         root["cmd"] = "action";
         root["type"] = "irc";
+        root["id"] = to_string(id);
         root["server"] = to_string(action->getServerId());
         root["nick"] = action->getUsername();
         root["msg"] = action->getMessage();
@@ -282,6 +290,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         auto kick = event->as<EventIrcKicked>();
         root["cmd"] = "kick";
         root["type"] = "irc";
+        root["id"] = to_string(id);
         root["server"] = to_string(kick->getServerId());
         root["nick"] = kick->getUsername();
         root["target"] = kick->getTarget();
@@ -291,6 +300,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         auto notice = event->as<EventIrcNoticed>();
         root["cmd"] = "notice";
         root["type"] = "irc";
+        root["id"] = to_string(id);
         root["server"] = to_string(notice->getServerId());
         root["channel"] = notice->getTarget();
         root["nick"] = notice->getUsername();
