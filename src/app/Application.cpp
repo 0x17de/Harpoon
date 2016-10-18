@@ -7,6 +7,7 @@
 #include "queue/EventQueue.hpp"
 #include "user/UserManager.hpp"
 #include "event/EventInit.hpp"
+#include "event/irc/EventIrcServiceInit.hpp"
 #include "event/EventQuit.hpp"
 #include "utils/ModuleProvider.hpp"
 
@@ -56,6 +57,8 @@ Application::Application()
         eventHandlers.push_back(moduleProvider.initializeModule("irc_database", ircDatabaseType, queue));
         if (backlogEnabled == "y")
             eventHandlers.push_back(moduleProvider.initializeModule("irc_backlog", "default", queue));
+        else
+            queue->sendEvent(make_shared<EventIrcServiceInit>());
     }
 
     if (databaseType != "" && databaseType != "none")

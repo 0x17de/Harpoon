@@ -1,6 +1,7 @@
 #include "IrcBacklogService.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventInit.hpp"
+#include "event/irc/EventIrcServiceInit.hpp"
 #include "event/EventDatabaseQuery.hpp"
 #include "event/EventDatabaseResult.hpp"
 #include "event/irc/EventIrcMessage.hpp"
@@ -83,6 +84,7 @@ bool IrcBacklogService::setupTable_processResult(std::shared_ptr<IEvent> event) 
             std::cout << "Error setting up irc backlog service. Could not setup table. Service will be disabled" << std::endl;
             getEventQueue()->setEnabled(false);
             heldBackEvents.clear();
+            appQueue->sendEvent(std::make_shared<EventIrcServiceInit>());
             return false;
         }
     }
@@ -103,11 +105,14 @@ bool IrcBacklogService::setupTable_processId(std::shared_ptr<IEvent> event) {
             IdProvider::getInstance().setLowestId("irc_log", lastId);
             std::cout << "Database Last ID: " << lastId << std::endl;
 
+            appQueue->sendEvent(std::make_shared<EventIrcServiceInit>());
+
             lastIdFetched = true;
         } else {
             std::cout << "Error setting up irc backlog service. Could not fetch last id. Service will be disabled" << std::endl;
             getEventQueue()->setEnabled(false);
             heldBackEvents.clear();
+            appQueue->sendEvent(std::make_shared<EventIrcServiceInit>());
             return false;
         }
     }

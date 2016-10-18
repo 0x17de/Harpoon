@@ -1,5 +1,5 @@
 #include "IrcDatabase_Ini.hpp"
-#include "event/EventInit.hpp"
+#include "event/irc/EventIrcServiceInit.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventLoginResult.hpp"
 #include "service/irc/IrcChannelLoginData.hpp"
@@ -31,7 +31,7 @@ PROVIDE_MODULE("irc_database", "ini", IrcDatabase_Ini);
 
 IrcDatabase_Ini::IrcDatabase_Ini(EventQueue* appQueue) :
     EventLoop({
-        EventInit::uuid,
+        EventIrcServiceInit::uuid,
         EventQuit::uuid,
         EventLoginResult::uuid,
         EventIrcAddServer::uuid,
@@ -237,7 +237,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             if (categoryEntry)
                 channelsConfig.setEntry(*categoryEntry, "disabled", "yes");
         }
-    } else if (eventType == EventInit::uuid) {
+    } else if (eventType == EventIrcServiceInit::uuid) {
         std::cout << "IrcDB received INIT event" << std::endl;
 
         // activate service per user

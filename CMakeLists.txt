@@ -35,6 +35,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
     src/utils/Password.cpp src/utils/Password.hpp
     src/utils/IdProvider.cpp src/utils/IdProvider.hpp
     src/event/EventInit.cpp src/event/EventInit.hpp
+    src/event/irc/EventIrcServiceInit.cpp src/event/irc/EventIrcServiceInit.hpp
     src/event/EventDatabaseQuery.cpp src/event/EventDatabaseQuery.hpp
     src/event/EventDatabaseResult.cpp src/event/EventDatabaseResult.hpp
     src/event/IActivateServiceEvent.hpp

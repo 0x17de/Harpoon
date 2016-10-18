@@ -19,9 +19,10 @@ namespace Database {
 
 
     struct Postgres_Impl {
+        bool connectionFailed;
         EventQueue* appQueue;
         shared_ptr<soci::session> sqlSession;
-        Postgres_Impl(EventQueue* appQueue) : appQueue{appQueue} {};
+        Postgres_Impl(EventQueue* appQueue) : connectionFailed{false}, appQueue{appQueue} {};
         bool onEvent(std::shared_ptr<IEvent> event);
         void handleQuery(std::shared_ptr<IEvent> event);
 
@@ -347,6 +348,11 @@ namespace Database {
         auto result = make_shared<EventDatabaseResult>(query->getEventOrigin());
         auto db = event->as<EventDatabaseQuery>();
 
+        if (connectionFailed) {
+            query->getTarget()->sendEvent(result); // send 'failed' status
+            return;
+        }
+
         for (const auto& query : db->getQueries()) {
             switch (query.getType()) {
             case Database::QueryType::SetupTable:
@@ -377,7 +383,7 @@ namespace Database {
         if (eventType == EventQuit::uuid) {
             return false;
         } else if (eventType == EventDatabaseQuery::uuid) {
-            if (sqlSession) {
+            if (sqlSession || connectionFailed) {
                 handleQuery(event);
             } else {
                 heldBackQueries.push_back(event);
@@ -413,8 +419,8 @@ namespace Database {
             try {
                 sqlSession = make_shared<soci::session>(login.str());
             } catch(soci_error& e) {
+                connectionFailed = true;
                 cout << "Could not connect to database server. Reason: " << endl << e.what() << endl << endl;
-                return false;
             }
 
             for (auto query : heldBackQueries)
