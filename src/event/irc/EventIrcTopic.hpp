@@ -2,10 +2,11 @@
 #define EVENTIRCTOPIC_H
 
 #include "../IClientEvent.hpp"
+#include "IrcLoggable.hpp"
 #include <string>
 
 
-class EventIrcTopic : public IClientEvent {
+class EventIrcTopic : public IClientEvent, public IrcLoggable {
     size_t userId;
     size_t serverId;
     std::string username;

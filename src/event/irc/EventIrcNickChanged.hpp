@@ -2,10 +2,11 @@
 #define EVENTIRCNICKCHANGED_H
 
 #include "../IClientEvent.hpp"
+#include "IrcLoggable.hpp"
 #include <string>
 
 
-class EventIrcNickChanged : public IClientEvent {
+class EventIrcNickChanged : public IClientEvent, public IrcLoggable {
     size_t userId;
     size_t serverId;
     std::string username;

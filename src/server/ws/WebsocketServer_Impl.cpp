@@ -266,6 +266,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         auto topic = event->as<EventIrcTopic>();
         root["cmd"] = "topic";
         root["type"] = "irc";
+        root["id"] = to_string(id);
         root["server"] = to_string(topic->getServerId());
         root["nick"] = topic->getUsername();
         root["topic"] = topic->getTopic();
@@ -274,6 +275,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         auto nick = event->as<EventIrcNickChanged>();
         root["cmd"] = "nickchange";
         root["type"] = "irc";
+        root["id"] = to_string(id);
         root["server"] = to_string(nick->getServerId());
         root["nick"] = nick->getUsername();
         root["newNick"] = nick->getNewNick();
