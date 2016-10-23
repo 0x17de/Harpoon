@@ -85,9 +85,9 @@ void doSetup(bool save) {
         } while (find(validIrcDatabaseTypes.begin(), validIrcDatabaseTypes.end(), ircSettingsDatabaseType) == validIrcDatabaseTypes.end());
         do {
             cout << "Collect IRC backlog (y/n) [y]: ";
-            getline(cin, ircSettingsDatabaseType);
-            if (ircSettingsDatabaseType.size() == 0) // auto value
-                ircSettingsDatabaseType = "y";
+            getline(cin, enableIrcBacklog);
+            if (enableIrcBacklog.size() == 0) // auto value
+                enableIrcBacklog = "y";
         } while (find(validYesNoAnswers.begin(), validYesNoAnswers.end(), enableIrcBacklog) == validYesNoAnswers.end());
     }
 
