@@ -10,7 +10,7 @@ class EventIrcRequestBacklog : public IIrcCommand {
     size_t serverId;
     std::string channelName;
     size_t fromId;
-    size_t count;
+    int count;
 public:
     static UUID uuid;
     virtual UUID getEventUuid() const override;
@@ -19,12 +19,12 @@ public:
                            size_t serverId,
                            const std::string& channelName,
                            size_t fromId,
-                           size_t count);
+                           int count);
     virtual size_t getUserId() const override;
     virtual size_t getServerId() const override;
     std::string getChannelName() const;
     size_t getFromId() const;
-    size_t getCount() const;
+    int getCount() const;
 };
 
 #endif

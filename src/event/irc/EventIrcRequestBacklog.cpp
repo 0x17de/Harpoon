@@ -6,7 +6,7 @@ EventIrcRequestBacklog::EventIrcRequestBacklog(size_t userId,
                                                size_t serverId,
                                                const std::string& channelName,
                                                size_t fromId,
-                                               size_t count)
+                                               int count)
     : userId{userId}
     , serverId{serverId}
     , channelName{channelName}
@@ -36,6 +36,6 @@ size_t EventIrcRequestBacklog::getFromId() const {
     return fromId;
 }
 
-size_t EventIrcRequestBacklog::getCount() const {
+int EventIrcRequestBacklog::getCount() const {
     return count;
 }

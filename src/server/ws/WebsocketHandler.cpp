@@ -14,6 +14,7 @@
 #include "event/irc/EventIrcJoinChannel.hpp"
 #include "event/irc/EventIrcPartChannel.hpp"
 #include "event/irc/EventIrcChangeNick.hpp"
+#include "event/irc/EventIrcRequestBacklog.hpp"
 #include <sstream>
 #include <json/json.h>
 
@@ -74,13 +75,20 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
             } else if (type == "irc") {
                 if (cmd == "chat") {
                     size_t serverId;
-                    stringstream(root.get("server", "0").asString()) >> serverId;
+                    istringstream(root.get("server", "0").asString()) >> serverId;
                     string channel = root.get("channel", "").asString();
                     string message = root.get("msg", "").asString();
                     appQueue->sendEvent(make_shared<EventIrcSendMessage>(clientData.userId, serverId, channel, message));
+                } else if (cmd == "requestbacklog") {
+                    size_t serverId, fromId;
+                    istringstream(root.get("server", "0").asString()) >> serverId;
+                    string channel = root.get("channel", "").asString();
+                    istringstream(root.get("channel", "").asString()) >> fromId;
+                    int count = root.get("channel", "").asInt();
+                    appQueue->sendEvent(make_shared<EventIrcRequestBacklog>(clientData.userId, serverId, channel, fromId, count));
                 } else if (cmd == "action") {
                     size_t serverId;
-                    stringstream(root.get("server", "0").asString()) >> serverId;
+                    istringstream(root.get("server", "0").asString()) >> serverId;
                     string channel = root.get("channel", "").asString();
                     string message = root.get("msg", "").asString();
                     appQueue->sendEvent(make_shared<EventIrcSendAction>(clientData.userId, serverId, channel, message));
