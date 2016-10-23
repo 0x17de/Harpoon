@@ -82,7 +82,9 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
     src/event/irc/EventIrcReconnectServer.cpp src/event/irc/EventIrcReconnectServer.hpp
     src/event/EventQuit.cpp src/event/EventQuit.hpp)
 
-set(LINK_LIBRARIES "")
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+set(LINK_LIBRARIES "Threads::Threads")
 set(INCLUDE_DIRECTORIES "")
 
 
