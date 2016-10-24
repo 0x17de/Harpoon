@@ -16,6 +16,7 @@
 #include "event/irc/EventIrcHostDeleted.hpp"
 #include "event/irc/EventIrcReconnectServer.hpp"
 #include "service/irc/IrcChannelStore.hpp"
+#include "utils/IdProvider.hpp"
 #include <iostream>
 #include <mutex>
 
@@ -113,7 +114,8 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
     } else if (type == EventQueryChats::uuid) {
         auto query = event->as<EventQueryChats>();
 
-        auto listing = make_shared<EventIrcChatListing>(userId, query->getData());
+        size_t firstId = IdProvider::getInstance().getLastId("irc_log"); // for backlog requests
+        auto listing = make_shared<EventIrcChatListing>(firstId, userId, query->getData());
 
         std::list<lock_guard<mutex>> locks;
         // lock all to assure correct results

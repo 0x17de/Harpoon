@@ -221,6 +221,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         auto listing = event->as<EventIrcChatListing>();
         root["cmd"] = "chatlist";
         root["type"] = "irc";
+        root["firstId"] = to_string(listing->getFirstId());
         Json::Value& serverList = root["servers"] = Json::objectValue;
         for (auto& serverData : listing->getServerList()) {
             Json::Value& server = serverList[to_string(serverData.getServerId())];

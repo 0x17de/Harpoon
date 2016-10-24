@@ -86,8 +86,11 @@ const std::list<IrcChannelListing>& IrcServerListing::getChannels() const {
     return channels;
 }
 
-EventIrcChatListing::EventIrcChatListing(size_t userId, void* data)
-    : userId{userId}
+EventIrcChatListing::EventIrcChatListing(size_t firstId,
+                                         size_t userId,
+                                         void* data)
+    : firstId{firstId}
+    , userId{userId}
     , data{data}
 {
 }
@@ -97,6 +100,10 @@ IrcServerListing& EventIrcChatListing::addServer(std::string activeNick,
                                                  std::string serverName) {
     servers.emplace_back(activeNick, serverId, serverName);
     return servers.back();
+}
+
+size_t EventIrcChatListing::getFirstId() const {
+    return firstId;
 }
 
 size_t EventIrcChatListing::getUserId() const {
