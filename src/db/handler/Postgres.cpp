@@ -229,10 +229,21 @@ namespace Database {
         std::list<Database::Operation const *> join;
         query_scanOperations(query, join, where, limit);
 
+        for (auto& op : join) {
+            q << " INNER JOIN " << op->getExtra()
+              << " ON " << op->getLeft()
+              << "_id = " << op->getLeft()
+              << "_ref";
+        }
+
         if (where) {
             q << " WHERE ";
             size_t index;
             query_handleWhere(q, *where, index);
+        }
+
+        if (limit) {
+            q << " LIMIT " << limit->getLeft();
         }
 
         for (size_t i = 0; i < columns.size(); ++i)
@@ -312,6 +323,28 @@ namespace Database {
                       "Type must be once_temp_type or prepare_temp_type");
         if (op.getOperation() == Database::OperationType::Assign) {
             q << op.getLeft() << " = " << ":where" << index;
+            if (op.getExtra().size() > 0) {
+                size_t idsIndex;
+                istringstream(op.getExtra()) >> idsIndex;
+                size_t& id = ids->at(idsIndex); // needs to live till the end of the request
+                q, soci::use(id);
+            } else {
+                q, soci::use(op.getRight());
+            }
+            return;
+        } else if (op.getOperation() == Database::OperationType::CompareGreater) {
+            q << op.getLeft() << " > " << ":where" << index;
+            if (op.getExtra().size() > 0) {
+                size_t idsIndex;
+                istringstream(op.getExtra()) >> idsIndex;
+                size_t& id = ids->at(idsIndex); // needs to live till the end of the request
+                q, soci::use(id);
+            } else {
+                q, soci::use(op.getRight());
+            }
+            return;
+        } else if (op.getOperation() == Database::OperationType::CompareLower) {
+            q << op.getLeft() << " < " << ":where" << index;
             if (op.getExtra().size() > 0) {
                 size_t idsIndex;
                 istringstream(op.getExtra()) >> idsIndex;

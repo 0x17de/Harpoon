@@ -11,6 +11,7 @@
 #include "event/irc/EventIrcParted.hpp"
 #include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcKicked.hpp"
+#include "event/irc/EventIrcRequestBacklog.hpp"
 #include "utils/IdProvider.hpp"
 #include "utils/ModuleProvider.hpp"
 
@@ -183,6 +184,17 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                 query.add(Database::OperationType::Join, "sender", noticed->getUsername(), "harpoon_irc_sender");
 
                 appQueue->sendEvent(eventInsert);
+            } else if (eventType == EventIrcRequestBacklog::uuid) {
+                auto request = event->as<EventIrcRequestBacklog>();
+                auto eventFetch = std::make_shared<EventDatabaseQuery>(getEventQueue(), event);
+                auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
+                                                              "harpoon_irc_backlog",
+                                                              std::list<std::string>{"message_id", "time", "message", "type", "flags", "channel"}));
+                query.add(Database::OperationType::Join, "channel", "", "harpoon_irc_channel");
+                query.add(Database::OperationType::CompareLower, "message_id", std::to_string(request->getFromId()+1));
+                query.add(Database::OperationType::Limit, std::to_string(request->getCount()));
+
+                appQueue->sendEvent(eventFetch);
             } else if (eventType == EventIrcAction::uuid) {
                 auto action = event->as<EventIrcAction>();
                 auto eventInsert = std::make_shared<EventDatabaseQuery>(getEventQueue(), event);
