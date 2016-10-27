@@ -12,7 +12,6 @@
 #include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcTopic.hpp"
 #include "event/irc/EventIrcNickChanged.hpp"
-#include "event/irc/EventIrcNoticed.hpp"
 #include "event/irc/EventIrcServerAdded.hpp"
 #include "event/irc/EventIrcHostAdded.hpp"
 #include "event/irc/EventIrcUserlistReceived.hpp"
@@ -153,6 +152,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["channel"] = message->getChannel();
         root["nick"] = message->getFrom();
         root["msg"] = message->getMessage();
+        root["type"] = static_cast<int>(message->getType());
     } else if (eventType == EventLoginResult::uuid) {
         auto result = event->as<EventLoginResult>();
         root["cmd"] = "login";
@@ -299,15 +299,6 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["target"] = kick->getTarget();
         root["msg"] = kick->getReason();
         root["channel"] = kick->getChannel();
-    } else if (eventType == EventIrcNoticed::uuid) {
-        auto notice = event->as<EventIrcNoticed>();
-        root["cmd"] = "notice";
-        root["type"] = "irc";
-        root["id"] = to_string(id);
-        root["server"] = to_string(notice->getServerId());
-        root["channel"] = notice->getTarget();
-        root["nick"] = notice->getUsername();
-        root["msg"] = notice->getMessage();
     } else {
         return "";
     }
