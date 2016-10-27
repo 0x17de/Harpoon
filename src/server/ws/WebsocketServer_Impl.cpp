@@ -145,7 +145,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     if (eventType == EventIrcMessage::uuid) {
         auto message = event->as<EventIrcMessage>();
         root["cmd"] = "chat";
-        root["type"] = "irc";
+        root["protocol"] = "irc";
         root["id"] = to_string(id);
         // jsonpp has no clue of size_t and clients only need to store it
         root["server"] = to_string(message->getServerId());
@@ -160,7 +160,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     } else if (eventType == EventIrcUserlistReceived::uuid) {
         auto userlist = event->as<EventIrcUserlistReceived>();
         root["cmd"] = "userlist";
-        root["type"] = "irc";
+        root["protocol"] = "irc";
         root["server"] = to_string(userlist->getServerId());
         root["channel"] = userlist->getChannel();
         auto& users = root["users"] = Json::arrayValue;
@@ -169,13 +169,13 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     } else if (eventType == EventIrcServerAdded::uuid) {
         auto added = event->as<EventIrcServerAdded>();
         root["cmd"] = "serveradded";
-        root["type"] = "irc";
+        root["protocol"] = "irc";
         root["name"] = added->getServerName();
         root["server"] = to_string(added->getServerId());
     } else if (eventType == EventIrcHostAdded::uuid) {
         auto added = event->as<EventIrcHostAdded>();
         root["cmd"] = "hostadded";
-        root["type"] = "irc";
+        root["protocol"] = "irc";
         root["server"] = to_string(added->getServerId());
         root["host"] = added->getHost();
         root["hasPassword"] = added->getPassword().size() > 0;
@@ -185,14 +185,14 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     } else if (eventType == EventIrcNickModified::uuid) {
         auto modified = event->as<EventIrcNickModified>();
         root["cmd"] = "nickmodified";
-        root["type"] = "irc";
+        root["protocol"] = "irc";
         root["server"] = to_string(modified->getServerId());
         root["oldnick"] = modified->getOldNick();
         root["newnick"] = modified->getNewNick();
     } else if (eventType == EventIrcSettingsListing::uuid) {
         auto settings = event->as<EventIrcSettingsListing>();
         root["cmd"] = "settings";
-        root["type"] = "irc";
+        root["protocol"] = "irc";
         Json::Value& data = root["data"] = Json::objectValue;
         Json::Value& servers = data["servers"] = Json::objectValue;
         for (auto& serverConfiguration : settings->getServerList()) {
@@ -220,7 +220,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     } else if (eventType == EventIrcChatListing::uuid) {
         auto listing = event->as<EventIrcChatListing>();
         root["cmd"] = "chatlist";
-        root["type"] = "irc";
+        root["protocol"] = "irc";
         root["firstId"] = to_string(listing->getFirstId());
         Json::Value& serverList = root["servers"] = Json::objectValue;
         for (auto& serverData : listing->getServerList()) {
@@ -242,7 +242,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     } else if (eventType == EventIrcJoined::uuid) {
         auto join = event->as<EventIrcJoined>();
         root["cmd"] = "join";
-        root["type"] = "irc";
+        root["protocol"] = "irc";
         root["id"] = to_string(id);
         root["server"] = to_string(join->getServerId());
         root["nick"] = join->getUsername();
@@ -250,7 +250,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     } else if (eventType == EventIrcParted::uuid) {
         auto part = event->as<EventIrcParted>();
         root["cmd"] = "part";
-        root["type"] = "irc";
+        root["protocol"] = "irc";
         root["id"] = to_string(id);
         root["server"] = to_string(part->getServerId());
         root["nick"] = part->getUsername();
@@ -258,7 +258,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     } else if (eventType == EventIrcQuit::uuid) {
         auto quit = event->as<EventIrcQuit>();
         root["cmd"] = "quit";
-        root["type"] = "irc";
+        root["protocol"] = "irc";
         root["id"] = to_string(id);
         root["server"] = to_string(quit->getServerId());
         root["nick"] = quit->getWho();
@@ -266,7 +266,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     } else if (eventType == EventIrcTopic::uuid) {
         auto topic = event->as<EventIrcTopic>();
         root["cmd"] = "topic";
-        root["type"] = "irc";
+        root["protocol"] = "irc";
         root["id"] = to_string(id);
         root["server"] = to_string(topic->getServerId());
         root["nick"] = topic->getUsername();
@@ -275,7 +275,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     } else if (eventType == EventIrcNickChanged::uuid) {
         auto nick = event->as<EventIrcNickChanged>();
         root["cmd"] = "nickchange";
-        root["type"] = "irc";
+        root["protocol"] = "irc";
         root["id"] = to_string(id);
         root["server"] = to_string(nick->getServerId());
         root["nick"] = nick->getUsername();
@@ -283,7 +283,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     } else if (eventType == EventIrcAction::uuid) {
         auto action = event->as<EventIrcAction>();
         root["cmd"] = "action";
-        root["type"] = "irc";
+        root["protocol"] = "irc";
         root["id"] = to_string(id);
         root["server"] = to_string(action->getServerId());
         root["nick"] = action->getUsername();
@@ -292,7 +292,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     } else if (eventType == EventIrcKicked::uuid) {
         auto kick = event->as<EventIrcKicked>();
         root["cmd"] = "kick";
-        root["type"] = "irc";
+        root["protocol"] = "irc";
         root["id"] = to_string(id);
         root["server"] = to_string(kick->getServerId());
         root["nick"] = kick->getUsername();

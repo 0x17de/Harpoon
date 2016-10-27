@@ -68,12 +68,12 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
 
         try {
             string cmd = root.get("cmd", "").asString();
-            string type = root.get("type", "").asString();
-            if (type == "") {
+            string protocol = root.get("protocol", "").asString();
+            if (protocol == "") {
                 if (cmd == "querysettings") {
                     appQueue->sendEvent(make_shared<EventQuerySettings>(clientData.userId, connection));
                 }
-            } else if (type == "irc") {
+            } else if (protocol == "irc") {
                 if (cmd == "chat") {
                     size_t serverId;
                     istringstream(root.get("server", "0").asString()) >> serverId;
