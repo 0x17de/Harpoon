@@ -395,7 +395,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
     } else if (type == EventIrcSendMessage::uuid) {
         auto message = event->as<EventIrcSendMessage>();
         if (!irc_cmd_msg(ircSession, message->getChannel().c_str(), message->getMessage().c_str())) {
-            appQueue->sendEvent(make_shared<EventIrcMessage>(message->getUserId(), message->getServerId(), nick, message->getChannel(), message->getMessage()));
+            appQueue->sendEvent(make_shared<EventIrcMessage>(message->getUserId(), message->getServerId(), nick, message->getChannel(), message->getMessage(), message->getType()));
         }
     } else if (type == EventIrcSendAction::uuid) {
         auto aaction = event->as<EventIrcSendAction>();

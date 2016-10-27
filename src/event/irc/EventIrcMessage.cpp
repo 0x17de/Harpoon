@@ -11,12 +11,14 @@ EventIrcMessage::EventIrcMessage(size_t userId,
                                  size_t serverId,
                                  const std::string& from,
                                  const std::string& channel,
-                                 const std::string& message)
+                                 const std::string& message,
+                                 MessageType type)
     : userId{userId}
     , serverId{serverId}
     , from{from}
     , channel{channel}
     , message{message}
+    , type{type}
 {
 }
 
@@ -40,3 +42,6 @@ std::string EventIrcMessage::getMessage() const {
     return message;
 }
 
+MessageType EventIrcMessage::getType() const {
+    return type;
+}

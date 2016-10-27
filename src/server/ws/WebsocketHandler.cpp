@@ -3,6 +3,7 @@
 #include "event/EventLogin.hpp"
 #include "event/EventLogout.hpp"
 #include "event/EventQuerySettings.hpp"
+#include "event/irc/EventIrcMessageType.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"
 #include "event/irc/EventIrcSendAction.hpp"
 #include "event/irc/EventIrcAddServer.hpp"
@@ -67,18 +68,18 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
 
         try {
             string cmd = root.get("cmd", "").asString();
-            string type = root.get("type", "").asString();
-            if (type == "") {
+            string protocol = root.get("protocol", "").asString();
+            if (protocol == "") {
                 if (cmd == "querysettings") {
                     appQueue->sendEvent(make_shared<EventQuerySettings>(clientData.userId, connection));
                 }
-            } else if (type == "irc") {
+            } else if (protocol == "irc") {
                 if (cmd == "chat") {
                     size_t serverId;
                     istringstream(root.get("server", "0").asString()) >> serverId;
                     string channel = root.get("channel", "").asString();
                     string message = root.get("msg", "").asString();
-                    appQueue->sendEvent(make_shared<EventIrcSendMessage>(clientData.userId, serverId, channel, message));
+                    appQueue->sendEvent(make_shared<EventIrcSendMessage>(clientData.userId, serverId, channel, message, MessageType::Message));
                 } else if (cmd == "requestbacklog") {
                     size_t serverId, fromId;
                     istringstream(root.get("server", "0").asString()) >> serverId;

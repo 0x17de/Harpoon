@@ -53,7 +53,6 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
     src/event/irc/EventIrcSendAction.cpp src/event/irc/EventIrcSendAction.hpp
     src/event/irc/EventIrcConnected.cpp src/event/irc/EventIrcConnected.hpp
     src/event/irc/EventIrcTopic.cpp src/event/irc/EventIrcTopic.hpp
-    src/event/irc/EventIrcNoticed.cpp src/event/irc/EventIrcNoticed.hpp
     src/event/irc/EventIrcInvited.cpp src/event/irc/EventIrcInvited.hpp
     src/event/irc/EventIrcModeChanged.cpp src/event/irc/EventIrcModeChanged.hpp
     src/event/irc/EventIrcUserModeChanged.cpp src/event/irc/EventIrcUserModeChanged.hpp
