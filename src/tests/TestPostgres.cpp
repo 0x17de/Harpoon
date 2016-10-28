@@ -476,6 +476,23 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             ASSERT_EQUAL(true, count == 1);
         }
 
+        {
+            // test compare lower
+            auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
+                                                          "test_postgresjoin"));
+            query.add(Database::OperationType::CompareLower, "id", "2");
+
+            handler.getEventQueue()->sendEvent(eventSetup);
+        }
+
+        ASSERT_EQUAL(true, waitForEvent());
+
+        // check result
+        ASSERT_EQUAL(true, results.size() == 1);
+        ASSERT_EQUAL(true, results.back()->as<EventDatabaseResult>()->getSuccess());
+        results.clear();
+
         // cleanup
         session->once << "DROP TABLE test_postgresjoin";
         session->once << "DROP TABLE test_postgresjoin_name";
