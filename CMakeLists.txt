@@ -123,15 +123,17 @@ endif()
 
 
 
-add_executable(iirc src/main.cpp ${SOURCE_FILES})
+add_library(iircCore SHARED ${SOURCE_FILES})
+add_executable(iirc src/main.cpp)
+target_link_libraries(iirc iircCore)
 if(${BUILD_TEST})
   set(TEST_SOURCE_FILES
       src/tests/TestPostgres.cpp
       src/tests/TestModules.cpp)
   add_executable(iircTest
                  src/test.cpp src/test.hpp
-                 ${SOURCE_FILES}
                  ${TEST_SOURCE_FILES})
+  target_link_libraries(iircTest iircCore)
 endif()
 
 
@@ -196,8 +198,9 @@ endif()
 
 
 
-target_link_libraries(iirc ${LINK_LIBRARIES})
-target_include_directories(iirc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
+target_link_libraries(iircCore ${LINK_LIBRARIES})
+target_include_directories(iircCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
+set_target_properties(iircCore PROPERTIES COMPILE_FLAGS "-std=c++11 -pedantic -Wall")
 set_target_properties(iirc PROPERTIES COMPILE_FLAGS "-std=c++11 -pedantic -Wall")
 
 if(${BUILD_TEST})
