@@ -297,6 +297,8 @@ namespace Database {
             case Database::OperationType::Assign:
             case Database::OperationType::CompareAnd:
             case Database::OperationType::CompareOr:
+            case Database::OperationType::CompareGreater:
+            case Database::OperationType::CompareLower:
                 if (where == 0)
                     where = &op;
                 break;
@@ -333,7 +335,7 @@ namespace Database {
             }
             return;
         } else if (op.getOperation() == Database::OperationType::CompareGreater) {
-            q << op.getLeft() << " > " << ":where" << index;
+            q << op.getLeft() << " > " << ":sql.set_log_stream(&file);where" << index;
             if (op.getExtra().size() > 0) {
                 size_t idsIndex;
                 istringstream(op.getExtra()) >> idsIndex;

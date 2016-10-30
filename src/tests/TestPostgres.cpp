@@ -213,7 +213,7 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
         return true;
     }
 
-    void test1() {
+    void testHandler() {
         tryDrop("test_postgreshandler");
 
         // create table
@@ -312,6 +312,31 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             results.clear();
         }
 
+        {
+            // test compare lower
+            auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            auto& query = eventSetup->add(Database::Query(Database::QueryType::Fetch,
+                                                          "test_postgreshandler",
+                                                          std::list<string>{"id", "key"}));
+            query.add(Database::OperationType::CompareLower, "id", "2");
+
+            handler.getEventQueue()->sendEvent(eventSetup);
+        }
+
+        ASSERT_EQUAL(true, waitForEvent());
+
+        // check result
+        {
+            ASSERT_EQUAL(true, results.size() == 1);
+            auto dbResult = results.back()->as<EventDatabaseResult>();
+            ASSERT_EQUAL(true, dbResult->getSuccess());
+            ASSERT_EQUAL(2uL, dbResult->getResults().size());
+            ASSERT_EQUAL("1", dbResult->getResults().front());
+            ASSERT_EQUAL("test0", dbResult->getResults().back());
+            results.clear();
+        }
+
+
         // delete test elements
         {
             auto eventDelete = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
@@ -351,7 +376,7 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
         ASSERT_EQUAL(false, exists("test_postgreshandler"));
     }
 
-    void test2() {
+    void testJoin() {
         tryDrop("test_postgresjoin");
         tryDrop("test_postgresjoin_name");
 
@@ -476,23 +501,6 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             ASSERT_EQUAL(true, count == 1);
         }
 
-        {
-            // test compare lower
-            auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
-                                                          "test_postgresjoin"));
-            query.add(Database::OperationType::CompareLower, "id", "2");
-
-            handler.getEventQueue()->sendEvent(eventSetup);
-        }
-
-        ASSERT_EQUAL(true, waitForEvent());
-
-        // check result
-        ASSERT_EQUAL(true, results.size() == 1);
-        ASSERT_EQUAL(true, results.back()->as<EventDatabaseResult>()->getSuccess());
-        results.clear();
-
         // cleanup
         session->once << "DROP TABLE test_postgresjoin";
         session->once << "DROP TABLE test_postgresjoin_name";
@@ -500,7 +508,7 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
         ASSERT_EQUAL(false, exists("test_postgresjoin_name"));
     }
 
-    void test3() {
+    void testTypes() {
         tryDrop("test_postgrestypes");
 
         // create table
@@ -553,17 +561,17 @@ TEST(PostgresWeirdWrite,
 TEST(PostgresHandler,
      ([]{
          PostgresHandlerChecker checker;
-         checker.test1();
+         checker.testHandler();
      }));
 
 TEST(PostgresHandlerJoin,
      ([]{
          PostgresHandlerChecker checker;
-         checker.test2();
+         checker.testJoin();
      }));
 
 TEST(PostgresHandlerTypes,
      ([]{
          PostgresHandlerChecker checker;
-         checker.test3();
+         checker.testTypes();
      }));
