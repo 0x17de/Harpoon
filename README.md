@@ -46,4 +46,5 @@ cmake .. -DCMAKE_BUILD_TYPE=Debug -DUSE_WEBSOCKET_SERVER=1 -DUSE_WEBSOCKET_SERVE
 Run ```make``` afterwards.
 
 ### Run the binary
-To start the service run ```build/iirc``` from the project root.
+To start the service run ```build/iirc``` from the project root. If you enabled
+webclient, you can check it on `localhost:8080`.
