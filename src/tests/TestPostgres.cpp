@@ -312,15 +312,39 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             results.clear();
         }
 
+
+        // test limit
         {
-            // test compare lower
-            auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            auto& query = eventSetup->add(Database::Query(Database::QueryType::Fetch,
+            auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
+                                                          "test_postgreshandler",
+                                                          std::list<string>{"id"}));
+            query.add(Database::OperationType::Limit, "2");
+
+            handler.getEventQueue()->sendEvent(eventFetch);
+        }
+
+        ASSERT_EQUAL(true, waitForEvent());
+
+        // check result
+        {
+            ASSERT_EQUAL(true, results.size() == 1);
+            auto dbResult = results.back()->as<EventDatabaseResult>();
+            ASSERT_EQUAL(true, dbResult->getSuccess());
+            ASSERT_EQUAL(2uL, dbResult->getResults().size());
+            results.clear();
+        }
+
+
+        // test compare lower
+        {
+            auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
                                                           "test_postgreshandler",
                                                           std::list<string>{"id", "key"}));
             query.add(Database::OperationType::CompareLower, "id", "2");
 
-            handler.getEventQueue()->sendEvent(eventSetup);
+            handler.getEventQueue()->sendEvent(eventFetch);
         }
 
         ASSERT_EQUAL(true, waitForEvent());
@@ -333,6 +357,30 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             ASSERT_EQUAL(2uL, dbResult->getResults().size());
             ASSERT_EQUAL("1", dbResult->getResults().front());
             ASSERT_EQUAL("test0", dbResult->getResults().back());
+            results.clear();
+        }
+
+
+        // test compare greater
+        {
+            auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
+                                                          "test_postgreshandler",
+                                                          std::list<string>{"id"}));
+            query.add(Database::OperationType::CompareGreater, "id", "1");
+
+            handler.getEventQueue()->sendEvent(eventFetch);
+        }
+
+        ASSERT_EQUAL(true, waitForEvent());
+
+        // check result
+        {
+            ASSERT_EQUAL(true, results.size() == 1);
+            auto dbResult = results.back()->as<EventDatabaseResult>();
+            ASSERT_EQUAL(true, dbResult->getSuccess());
+            ASSERT_EQUAL(1uL, dbResult->getResults().size());
+            ASSERT_EQUAL("2", dbResult->getResults().back());
             results.clear();
         }
 

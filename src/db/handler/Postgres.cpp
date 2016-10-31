@@ -335,7 +335,7 @@ namespace Database {
             }
             return;
         } else if (op.getOperation() == Database::OperationType::CompareGreater) {
-            q << op.getLeft() << " > " << ":sql.set_log_stream(&file);where" << index;
+            q << op.getLeft() << " > " << ":where" << index;
             if (op.getExtra().size() > 0) {
                 size_t idsIndex;
                 istringstream(op.getExtra()) >> idsIndex;
