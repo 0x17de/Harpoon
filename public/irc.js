@@ -84,7 +84,7 @@ class IrcService extends ServiceBase {
                 if (split.length >= 2) {
                     if (!split[2]) split[2] = '';
                     this.chat.send({
-                        type:'irc',
+                        protocol:'irc',
                         cmd:'join',
                         server:server.id,
                         channel:split[1],
@@ -95,7 +95,7 @@ class IrcService extends ServiceBase {
             case 'part':
                 var partChannel = split[1] || this.chat.activeChannel.name;
                 this.chat.send({
-                    type:'irc',
+                    protocol:'irc',
                     cmd:'part',
                     server:server.id,
                     channel:partChannel
@@ -104,7 +104,7 @@ class IrcService extends ServiceBase {
             case 'nick':
                 if (split[1] != '') {
                     this.chat.send({
-                        type:'irc',
+                        protocol:'irc',
                         cmd:'nick',
                         server:server.id,
                         channel:channel.name,
@@ -116,7 +116,7 @@ class IrcService extends ServiceBase {
                 var message = msg.substr(msg.indexOf(' ')+1);
                 if (message != '') {
                     this.chat.send({
-                        type:'irc',
+                        protocol:'irc',
                         cmd:'action',
                         server:server.id,
                         channel:channel.name,
@@ -128,7 +128,7 @@ class IrcService extends ServiceBase {
         } else {
             this.chat.send({
                 cmd:'chat',
-                type:'irc',
+                protocol:'irc',
                 server:server.id,
                 channel:channel.name,
                 msg:msg

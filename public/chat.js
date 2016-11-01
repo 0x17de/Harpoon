@@ -259,13 +259,13 @@ class Chat {
             return;
         }
 
-        if (json.type) {
+        if (json.protocol) {
             // service specific message
-            var service = this.get(json.type);
+            var service = this.get(json.protocol);
             if (service)
                 service.handleCommand(json);
             else
-                console.log("Service missing: "+json.type);
+                console.log("Service missing: "+json.protocol);
             return;
         }
 
