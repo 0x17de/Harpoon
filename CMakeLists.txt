@@ -43,8 +43,7 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
     src/event/EventLogin.cpp src/event/EventLogin.hpp
     src/event/EventLogout.cpp src/event/EventLogout.hpp
     src/event/EventLoginResult.cpp src/event/EventLoginResult.hpp
-    src/event/EventQueryChats.cpp src/event/EventQueryChats.hpp
-    src/event/EventQuerySettings.cpp src/event/EventQuerySettings.hpp
+    src/event/EventQuery.cpp src/event/EventQuery.hpp
     src/event/irc/IrcLoggable.cpp src/event/irc/IrcLoggable.hpp
     src/event/irc/EventIrcChatListing.cpp src/event/irc/EventIrcChatListing.hpp
     src/event/irc/EventIrcSettingsListing.cpp src/event/irc/EventIrcSettingsListing.hpp
@@ -79,6 +78,9 @@ set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
     src/event/irc/EventIrcNickModified.cpp src/event/irc/EventIrcNickModified.hpp
     src/event/irc/EventIrcUserlistReceived.cpp src/event/irc/EventIrcUserlistReceived.hpp
     src/event/irc/EventIrcReconnectServer.cpp src/event/irc/EventIrcReconnectServer.hpp
+    src/event/irc/IrcChannelListing.cpp src/event/irc/IrcChannelListing.hpp
+    src/event/irc/IrcChannelUser.cpp src/event/irc/IrcChannelUser.hpp
+    src/event/irc/IrcServerListing.cpp src/event/irc/IrcServerListing.hpp
     src/event/EventQuit.cpp src/event/EventQuit.hpp)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)

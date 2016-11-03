@@ -6,16 +6,6 @@
 #include <list>
 
 
-class IrcChannelUser {
-    std::string nick;
-    std::string mode;
-public:
-    IrcChannelUser(const std::string& nick, const std::string& mode);
-
-    std::string getNick() const;
-    std::string getMode() const;
-};
-
 class IrcChannelListing {
     std::string channelName;
     std::string channelTopic;
