@@ -146,7 +146,7 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
             appQueue->sendEvent(listing);
         }
         else if (query->getType() == EventQueryType::Settings) {
-            auto listing = make_shared<EventIrcChatListing>(0, userId, query->getData());
+            auto listing = make_shared<EventIrcSettingsListing>(userId, query->getData());
 
             std::list<lock_guard<mutex>> locks;
             // lock all to assure correct results
