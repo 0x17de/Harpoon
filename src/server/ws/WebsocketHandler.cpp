@@ -2,7 +2,8 @@
 #include "WebsocketServer_Impl.hpp"
 #include "event/EventLogin.hpp"
 #include "event/EventLogout.hpp"
-#include "event/EventQuerySettings.hpp"
+#include "event/EventQuery.hpp"
+#include "event/EventQueryType.hpp"
 #include "event/irc/EventIrcMessageType.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"
 #include "event/irc/EventIrcSendAction.hpp"
@@ -71,7 +72,7 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
             string protocol = root.get("protocol", "").asString();
             if (protocol == "") {
                 if (cmd == "querysettings") {
-                    appQueue->sendEvent(make_shared<EventQuerySettings>(clientData.userId, connection));
+                    appQueue->sendEvent(make_shared<EventQuery>(clientData.userId, connection, EventQueryType::Settings));
                 }
             } else if (protocol == "irc") {
                 if (cmd == "chat") {
