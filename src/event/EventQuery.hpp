@@ -17,6 +17,7 @@ public:
 
     virtual size_t getUserId() const override;
     void* getData() const;
+    EventQueryType getType() const;
 };
 
 #endif
