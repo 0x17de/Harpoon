@@ -6,6 +6,7 @@
 #include "queue/EventQueue.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventQuery.hpp"
+#include "event/irc/IrcChannelListing.hpp"
 #include "event/irc/EventIrcActivateService.hpp"
 #include "event/irc/EventIrcChatListing.hpp"
 #include "event/irc/EventIrcSettingsListing.hpp"
