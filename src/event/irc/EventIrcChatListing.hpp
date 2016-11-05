@@ -2,6 +2,7 @@
 #define EVENTIRCCHATLISTING_H
 
 #include "../ISingleClientEvent.hpp"
+#include "IrcServerListing.hpp"
 #include <string>
 #include <list>
 
