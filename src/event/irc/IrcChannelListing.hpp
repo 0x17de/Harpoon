@@ -4,7 +4,7 @@
 #include <list>
 #include <string>
 
-#include "IrcChannelUser.cpp"
+#include "IrcChannelUser.hpp"
 
 class IrcChannelListing {
     std::string channelName;
