@@ -7,10 +7,10 @@ UUID EventQuery::getEventUuid() const {
     return this->uuid;
 }
 
-EventQuery::EventQuery(size_t userId, void* data)
+EventQuery::EventQuery(size_t userId, void* data, EventQueryType type)
     : userId{userId}
-    , target{target}
     , data{data}
+    , type{type}
 {
 }
 
@@ -22,3 +22,6 @@ void* EventQuery::getData() const {
     return data;
 }
 
+EventQueryType EventQuery::getType() const {
+    return type;
+}
