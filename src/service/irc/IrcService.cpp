@@ -113,7 +113,7 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
         }
     } else if (type == EventQuery::uuid) {
         auto query = event->as<EventQuery>();
-        if (query.getType() == EventQueryType::Chats) {
+        if (query->getType() == EventQueryType::Chats) {
             size_t firstId = IdProvider::getInstance().getLastId("irc_log"); // for backlog requests
             auto listing = make_shared<EventIrcChatListing>(firstId, userId, query->getData());
 
@@ -145,8 +145,8 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
             cout << "[US] Sending chat listing" << endl;
             appQueue->sendEvent(listing);
         }
-        else if (query.getType() == EventQueryType::Settings) {
-            auto listing = make_shared<EventIrcSettingsListing>(userId, query->getData());
+        else if (query->getType() == EventQueryType::Settings) {
+            auto listing = make_shared<EventIrcChatListing>(0, userId, query->getData());
 
             std::list<lock_guard<mutex>> locks;
             // lock all to assure correct results
