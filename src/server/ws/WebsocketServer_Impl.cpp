@@ -13,6 +13,7 @@
 #include "event/irc/EventIrcTopic.hpp"
 #include "event/irc/EventIrcNickChanged.hpp"
 #include "event/irc/EventIrcServerAdded.hpp"
+#include "event/irc/EventIrcServerDeleted.hpp"
 #include "event/irc/EventIrcHostAdded.hpp"
 #include "event/irc/EventIrcUserlistReceived.hpp"
 #include "event/irc/EventIrcNickModified.hpp"
@@ -171,6 +172,11 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["cmd"] = "serveradded";
         root["protocol"] = "irc";
         root["name"] = added->getServerName();
+        root["server"] = to_string(added->getServerId());
+    } else if (eventType == EventIrcServerDeleted::uuid) {
+        auto added = event->as<EventIrcServerDeleted>();
+        root["cmd"] = "serverremoved";
+        root["protocol"] = "irc";
         root["server"] = to_string(added->getServerId());
     } else if (eventType == EventIrcHostAdded::uuid) {
         auto added = event->as<EventIrcHostAdded>();
