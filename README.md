@@ -25,7 +25,8 @@ This program is still work in progress. It will require a server.
    - You can additionally rely on the [bitlbee](https://www.bitlbee.org/) project, which is using the IRC protocol
    - ...
 
-## Setup
+## Build instructions
+
 ### Dependencies
  - Services
    - IRC
@@ -38,12 +39,30 @@ This program is still work in progress. It will require a server.
      - Seasocks (>=1.2.4)
      - JsonCpp (>=0.10.2-r1)
 
-### Generate Makefiles
+### Docker
+
+Harpoon can be built inside Docker container. To do so, before reading next
+sections, run this line inside project root:
+
+```
+sudo docker run -it --rm -p 8080:8080 -v $(pwd):/harpoon harpoon/harpoon
+```
+
+### Compilation
+
 For building the source CMake is required. Run the following in the project's build folder:
 ```
 cmake .. -DCMAKE_BUILD_TYPE=Debug -DUSE_WEBSOCKET_SERVER=1 -DUSE_WEBSOCKET_SERVER_VERBOSE=0 -DUSE_POSTGRES_DATABASE=1
 ```
-Run ```make``` afterwards.
+Run `make` afterwards.
+
+### Configuration
+
+Before first run you should set few Harpoon options. To do so, run `build/iirc
+--setup` from the project's root. You can just select default values, pressing
+`Return` one by one.
+
 
 ### Run the binary
-To start the service run ```build/iirc``` from the project root.
+To start the service run `build/iirc` from the project root. If you enabled
+webclient, you can check it on `localhost:8080`.
