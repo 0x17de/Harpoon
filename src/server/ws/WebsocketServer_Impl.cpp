@@ -20,7 +20,8 @@
 #include "event/irc/EventIrcNickModified.hpp"
 #include "event/EventLoginResult.hpp"
 #include "event/EventLogout.hpp"
-#include "event/EventQueryChats.hpp"
+#include "event/EventQuery.hpp"
+#include "event/EventQueryType.hpp"
 #include <sstream>
 #include <json/json.h>
 
@@ -119,7 +120,7 @@ void WebsocketServer_Impl::addClient(size_t userId, seasocks::WebSocket* socket)
     dataList->emplace_back(userId, socket);
     clients.emplace(socket, (++dataList->rbegin()).base()); // iterator to last element
 
-    appQueue->sendEvent(make_shared<EventQueryChats>(userId, socket));
+    appQueue->sendEvent(make_shared<EventQuery>(userId, socket, EventQueryType::Chats));
 }
 
 void WebsocketServer_Impl::removeClient(seasocks::WebSocket* socket) {
