@@ -5,8 +5,9 @@
 #include "IrcConnection.hpp"
 #include "queue/EventQueue.hpp"
 #include "event/EventQuit.hpp"
-#include "event/EventQueryChats.hpp"
-#include "event/EventQuerySettings.hpp"
+#include "event/EventQuery.hpp"
+#include "event/irc/IrcChannelListing.hpp"
+#include "event/irc/IrcServerListing.hpp"
 #include "event/irc/EventIrcActivateService.hpp"
 #include "event/irc/EventIrcChatListing.hpp"
 #include "event/irc/EventIrcSettingsListing.hpp"
@@ -26,8 +27,7 @@ using namespace std;
 IrcService::IrcService(size_t userId, EventQueue* appQueue)
     : EventLoop({
           EventQuit::uuid,
-          EventQueryChats::uuid,
-          EventQuerySettings::uuid,
+          EventQuery::uuid,
           EventIrcServerAdded::uuid,
           EventIrcServerDeleted::uuid,
           EventIrcHostAdded::uuid,
@@ -111,68 +111,68 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
             lock_guard<mutex> lock(connection.getChannelLoginDataMutex());
             connection.removeHost(del->getHost(), del->getPort());
         }
-    } else if (type == EventQueryChats::uuid) {
-        auto query = event->as<EventQueryChats>();
+    } else if (type == EventQuery::uuid) {
+        auto query = event->as<EventQuery>();
+        if (query->getType() == EventQueryType::Chats) {
+            size_t firstId = IdProvider::getInstance().getLastId("irc_log"); // for backlog requests
+            auto listing = make_shared<EventIrcChatListing>(firstId, userId, query->getData());
 
-        size_t firstId = IdProvider::getInstance().getLastId("irc_log"); // for backlog requests
-        auto listing = make_shared<EventIrcChatListing>(firstId, userId, query->getData());
+            std::list<lock_guard<mutex>> locks;
+            // lock all to assure correct results
+            for (auto& cxnPair : ircConnections) {
+                auto& connection = cxnPair.second;
+                locks.emplace_back(connection.getChannelLoginDataMutex());
+            }
 
-        std::list<lock_guard<mutex>> locks;
-        // lock all to assure correct results
-        for (auto& cxnPair : ircConnections) {
-            auto& connection = cxnPair.second;
-            locks.emplace_back(connection.getChannelLoginDataMutex());
-        }
-
-        for (auto& cxnPair : ircConnections) {
-            auto& connection = cxnPair.second;
-            IrcServerListing& server = listing->addServer(connection.getActiveNick(),
-                                                          connection.getServerId(),
-                                                          connection.getServerName());
-            for (auto& channelPair : connection.getChannelStore()) {
-                string channelName = channelPair.first;
-                const IrcChannelStore& channelStore = channelPair.second;
-                IrcChannelListing& channel = server.addChannel(channelName,
-                                                               channelStore.getTopic(),
-                                                               channelStore.getDisabled());
-                for (auto& userPair : channelStore.getUsers()) {
-                    string username = userPair.second.getNick();
-                    channel.addUser(username, "");
+            for (auto& cxnPair : ircConnections) {
+                auto& connection = cxnPair.second;
+                IrcServerListing& server = listing->addServer(connection.getActiveNick(),
+                                                            connection.getServerId(),
+                                                            connection.getServerName());
+                for (auto& channelPair : connection.getChannelStore()) {
+                    string channelName = channelPair.first;
+                    const IrcChannelStore& channelStore = channelPair.second;
+                    IrcChannelListing& channel = server.addChannel(channelName,
+                                                                channelStore.getTopic(),
+                                                                channelStore.getDisabled());
+                    for (auto& userPair : channelStore.getUsers()) {
+                        string username = userPair.second.getNick();
+                        channel.addUser(username, "");
+                    }
                 }
             }
+
+            cout << "[US] Sending chat listing" << endl;
+            appQueue->sendEvent(listing);
         }
+        else if (query->getType() == EventQueryType::Settings) {
+            auto listing = make_shared<EventIrcSettingsListing>(userId, query->getData());
 
-        cout << "[US] Sending chat listing" << endl;
-        appQueue->sendEvent(listing);
-    } else if (type == EventQuerySettings::uuid) {
-        auto query = event->as<EventQuerySettings>();
-
-        auto listing = make_shared<EventIrcSettingsListing>(userId, query->getData());
-
-        std::list<lock_guard<mutex>> locks;
-        // lock all to assure correct results
-        for (auto& cxnPair : ircConnections) {
-            auto& connection = cxnPair.second;
-            locks.emplace_back(connection.getChannelLoginDataMutex());
-        }
-
-        for (auto& cxnPair : ircConnections) {
-            auto& connection = cxnPair.second;
-            auto& serverConfiguration = listing->addServer(connection.getServerId(),
-                                                           connection.getServerName());
-            auto& connectionServerConfiguration = connection.getServerConfiguration();
-            for (auto& nick : connectionServerConfiguration.getNicks())
-                serverConfiguration.addNick(nick);
-            for (auto& hostConfiguration : connectionServerConfiguration.getHostConfigurations()) {
-                serverConfiguration.addHostConfiguration(hostConfiguration.getHostName(),
-                                                         hostConfiguration.getPort(),
-                                                         hostConfiguration.getPassword(),
-                                                         hostConfiguration.getIpV6(),
-                                                         hostConfiguration.getSsl());
+            std::list<lock_guard<mutex>> locks;
+            // lock all to assure correct results
+            for (auto& cxnPair : ircConnections) {
+                auto& connection = cxnPair.second;
+                locks.emplace_back(connection.getChannelLoginDataMutex());
             }
-        }
 
-        appQueue->sendEvent(listing);
+            for (auto& cxnPair : ircConnections) {
+                auto& connection = cxnPair.second;
+                auto& serverConfiguration = listing->addServer(connection.getServerId(),
+                                                            connection.getServerName());
+                auto& connectionServerConfiguration = connection.getServerConfiguration();
+                for (auto& nick : connectionServerConfiguration.getNicks())
+                    serverConfiguration.addNick(nick);
+                for (auto& hostConfiguration : connectionServerConfiguration.getHostConfigurations()) {
+                    serverConfiguration.addHostConfiguration(hostConfiguration.getHostName(),
+                                                            hostConfiguration.getPort(),
+                                                            hostConfiguration.getPassword(),
+                                                            hostConfiguration.getIpV6(),
+                                                            hostConfiguration.getSsl());
+                }
+            }
+
+            appQueue->sendEvent(listing);
+        }
     } else {
         auto ircCommand = event->as<IIrcCommand>();
         if (ircCommand) {
