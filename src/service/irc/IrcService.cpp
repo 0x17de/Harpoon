@@ -127,14 +127,14 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
             for (auto& cxnPair : ircConnections) {
                 auto& connection = cxnPair.second;
                 IrcServerListing& server = listing->addServer(connection.getActiveNick(),
-                                                            connection.getServerId(),
-                                                            connection.getServerName());
+                                                              connection.getServerId(),
+                                                              connection.getServerName());
                 for (auto& channelPair : connection.getChannelStore()) {
                     string channelName = channelPair.first;
                     const IrcChannelStore& channelStore = channelPair.second;
                     IrcChannelListing& channel = server.addChannel(channelName,
-                                                                channelStore.getTopic(),
-                                                                channelStore.getDisabled());
+                                                                   channelStore.getTopic(),
+                                                                   channelStore.getDisabled());
                     for (auto& userPair : channelStore.getUsers()) {
                         string username = userPair.second.getNick();
                         channel.addUser(username, "");

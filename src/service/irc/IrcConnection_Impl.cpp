@@ -319,6 +319,14 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
             inUseNicks.emplace(nick);
             if (findUnusedNick(nick))
                 irc_cmd_nick(ircSession, nick.c_str());
+        } else if (code == LIBIRC_RFC_RPL_TOPIC) {
+            lock_guard<mutex> lock(channelLoginDataMutex);
+            auto num = event->as<EventIrcNumeric>();
+            auto& parameters = num->getParameters();
+
+            auto it = channelStores.find(parameters.at(1));
+            if (it != channelStores.end())
+                it->second.setTopic(parameters.at(2));
         } else if (code == LIBIRC_RFC_RPL_NAMREPLY) {
             lock_guard<mutex> lock(channelLoginDataMutex);
             auto num = event->as<EventIrcNumeric>();
