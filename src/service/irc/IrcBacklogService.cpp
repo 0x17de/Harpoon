@@ -236,13 +236,13 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                 auto eventInsert = std::make_shared<EventDatabaseQuery>(getEventQueue(), event);
                 auto& query = eventInsert->add(Database::Query(Database::QueryType::Insert,
                                                                "harpoon_irc_backlog",
-                                                               std::list<std::string>{"message_id", "time", "type", "flags", "sender_ref"}));
+                                                               std::list<std::string>{"message_id", "time", "type", "flags", "channel_ref", "sender_ref"}));
                 query.add(Database::OperationType::Assign, std::to_string(loggable->getLogEntryId()));
                 query.add(Database::OperationType::Assign, convertTimestamp(quit->getTimestamp()));
                 query.add(Database::OperationType::Assign, "3");
                 query.add(Database::OperationType::Assign, "0");
+                query.add(Database::OperationType::Assign, "0");
                 query.add(Database::OperationType::Assign, "", "", "0");
-                query.add(Database::OperationType::Assign, "", "", "1");
                 query.add(Database::OperationType::Join, "sender", quit->getWho(), "harpoon_irc_sender");
 
                 appQueue->sendEvent(eventInsert);
