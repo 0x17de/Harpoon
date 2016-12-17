@@ -156,7 +156,6 @@ q(window).on('mousemove', (event)=>{
     });
 
     dragInfo.start = mousePosition; // changes are relative
-    layout.layout(true);
 });
 q(window).on('mouseup', ()=>{
     if (dragInfo) {
