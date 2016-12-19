@@ -119,7 +119,7 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                     appQueue->sendEvent(make_shared<EventIrcAddServer>(clientData.userId, name));
                 } else if (cmd == "deleteserver") {
                     size_t serverId;
-                    istringstream(root.get("id", "0").asString()) >> serverId;
+                    istringstream(root.get("server", "0").asString()) >> serverId;
                     if (serverId != 0)
                         appQueue->sendEvent(make_shared<EventIrcDeleteServer>(clientData.userId, serverId));
                 } else if (cmd == "addhost") {
