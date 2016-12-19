@@ -216,6 +216,11 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
         auto joinCommand = event->as<EventIrcJoinChannel>();
         for (auto& entry : joinCommand->getLoginData()) {
             string channelName = entry.name;
+
+            size_t lastPound = channelName.rfind('#');
+            if (channelName.size() == 0 || lastPound == channelName.size())
+                continue; // invalid channel name
+
             string channelLower = channelName;
             transform(channelLower.begin(), channelLower.end(), channelLower.begin(), ::tolower);
 
