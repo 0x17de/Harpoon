@@ -10,6 +10,7 @@
 #include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcNickChanged.hpp"
 #include "event/irc/EventIrcPartChannel.hpp"
+#include "event/irc/EventIrcDeleteChannel.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"
 #include "event/irc/EventIrcSendAction.hpp"
 #include "event/irc/EventIrcMessage.hpp"
@@ -404,6 +405,17 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                 continue;
             irc_cmd_part(ircSession, channelLower.c_str());
             it->second.setDisabled(true);
+        }
+    } else if (type == EventIrcDeleteChannel::uuid) {
+        lock_guard<mutex> lock(channelLoginDataMutex);
+        auto deleteCommang = event->as<EventIrcDeleteChannel>();
+        string channelName = deleteCommang->getChannelName();
+        string channelLower = channelName;
+        transform(channelLower.begin(), channelLower.end(), channelLower.begin(), ::tolower);
+        auto it = channelStores.find(channelLower);
+        if (it != channelStores.end()) { // channel was found
+            irc_cmd_part(ircSession, channelLower.c_str());
+            channelStores.erase(it);
         }
     } else if (type == EventIrcSendMessage::uuid) {
         auto message = event->as<EventIrcSendMessage>();

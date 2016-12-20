@@ -9,6 +9,7 @@
 #include "event/irc/EventIrcSendAction.hpp"
 #include "event/irc/EventIrcAddServer.hpp"
 #include "event/irc/EventIrcDeleteServer.hpp"
+#include "event/irc/EventIrcDeleteChannel.hpp"
 #include "event/irc/EventIrcAddHost.hpp"
 #include "event/irc/EventIrcDeleteHost.hpp"
 #include "event/irc/EventIrcModifyNick.hpp"
@@ -122,6 +123,12 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                     istringstream(root.get("server", "0").asString()) >> serverId;
                     if (serverId != 0)
                         appQueue->sendEvent(make_shared<EventIrcDeleteServer>(clientData.userId, serverId));
+                } else if (cmd == "deletechannel") {
+                    size_t serverId;
+                    istringstream(root.get("server", "0").asString()) >> serverId;
+                    string channel = root.get("channel", "").asString();
+                    if (serverId != 0 && channel != "")
+                        appQueue->sendEvent(make_shared<EventIrcDeleteChannel>(clientData.userId, serverId, channel));
                 } else if (cmd == "addhost") {
                     size_t serverId;
                     istringstream(root.get("server", "0").asString()) >> serverId;

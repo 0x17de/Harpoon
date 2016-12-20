@@ -8,6 +8,7 @@
 #include "event/irc/EventIrcActivateService.hpp"
 #include "event/irc/EventIrcJoinChannel.hpp"
 #include "event/irc/EventIrcPartChannel.hpp"
+#include "event/irc/EventIrcDeleteChannel.hpp"
 #include "event/irc/EventIrcAddServer.hpp"
 #include "event/irc/EventIrcDeleteServer.hpp"
 #include "event/irc/EventIrcServerAdded.hpp"
@@ -40,7 +41,8 @@ IrcDatabase_Ini::IrcDatabase_Ini(EventQueue* appQueue) :
         EventIrcDeleteHost::uuid,
         EventIrcModifyNick::uuid,
         EventIrcJoinChannel::uuid,
-        EventIrcPartChannel::uuid
+        EventIrcPartChannel::uuid,
+        EventIrcDeleteChannel::uuid
     }),
     appQueue{appQueue}
 {
@@ -237,6 +239,23 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             if (categoryEntry)
                 channelsConfig.setEntry(*categoryEntry, "disabled", "yes");
         }
+    } else if (eventType == EventIrcDeleteChannel::uuid) {
+        auto deleteCommand = event->as<EventIrcDeleteChannel>();
+
+        // construct channel.ini path
+        stringstream serverChannelsConfigFilename;
+        serverChannelsConfigFilename
+           << "config/user" << deleteCommand->getUserId()
+            << "/server" << deleteCommand->getServerId()
+            << "/channels.ini";
+
+        Ini channelsConfig(serverChannelsConfigFilename.str());
+
+        // save data from join event to ini
+        string channelName = deleteCommand->getChannelName();
+        auto* categoryEntry = channelsConfig.getEntry(channelName);
+        if (categoryEntry)
+            channelsConfig.deleteCategory(channelName);
     } else if (eventType == EventIrcServiceInit::uuid) {
         std::cout << "IrcDB received INIT event" << std::endl;
 
