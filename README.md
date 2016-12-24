@@ -58,11 +58,11 @@ Run `make` afterwards.
 
 ### Configuration
 
-Before first run you should set few Harpoon options. To do so, run `build/iirc
+Before first run you should set few Harpoon options. To do so, run `build/Harpoon
 --setup` from the project's root. You can just select default values, pressing
 `Return` one by one.
 
 
 ### Run the binary
-To start the service run `build/iirc` from the project root. If you enabled
+To start the service run `build/Harpoon` from the project root. If you enabled
 webclient, you can check it on `localhost:8080`.

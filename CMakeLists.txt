@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.3)
-project(iirc)
+project(Harpoon)
 include(ExternalProject)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
@@ -126,17 +126,17 @@ endif()
 
 
 
-add_library(iircCore SHARED ${SOURCE_FILES})
-add_executable(iirc src/main.cpp)
-target_link_libraries(iirc iircCore)
+add_library(HarpoonCore SHARED ${SOURCE_FILES})
+add_executable(Harpoon src/main.cpp)
+target_link_libraries(Harpoon HarpoonCore)
 if(${BUILD_TEST})
   set(TEST_SOURCE_FILES
       src/tests/TestPostgres.cpp
       src/tests/TestModules.cpp)
-  add_executable(iircTest
+  add_executable(HarpoonTest
                  src/test.cpp src/test.hpp
                  ${TEST_SOURCE_FILES})
-  target_link_libraries(iircTest iircCore)
+  target_link_libraries(HarpoonTest HarpoonCore)
 endif()
 
 
@@ -201,13 +201,13 @@ endif()
 
 
 
-target_link_libraries(iircCore ${LINK_LIBRARIES})
-target_include_directories(iircCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
-set_target_properties(iircCore PROPERTIES COMPILE_FLAGS "-std=c++11 -pedantic -Wall")
-set_target_properties(iirc PROPERTIES COMPILE_FLAGS "-std=c++11 -pedantic -Wall")
+target_link_libraries(HarpoonCore ${LINK_LIBRARIES})
+target_include_directories(HarpoonCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
+set_target_properties(HarpoonCore PROPERTIES COMPILE_FLAGS "-std=c++11 -pedantic -Wall")
+set_target_properties(Harpoon PROPERTIES COMPILE_FLAGS "-std=c++11 -pedantic -Wall")
 
 if(${BUILD_TEST})
-  target_link_libraries(iircTest ${LINK_LIBRARIES})
-  target_include_directories(iircTest PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
-  set_target_properties(iircTest PROPERTIES COMPILE_FLAGS "-std=c++11 -pedantic -Wall")
+  target_link_libraries(HarpoonTest ${LINK_LIBRARIES})
+  target_include_directories(HarpoonTest PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
+  set_target_properties(HarpoonTest PROPERTIES COMPILE_FLAGS "-std=c++11 -pedantic -Wall")
 endif()
