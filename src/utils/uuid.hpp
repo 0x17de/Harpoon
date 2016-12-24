@@ -4,6 +4,6 @@
 #include <cstdint>
 
 
-typedef uintptr_t UUID;
+using UUID = uintptr_t;
 
 #endif

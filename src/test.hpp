@@ -37,9 +37,9 @@ public:
 
 
 class TestRunner {
-    typedef std::tuple<std::string,
-                       std::string,
-                       std::function<void()>> TestData;
+    using TestData = std::tuple<std::string,
+                                std::string,
+                                std::function<void()>>;
     std::list<TestData> tests;
 public:
     TestRunner();

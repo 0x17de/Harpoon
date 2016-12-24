@@ -22,8 +22,8 @@
 class EventQueue;
 class EventLoop;
 class ModuleProvider {
-    typedef std::shared_ptr<EventLoop> LoopPtr;
-    typedef std::map<std::string, std::function<LoopPtr(EventQueue*)>> InitializerMap;
+    using LoopPtr = std::shared_ptr<EventLoop>;
+    using InitializerMap = std::map<std::string, std::function<LoopPtr(EventQueue*)>>;
     std::map<std::string, InitializerMap> initializerByCategory;
 
     ModuleProvider();

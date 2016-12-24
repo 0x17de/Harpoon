@@ -44,33 +44,33 @@ public:
     bool onEvent(std::shared_ptr<IEvent> event);
     bool findUnusedNick(std::string& nick);
 
-    // event callback typedef
-    typedef void (ircEventCallback_t)(irc_session_t* session,
-                                      const char* event,
-                                      const char* origin,
-                                      const std::vector<std::string>& parameters,
-                                      std::shared_ptr<IEvent>& resultEvent);
-    typedef void (ircEventCodeCallback_t)(irc_session_t* session,
-                                          unsigned int event,
-                                          const char* origin,
-                                          const std::vector<std::string>& parameters,
-                                          std::shared_ptr<IEvent>& resultEvent);
-    typedef void (ircEventDccChat_t)(irc_session_t* session,
-                                     const char* nick,
-                                     const char* addr,
-                                     irc_dcc_t dccid);
-    typedef void (ircEventDccSend_t)(irc_session_t* session,
-                                     const char* nick,
-                                     const char* addr,
-                                     const char* filename,
-                                     unsigned long size,
-                                     irc_dcc_t dccid);
-    typedef void (ircDccCallback_t)(irc_session_t* session,
-                                    irc_dcc_t id,
-                                    int status,
-                                    void* ctx,
-                                    const char* data,
-                                    unsigned int length);
+    // event callback aliases
+    using ircEventCallback_t = void(irc_session_t* session,
+                                    const char* event,
+                                    const char* origin,
+                                    const std::vector<std::string>& parameters,
+                                    std::shared_ptr<IEvent>& resultEvent);
+    using ircEventCodeCallback_t = void(irc_session_t* session,
+                                        unsigned int event,
+                                        const char* origin,
+                                        const std::vector<std::string>& parameters,
+                                        std::shared_ptr<IEvent>& resultEvent);
+    using ircEventDccChat_t = void(irc_session_t* session,
+                                   const char* nick,
+                                   const char* addr,
+                                   irc_dcc_t dccid);
+    using ircEventDccSend_t = void(irc_session_t* session,
+                                   const char* nick,
+                                   const char* addr,
+                                   const char* filename,
+                                   unsigned long size,
+                                   irc_dcc_t dccid);
+    using ircDccCallback_t = void(irc_session_t* session,
+                                  irc_dcc_t id,
+                                  int status,
+                                  void* ctx,
+                                  const char* data,
+                                  unsigned int length);
 
     // various event callbacks for libircclient
 

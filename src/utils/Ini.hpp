@@ -7,8 +7,8 @@
 
 class Ini {
 public:
-    typedef std::map<std::string, std::string> Entries;
-    typedef std::map<std::string, Entries> Categories;
+    using Entries = std::map<std::string, std::string>;
+    using Categories = std::map<std::string, Entries>;
 private:
     Categories categories;
 
