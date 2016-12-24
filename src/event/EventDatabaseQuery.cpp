@@ -7,7 +7,7 @@ UUID EventDatabaseQuery::getEventUuid() const {
     return this->uuid;
 }
 
-EventDatabaseQuery::EventDatabaseQuery(EventQueue* target, std::shared_ptr<IEvent> eventOrigin)
+EventDatabaseQuery::EventDatabaseQuery(EventQueue* target, const std::shared_ptr<IEvent>& eventOrigin)
     : target{target}
     , eventOrigin{eventOrigin}
 {

@@ -9,8 +9,8 @@ UUID EventIrcNumeric::getEventUuid() const {
 
 EventIrcNumeric::EventIrcNumeric(size_t userId, size_t serverId,
                                  unsigned int eventCode,
-                                 std::string from,
-                                 std::vector<std::string> parameters)
+                                 const std::string& from,
+                                 const std::vector<std::string>& parameters)
     : userId{userId}
     , serverId{serverId}
     , eventCode{eventCode}

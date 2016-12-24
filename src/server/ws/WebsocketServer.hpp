@@ -11,7 +11,7 @@ class WebsocketServer_Impl;
 class WebsocketServer : public EventLoop {
     std::shared_ptr<WebsocketServer_Impl> impl;
 public:
-    WebsocketServer(EventQueue* appQueue);
+    explicit WebsocketServer(EventQueue* appQueue);
     virtual ~WebsocketServer();
     virtual bool onEvent(std::shared_ptr<IEvent> event) override;
 };

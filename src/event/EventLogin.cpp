@@ -7,7 +7,7 @@ UUID EventLogin::getEventUuid() const {
     return this->uuid;
 }
 
-EventLogin::EventLogin(void* data, std::string username, std::string password)
+EventLogin::EventLogin(void* data, const std::string& username, const std::string& password)
     : data{data}
     , username{username}
     , password{password}

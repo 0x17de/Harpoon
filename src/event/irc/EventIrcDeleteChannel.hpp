@@ -15,7 +15,7 @@ public:
 
     EventIrcDeleteChannel(size_t userId,
                           size_t serverId,
-                          std::string channelName);
+                          const std::string& channelName);
     virtual size_t getUserId() const override;
     virtual size_t getServerId() const override;
     std::string getChannelName() const;

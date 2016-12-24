@@ -17,7 +17,7 @@ class EventQueue {
     bool running;
 public:
     EventQueue();
-    EventQueue(std::set<UUID> eventsToBeProcessed, std::list<bool(*)(IEvent*)> eventGuards);
+    explicit EventQueue(const std::set<UUID>& eventsToBeProcessed, const std::list<bool(*)(IEvent*)>& eventGuards);
     virtual ~EventQueue();
 
     void stop();

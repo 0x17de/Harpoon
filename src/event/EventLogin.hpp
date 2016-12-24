@@ -11,7 +11,7 @@ class EventLogin : public IEvent {
     std::string username;
     std::string password;
 public:
-    EventLogin(void* data, std::string username, std::string password);
+    EventLogin(void* data, const std::string& username, const std::string& password);
 
     static UUID uuid;
     virtual UUID getEventUuid() const override;

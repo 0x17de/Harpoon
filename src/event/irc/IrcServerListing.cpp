@@ -1,6 +1,6 @@
 #include "IrcServerListing.hpp"
 
-IrcServerListing::IrcServerListing(std::string activeNick,
+IrcServerListing::IrcServerListing(const std::string& activeNick,
                                    size_t serverId,
                                    const std::string& serverName)
     : activeNick{activeNick}

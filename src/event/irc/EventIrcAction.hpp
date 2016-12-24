@@ -18,9 +18,9 @@ public:
 
     EventIrcAction(size_t userId,
                    size_t serverId,
-                   std::string username,
-                   std::string channel,
-                   std::string message);
+                   const std::string& username,
+                   const std::string& channel,
+                   const std::string& message);
 
     virtual size_t getUserId() const override;
     size_t getServerId() const;

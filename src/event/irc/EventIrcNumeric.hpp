@@ -18,8 +18,8 @@ public:
 
     EventIrcNumeric(size_t userId, size_t serverId,
                     unsigned int eventCode,
-                    std::string from,
-                    std::vector<std::string> parameters);
+                    const std::string& from,
+                    const std::vector<std::string>& parameters);
     virtual size_t getUserId() const override;
     size_t getServerId() const;
     unsigned int getEventCode() const;

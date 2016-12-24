@@ -13,7 +13,7 @@ EventQueue::EventQueue()
 {
 }
 
-EventQueue::EventQueue(std::set<UUID> eventsToBeProcessed, std::list<bool(*)(IEvent*)> eventGuards)
+EventQueue::EventQueue(const std::set<UUID>& eventsToBeProcessed, const std::list<bool(*)(IEvent*)>& eventGuards)
     : impl{make_shared<EventQueue_Impl>()}
     , eventsToBeProcessed{eventsToBeProcessed}
     , eventGuards{eventGuards}

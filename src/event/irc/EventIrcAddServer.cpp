@@ -3,7 +3,7 @@
 
 
 EventIrcAddServer::EventIrcAddServer(size_t userId,
-                                     std::string name)
+                                     const std::string& name)
     : userId{userId}
     , name{name}
 {

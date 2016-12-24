@@ -13,7 +13,7 @@ EventLoop::EventLoop()
 {
 }
 
-EventLoop::EventLoop(std::set<UUID> processableEvents, std::list<bool(*)(IEvent*)> eventGuards, bool threaded)
+EventLoop::EventLoop(const std::set<UUID>& processableEvents, const std::list<bool(*)(IEvent*)>& eventGuards, bool threaded)
     : queue{processableEvents, eventGuards}
     , threaded{threaded}
     , destruction{false}

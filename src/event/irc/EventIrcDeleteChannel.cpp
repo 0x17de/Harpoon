@@ -4,7 +4,7 @@
 
 EventIrcDeleteChannel::EventIrcDeleteChannel(size_t userId,
                                              size_t serverId,
-                                             std::string channelName)
+                                             const std::string& channelName)
     : userId{userId}
     , serverId{serverId}
     , channelName{channelName}

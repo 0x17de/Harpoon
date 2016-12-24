@@ -12,7 +12,7 @@ class IrcServerListing {
     std::string serverName;
     std::list<IrcChannelListing> channels;
 public:
-    IrcServerListing(std::string activeNick,
+    IrcServerListing(const std::string& activeNick,
                      size_t serverId,
                      const std::string& serverName);
     IrcChannelListing& addChannel(const std::string& channelName,

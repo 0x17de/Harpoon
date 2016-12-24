@@ -13,7 +13,7 @@ public:
     virtual UUID getEventUuid() const override;
 
     EventIrcAddServer(size_t userId,
-                      std::string name);
+                      const std::string& name);
     virtual size_t getUserId() const override;
     std::string getName() const;
 };
