@@ -11,7 +11,7 @@ IrcLoggable::IrcLoggable()
 {
 }
 
-size_t IrcLoggable::getLogEntryId()
+size_t IrcLoggable::getLogEntryId() const
 {
     return logEntryId;
 }

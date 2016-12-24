@@ -32,10 +32,10 @@ namespace Database {
         void query_lastId(const Database::Query& query, EventDatabaseResult* result);
         void query_delete(const Database::Query& query, EventDatabaseResult* result);
 
-        void query_scanOperations(const Database::Query& query,
-                                  std::list<Database::Operation const *>& join,
-                                  Database::Operation const *& where,
-                                  Database::Operation const *& limit);
+        static void query_scanOperations(const Database::Query& query,
+                                         std::list<Database::Operation const *>& join,
+                                         Database::Operation const *& where,
+                                         Database::Operation const *& limit);
         template<class T>
         void query_handleWhere(T& temp_type,
                                const Database::Operation& op,

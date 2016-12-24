@@ -19,6 +19,6 @@ std::string Password::getSaltBase64() const {
 std::string Password::getHashBase64() const {
     return hash;
 }
-bool Password::equals(const std::string& lhash) {
+bool Password::equals(const std::string& lhash) const {
     return hash == lhash;
 }

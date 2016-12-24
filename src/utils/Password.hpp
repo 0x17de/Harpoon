@@ -12,7 +12,7 @@ public:
     explicit Password(const std::string& salt, const std::string& password);
     std::string getSaltBase64() const;
     std::string getHashBase64() const;
-    bool equals(const std::string& hash);
+    bool equals(const std::string& hash) const;
 };
 
 #endif

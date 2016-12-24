@@ -10,7 +10,7 @@ class IrcLoggable {
     size_t logEntryId;
 public:
     IrcLoggable();
-    size_t getLogEntryId();
+    size_t getLogEntryId() const;
 };
 
 #endif

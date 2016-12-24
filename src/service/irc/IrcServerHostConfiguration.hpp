@@ -5,11 +5,11 @@
 
 
 class IrcServerHostConfiguration {
-    std::string hostName;
-    int port;
-    std::string password;
-    bool ipV6;
-    bool ssl;
+    std::string hostName_;
+    int port_;
+    std::string password_;
+    bool ipV6_;
+    bool ssl_;
 public:
     IrcServerHostConfiguration();
     IrcServerHostConfiguration(const std::string& hostName,
