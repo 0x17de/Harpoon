@@ -16,7 +16,7 @@ private:
     bool modified;
     bool newFile;
 public:
-    Ini(const std::string& filename);
+    explicit Ini(const std::string& filename);
     ~Ini();
 
     void load();

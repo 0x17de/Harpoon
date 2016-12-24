@@ -16,7 +16,7 @@ public:
     static UUID uuid;
     virtual UUID getEventUuid() const override;
 
-    EventDatabaseResult(std::shared_ptr<IEvent> eventOrigin);
+    explicit EventDatabaseResult(std::shared_ptr<IEvent> eventOrigin);
     void setSuccess(bool success);
     void addResult(const std::string& result);
     bool getSuccess() const;

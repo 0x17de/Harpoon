@@ -100,7 +100,6 @@ std::string Base64::encode(const std::string& source) {
         out_iterator[1] = base64chars[b];
         out_iterator[2] = base64chars[c];
         out_iterator[3] = '=';
-        out_iterator += 4;
     }
     return string(reinterpret_cast<char*>(outData.data()), outData.size());
 }

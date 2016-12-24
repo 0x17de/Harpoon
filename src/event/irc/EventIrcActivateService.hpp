@@ -16,7 +16,7 @@ public:
     static UUID uuid;
     virtual UUID getEventUuid() const override;
 
-    EventIrcActivateService(size_t userId);
+    explicit EventIrcActivateService(size_t userId);
     virtual std::shared_ptr<EventLoop> instantiateService(size_t userId, EventQueue* appQueue) const override;
 
     size_t getUserId() const;

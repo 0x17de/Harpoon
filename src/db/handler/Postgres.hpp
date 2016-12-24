@@ -12,7 +12,7 @@ namespace Database {
     class Postgres : public EventLoop {
         std::shared_ptr<Postgres_Impl> impl;
     public:
-        Postgres(EventQueue* appQueue);
+        explicit Postgres(EventQueue* appQueue);
         virtual ~Postgres();
 
         virtual bool onEvent(std::shared_ptr<IEvent> event) override;

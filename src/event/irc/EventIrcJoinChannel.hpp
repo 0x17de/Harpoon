@@ -7,8 +7,8 @@
 
 
 struct IrcChannelJoinData {
-    IrcChannelJoinData(const std::string& name);
-    IrcChannelJoinData(const std::string& name, const std::string& password);
+    explicit IrcChannelJoinData(const std::string& name);
+    explicit IrcChannelJoinData(const std::string& name, const std::string& password);
 
     std::string name;
     bool passwordSpecified;
@@ -24,7 +24,7 @@ public:
     static UUID uuid;
     virtual UUID getEventUuid() const override;
 
-    EventIrcJoinChannel(size_t userId, size_t serverId);
+    explicit EventIrcJoinChannel(size_t userId, size_t serverId);
     virtual size_t getUserId() const override;
     virtual size_t getServerId() const override;
     void addLoginData(const std::string& name, const std::string& password);

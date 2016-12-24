@@ -263,7 +263,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
         Ini usersConfig("config/users.ini");
         for (auto& userCategoryPair : usersConfig) {
             auto& userCategory = userCategoryPair.second;
-            string userName = userCategoryPair.first;
+            //string userName = userCategoryPair.first;
 
             // read in user configuration
             size_t userId;

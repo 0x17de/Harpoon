@@ -367,11 +367,11 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                 while (getline(users, user, ' ')) {
                     if (user.size() == 0) continue;
                     char userMode = user.at(0);
-                    string mode = "";
+                    //string mode = "";
                     if (userMode == '@'
                         || userMode == '+') {
 #pragma message "user mode stub"
-                        mode = "";
+                        //mode = "";
                         user = user.substr(1);
                     }
                     channelStore->addUser(user, "");
@@ -385,14 +385,14 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
             auto& parameters = num->getParameters();
             string channelName = parameters.at(0);
             auto it = channelStores.find(channelName);
-            if (it != channelStores.end()) {
-                auto& channelStore = it->second;
-                auto& users = channelStore.getUsers();
-                for (auto userStorePair : users) {
-                    auto& userStore = userStorePair.second;
+            //if (it != channelStores.end()) {
+                //auto& channelStore = it->second;
+                //auto& users = channelStore.getUsers();
+                //for (auto userStorePair : users) {
+                    //auto& userStore = userStorePair.second;
 #pragma message "submit userlist stub"
-                }
-            }
+                //}
+            //}
         }
     } else if (type == EventIrcPartChannel::uuid) {
         lock_guard<mutex> lock(channelLoginDataMutex);

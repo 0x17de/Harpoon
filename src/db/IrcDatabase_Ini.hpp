@@ -8,7 +8,7 @@
 class IrcDatabase_Ini : public EventLoop {
     EventQueue* appQueue;
 public:
-    IrcDatabase_Ini(EventQueue* appQueue);
+    explicit IrcDatabase_Ini(EventQueue* appQueue);
     virtual ~IrcDatabase_Ini();
 
     virtual bool onEvent(std::shared_ptr<IEvent> event) override;

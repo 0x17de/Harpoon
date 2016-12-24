@@ -11,7 +11,7 @@ public:
     static UUID uuid;
     virtual UUID getEventUuid() const override;
 
-    EventLogout(void* data);
+    explicit EventLogout(void* data);
     void* getData() const;
 };
 

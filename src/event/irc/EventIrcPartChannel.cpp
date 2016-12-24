@@ -6,7 +6,6 @@ EventIrcPartChannel::EventIrcPartChannel(size_t userId,
                                          size_t serverId)
     : userId{userId}
     , serverId{serverId}
-    , channels{channels}
 {
 }
 

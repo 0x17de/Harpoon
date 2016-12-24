@@ -22,7 +22,7 @@ namespace Database {
         bool connectionFailed;
         EventQueue* appQueue;
         shared_ptr<soci::session> sqlSession;
-        Postgres_Impl(EventQueue* appQueue) : connectionFailed{false}, appQueue{appQueue} {};
+        explicit Postgres_Impl(EventQueue* appQueue) : connectionFailed{false}, appQueue{appQueue} {};
         bool onEvent(std::shared_ptr<IEvent> event);
         void handleQuery(std::shared_ptr<IEvent> event);
 
