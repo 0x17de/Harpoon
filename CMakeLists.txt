@@ -211,3 +211,19 @@ if(${BUILD_TEST})
   target_include_directories(HarpoonTest PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
   set_target_properties(HarpoonTest PROPERTIES COMPILE_FLAGS "-std=c++11 -pedantic -Wall")
 endif()
+
+
+
+INSTALL(TARGETS Harpoon HarpoonCore
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib/static)
+include(InstallRequiredSystemLibraries)
+
+SET(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
+SET(CPACK_MONOLITHIC_INSTALL 1)
+SET(CPACK_GENERATOR "DEB;TGZ")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Manuel Herrmann")
+SET(CPACK_PACKAGE_EXECUTABLES "Harpoon" "Harpoon")
+
+INCLUDE(CPack)

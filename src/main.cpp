@@ -47,6 +47,8 @@ void doGenUser(bool save) {
 }
 
 void doSetup(bool save) {
+    Filesystem::getInstance().createPathRecursive("config");
+
     bool usersIniExists;
     {
         Ini users("config/users.ini");
