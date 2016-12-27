@@ -145,6 +145,29 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                                                                      password,
                                                                      ipV6,
                                                                      ssl));
+                } else if (cmd == "modifyhost") {
+                    size_t serverId;
+                    istringstream(root.get("server", "0").asString()) >> serverId;
+                    string oldHost = root.get("oldhost", "").asString();
+                    int oldPort = root.get("oldport", -1).asInt();
+                    string host = root.get("host", "").asString();
+                    string password = root.get("password", "").asString();
+                    int port = root.get("port", -1).asInt();
+                    bool ipV6 = root.get("ipv6", true).asBool();
+                    bool ssl = root.get("ssl", true).asBool();
+
+                    appQueue->sendEvent(make_shared<EventIrcDeleteHost>(clientData.userId,
+                                                                        serverId,
+                                                                        oldHost,
+                                                                        oldPort));
+
+                    appQueue->sendEvent(make_shared<EventIrcAddHost>(clientData.userId,
+                                                                     serverId,
+                                                                     host,
+                                                                     port,
+                                                                     password,
+                                                                     ipV6,
+                                                                     ssl));
                 } else if (cmd == "modifynick") {
                     size_t serverId;
                     istringstream(root.get("server", "0").asString()) >> serverId;
