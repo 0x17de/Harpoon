@@ -7,6 +7,7 @@
 #include "utils/Ini.hpp"
 #include "utils/IdProvider.hpp"
 #include "utils/Filesystem.hpp"
+#include "version.hpp"
 
 using namespace std;
 
@@ -132,11 +133,13 @@ bool checkArgs(int argc, char** argv) {
     bool help = false,
         setup = false,
         genUser = false,
-        save = false;
+        save = false,
+        version = false;
 
     // check parameters
     for (int currentArgI = 1; currentArgI < argc; ++currentArgI) {
         string arg(argv[currentArgI]);
+        if (arg == "-v" || arg == "--version") version = true;
         if (arg == "--setup") setup = true;
         if (arg == "--genuser") genUser = true;
         if (arg == "-h" || arg == "--help") help = true;
@@ -149,6 +152,10 @@ bool checkArgs(int argc, char** argv) {
              << "  --setup     Generate initial configuration. (Useful with --save)" << endl
              << "  --genuser   Generate some user account. (Useful with --save)" << endl
              << "  --save      Save the configured data into the corresponding ini file. (No process must be running)" << endl;
+        return false;
+    }
+    if (version) {
+        cout << "Harpoon v" << VERSION_MAJOR << "." << VERSION_MINOR << "." << VERSION_PATCH << endl;
         return false;
     }
     if (setup) {

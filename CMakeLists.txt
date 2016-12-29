@@ -4,9 +4,16 @@ include(ExternalProject)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 
+file(STRINGS src/version.hpp VERSION)
+string(REPLACE " " ";" VERSION "${VERSION}")
+list(LENGTH VERSION VERSION_LEN)
+list(GET VERSION 4 CPACK_PACKAGE_VERSION_MAJOR)
+list(GET VERSION 10 CPACK_PACKAGE_VERSION_MINOR)
+list(GET VERSION 16 CPACK_PACKAGE_VERSION_PATCH)
+message("Harpoon Version ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 
-
-set(SOURCE_FILES src/app/Application.cpp src/app/Application.hpp
+set(SOURCE_FILES src/version.hpp
+    src/app/Application.cpp src/app/Application.hpp
     src/app/ApplicationGuard.cpp src/app/ApplicationGuard.hpp
     src/queue/EventLoop.cpp src/queue/EventLoop.hpp
     src/db/DatabaseQuery.cpp src/db/DatabaseQuery.hpp
