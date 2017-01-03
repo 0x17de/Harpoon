@@ -6,5 +6,14 @@ function init() {
     chat = new Chat();
     new IrcService(chat);
 
-    chat.login('user', 'password'); // TODO: use login dialog
+    //login('user', 'password');
+}
+
+function login() {
+    var user = q('#login-user').val();
+    var password = q('#login-password').val();
+    q('#login-user').val("");
+    q('#login-password').val("");
+    q('#login').css({'display':'none'});
+    chat.login(user, password);
 }

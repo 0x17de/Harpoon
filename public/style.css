@@ -120,7 +120,40 @@ body, html {
 .backlog-message {
     width:calc(100% - 130px - 85px);
 }
-
+/* LOGIN */
+#login {
+    display:block;
+    position:absolute;
+    left:0px; top:0px;
+    width:100vw; height:100vw;
+    background:#333;
+}
+.login-header {
+    padding:10px 15px;
+    background-color:#f16745;
+    border-radius:10px 10px 0 0;
+    font-weight:bold;
+    color:#fff;
+}
+.login-form {
+    background-color:#f8f8f8;
+    border-radius:10px 10px 3px 3px;
+    -moz-box-shadow: 0 0 20px #000000;
+    -webkit-box-shadow: 0 0 20px #000000;
+    box-shadow: 0 0 20px #000000;
+}
+.login-form input {
+    padding:5px;
+    margin:0px;
+    border:1px solid;
+    width:calc(100% - 12px);
+}
+.login-form input[type=button] {
+    padding:5px;
+    margin:0px;
+    border:1px solid;
+    width:100%;
+}
 /* SETTINGS */
 #settings {
     display:none;
