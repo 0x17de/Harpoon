@@ -81,10 +81,10 @@ void doSetup(bool save) {
 
     if (enableIrcService == "y") {
         do {
-            cout << "IRC settings database type (dummy/ini) [dummy]: ";
+            cout << "IRC settings database type (dummy/ini) [ini]: ";
             getline(cin, ircSettingsDatabaseType);
             if (ircSettingsDatabaseType.size() == 0) // auto value
-                ircSettingsDatabaseType = "dummy";
+                ircSettingsDatabaseType = "ini";
         } while (find(validIrcDatabaseTypes.begin(), validIrcDatabaseTypes.end(), ircSettingsDatabaseType) == validIrcDatabaseTypes.end());
         do {
             cout << "Collect IRC backlog (y/n) [y]: ";
