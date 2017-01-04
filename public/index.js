@@ -6,6 +6,7 @@ function init() {
     chat = new Chat();
     new IrcService(chat);
 
+    q('#login-user').focus();
     //login('user', 'password');
 }
 

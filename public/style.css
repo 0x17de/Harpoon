@@ -52,6 +52,7 @@ body, html {
     background:#fff;
 }
 .channel {
+    cursor:pointer;
     padding-left:12px !important;
 }
 .channel:nth-child(2n+1) {
@@ -148,7 +149,7 @@ body, html {
     border:1px solid;
     width:calc(100% - 12px);
 }
-.login-form input[type=button] {
+.login-form input[type=submit] {
     padding:5px;
     margin:0px;
     border:1px solid;

@@ -90,9 +90,11 @@
             HARPOON LOGIN
           </div>
           <div style="padding:10px">
-            <input name="user" id="login-user" />
-            <input name="password" id="login-password" type="password" />
-            <input type="button" value="LOGIN" onclick="login()" />
+            <form onsubmit="login(); return false">
+              <input name="user" id="login-user" />
+              <input name="password" id="login-password" type="password" />
+              <input type="submit" value="LOGIN" />
+            </form>
           </div>
         </div>
       </div>

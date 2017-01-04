@@ -111,6 +111,10 @@ class _q {
             });
         }
     }
+    focus() {
+        this.e[0].focus();
+        return this;
+    }
     addClass() {
         var args = Array.prototype.slice.call(arguments);
         this.e.forEach(function(e) {
