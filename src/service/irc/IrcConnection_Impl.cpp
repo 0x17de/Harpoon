@@ -195,6 +195,14 @@ IrcConnection_Impl::~IrcConnection_Impl() {
         irc_destroy_session(ircSession);
 }
 
+const std::map<char, char> IrcConnection_Impl::prefixToMode {
+    {'~', 'q'},
+    {'&', 'a'},
+    {'@', 'o'},
+    {'%', 'h'},
+    {'+', 'v'}
+};
+
 std::string IrcConnection_Impl::getPureNick(const std::string& nick) {
     size_t exclamationPosition = nick.find('!');
     if (exclamationPosition == string::npos)
@@ -363,19 +371,18 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                 channelStore->clear();
                 auto userlist = make_shared<EventIrcUserlistReceived>(num->getUserId(), num->getServerId(), channelName);
                 istringstream users(parameters.at(3));
-                string user;
-                while (getline(users, user, ' ')) {
-                    if (user.size() == 0) continue;
-                    char userMode = user.at(0);
-                    //string mode = "";
-                    if (userMode == '@'
-                        || userMode == '+') {
-#pragma message "user mode stub"
-                        //mode = "";
-                        user = user.substr(1);
+                string username;
+                while (getline(users, username, ' ')) {
+                    if (username.size() == 0) continue;
+
+                    std::string mode; // optional, first letter of username
+                    auto modeIt = prefixToMode.find(username.at(0));
+                    if (modeIt != prefixToMode.end()) {
+                        mode = modeIt->second;
+                        username = username.substr(1);
                     }
-                    channelStore->addUser(user, "");
-                    userlist->addUser(user);
+                    channelStore->addUser(username, "");
+                    userlist->addUser(username, "");
                 }
                 appQueue->sendEvent(userlist);
             }

@@ -26,6 +26,8 @@ public:
     IrcConnection_Impl(EventQueue* appQueue, EventQueue* queue, size_t userId, const IrcServerConfiguration& configuration);
     ~IrcConnection_Impl();
 
+    static const std::map<char, char> prefixToMode;
+
     EventQueue* appQueue;
     EventQueue* queue;
     size_t userId;

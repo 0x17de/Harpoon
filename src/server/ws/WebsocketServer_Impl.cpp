@@ -166,9 +166,9 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["protocol"] = "irc";
         root["server"] = to_string(userlist->getServerId());
         root["channel"] = userlist->getChannel();
-        auto& users = root["users"] = Json::arrayValue;
+        auto& users = root["users"] = Json::objectValue;
         for (auto& user : userlist->getUsers())
-            users.append(user);
+            users[user.nick] = user.mode;
     } else if (eventType == EventIrcServerAdded::uuid) {
         auto added = event->as<EventIrcServerAdded>();
         root["cmd"] = "serveradded";

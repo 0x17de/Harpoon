@@ -2,22 +2,29 @@
 #include "utils/uuidGen.hpp"
 
 
+EventIrcUserlistReceived::User::User(const std::string& nick,
+                                     const std::string& mode)
+    : nick{nick}
+    , mode{mode}
+{ }
+
 UUID EventIrcUserlistReceived::uuid = ::uuid.get();
 UUID EventIrcUserlistReceived::getEventUuid() const {
     return this->uuid;
 }
 
 EventIrcUserlistReceived::EventIrcUserlistReceived(size_t userId,
-                                         size_t serverId,
-                                         const std::string& channel)
+                                                   size_t serverId,
+                                                   const std::string& channel)
     : userId{userId}
     , serverId{serverId}
     , channel{channel}
 {
 }
 
-void EventIrcUserlistReceived::addUser(const std::string& user) {
-    users.push_back(user);
+void EventIrcUserlistReceived::addUser(const std::string& nick,
+                                       const std::string& mode) {
+    users.emplace_back(nick, mode);
 }
 
 size_t EventIrcUserlistReceived::getUserId() const {
@@ -32,6 +39,6 @@ std::string EventIrcUserlistReceived::getChannel() const {
     return channel;
 }
 
-const std::list<std::string>& EventIrcUserlistReceived::getUsers() const {
+const std::list<EventIrcUserlistReceived::User>& EventIrcUserlistReceived::getUsers() const {
     return users;
 }
