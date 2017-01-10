@@ -196,11 +196,11 @@ IrcConnection_Impl::~IrcConnection_Impl() {
 }
 
 const std::map<char, char> IrcConnection_Impl::prefixToMode {
-    {'~', 'q'},
-    {'&', 'a'},
-    {'@', 'o'},
-    {'%', 'h'},
-    {'+', 'v'}
+    {'~', 'q'}, // Owner
+    {'&', 'a'}, // Admin
+    {'@', 'o'}, // Operator
+    {'%', 'h'}, // HalfOperator
+    {'+', 'v'} // Voiced
 };
 
 std::string IrcConnection_Impl::getPureNick(const std::string& nick) {
@@ -381,8 +381,8 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                         mode = modeIt->second;
                         username = username.substr(1);
                     }
-                    channelStore->addUser(username, "");
-                    userlist->addUser(username, "");
+                    channelStore->addUser(username, mode);
+                    userlist->addUser(username, mode);
                 }
                 appQueue->sendEvent(userlist);
             }
