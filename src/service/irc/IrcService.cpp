@@ -136,8 +136,8 @@ bool IrcService::onEvent(std::shared_ptr<IEvent> event) {
                                                                    channelStore.getTopic(),
                                                                    channelStore.getDisabled());
                     for (auto& userPair : channelStore.getUsers()) {
-                        string username = userPair.second.getNick();
-                        channel.addUser(username, "");
+                        auto& userData = userPair.second;
+                        channel.addUser(userData.getNick(), userData.getMode());
                     }
                 }
             }
