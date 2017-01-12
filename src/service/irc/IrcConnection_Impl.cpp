@@ -21,6 +21,7 @@
 #include "event/irc/EventIrcNickModified.hpp"
 #include "event/irc/EventIrcChangeNick.hpp"
 #include "event/irc/EventIrcUserlistReceived.hpp"
+#include "event/irc/EventIrcModeChanged.hpp"
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -401,6 +402,11 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                 //}
             //}
         }
+    } else if (type == EventIrcModeChanged::uuid) {
+        auto mode = event->as<EventIrcModeChanged>();
+        auto it = channelStores.find(mode->getChannel());
+        if (it != channelStores.end())
+            it->second.changeUserMode(mode->getUsername(), mode->getMode());
     } else if (type == EventIrcPartChannel::uuid) {
         lock_guard<mutex> lock(channelLoginDataMutex);
         auto partCommand = event->as<EventIrcPartChannel>();

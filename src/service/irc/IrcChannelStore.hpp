@@ -14,6 +14,8 @@ public:
     void setMode(const std::string& mode);
     std::string getNick() const;
     std::string getMode() const;
+    void addMode(const std::string& mode);
+    void removeMode(const std::string& mode);
 };
 
 class IrcChannelStore {
@@ -21,6 +23,8 @@ class IrcChannelStore {
     std::string channelTopic;
     std::map<std::string, IrcUserStore> users;
     bool disabled;
+
+    std::string nickToLower(const std::string& nick);
 public:
     IrcChannelStore(const std::string& channelPassword,
                     bool disabled);
@@ -29,6 +33,7 @@ public:
     void addUser(const std::string& nick, const std::string& mode);
     void removeUser(const std::string& nick);
     void renameUser(const std::string& nick, const std::string& newNick);
+    void changeUserMode(const std::string& nick, const std::string& mode);
     const std::map<std::string, IrcUserStore>& getUsers() const;
     std::string getChannelPassword() const;
     bool getDisabled() const;

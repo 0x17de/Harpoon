@@ -103,7 +103,7 @@ void IrcConnection_Impl::onMode(irc_session_t* session,
     string mode(params.at(1));
     string arg = params.size() < 3 ? "" : params.at(2);
     resultEvent = make_shared<EventIrcModeChanged>(userId, configuration.getServerId(), who, channel, mode, arg);
-    cout << "MODE<" << who << ">: " << channel << " " << mode << ": " << arg << endl;
+    cout << "MODE<" << who << ">: " << userId << " " << channel << " " << mode << ": " << arg << endl;
 }
 
 void IrcConnection_Impl::onUmode(irc_session_t* session,
