@@ -101,9 +101,12 @@ void IrcConnection_Impl::onMode(irc_session_t* session,
     string who(origin);
     string channel(params.at(0));
     string mode(params.at(1));
-    string arg = params.size() < 3 ? "" : params.at(2);
-    resultEvent = make_shared<EventIrcModeChanged>(userId, configuration.getServerId(), who, channel, mode, arg);
-    cout << "MODE<" << who << ">: " << userId << " " << channel << " " << mode << ": " << arg << endl;
+    auto argIt = params.begin()+2;
+    resultEvent = make_shared<EventIrcModeChanged>(userId, configuration.getServerId(), who, channel, mode, argIt, params.end());
+    cout << "MODE<" << who << ">: " << userId << " " << channel << " " << mode << ":";
+    for (auto it = argIt; it != params.end(); ++it)
+        cout << " " << *it;
+    cout << endl;
 }
 
 void IrcConnection_Impl::onUmode(irc_session_t* session,

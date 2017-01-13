@@ -18,6 +18,7 @@
 #include "event/irc/EventIrcHostDeleted.hpp"
 #include "event/irc/EventIrcUserlistReceived.hpp"
 #include "event/irc/EventIrcNickModified.hpp"
+#include "event/irc/EventIrcModeChanged.hpp"
 #include "event/EventLoginResult.hpp"
 #include "event/EventLogout.hpp"
 #include "event/EventQuery.hpp"
@@ -304,6 +305,18 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["nick"] = action->getUsername();
         root["msg"] = action->getMessage();
         root["channel"] = action->getChannel();
+    } else if (eventType == EventIrcModeChanged::uuid) {
+        auto mode = event->as<EventIrcModeChanged>();
+        root["cmd"] = "mode";
+        root["protocol"] = "irc";
+        root["id"] = to_string(id);
+        root["server"] = to_string(mode->getServerId());
+        root["channel"] = mode->getChannel();
+        root["nick"] = mode->getUsername();
+        root["mode"] = mode->getMode();
+        auto& args = root["args"] = Json::arrayValue;
+        for (auto& s : mode->getArgs())
+            args.append(s);
     } else if (eventType == EventIrcKicked::uuid) {
         auto kick = event->as<EventIrcKicked>();
         root["cmd"] = "kick";

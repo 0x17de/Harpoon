@@ -388,11 +388,11 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                 appQueue->sendEvent(userlist);
             }
         } else if (code == LIBIRC_RFC_RPL_ENDOFNAMES) {
-            lock_guard<mutex> lock(channelLoginDataMutex);
-            auto num = event->as<EventIrcNumeric>();
-            auto& parameters = num->getParameters();
-            string channelName = parameters.at(0);
-            auto it = channelStores.find(channelName);
+            //lock_guard<mutex> lock(channelLoginDataMutex);
+            //auto num = event->as<EventIrcNumeric>();
+            //auto& parameters = num->getParameters();
+            //string channelName = parameters.at(0);
+            //auto it = channelStores.find(channelName);
             //if (it != channelStores.end()) {
                 //auto& channelStore = it->second;
                 //auto& users = channelStore.getUsers();
@@ -404,9 +404,27 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
         }
     } else if (type == EventIrcModeChanged::uuid) {
         auto mode = event->as<EventIrcModeChanged>();
-        auto it = channelStores.find(mode->getChannel());
-        if (it != channelStores.end())
-            it->second.changeUserMode(mode->getUsername(), mode->getMode());
+
+        auto channelIt = channelStores.find(mode->getChannel());
+        if (channelIt != channelStores.end()) {
+            auto& channel = channelIt->second;
+            auto modeString = mode->getMode();
+            auto& args = mode->getArgs();
+            bool add = true;
+            size_t argIndex = 0;
+
+            for (char modeChar : modeString) {
+                if (modeChar == '+') {
+                    add = true;
+                } else if (modeChar == '-') {
+                    add = false;
+                } else {
+                    auto& targetNick = args.at(argIndex);
+                    channel.changeUserMode(targetNick, modeChar, add);
+                    argIndex += 1;
+                }
+            }
+        }
     } else if (type == EventIrcPartChannel::uuid) {
         lock_guard<mutex> lock(channelLoginDataMutex);
         auto partCommand = event->as<EventIrcPartChannel>();

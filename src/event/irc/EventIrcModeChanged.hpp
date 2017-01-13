@@ -3,6 +3,7 @@
 
 #include "../IClientEvent.hpp"
 #include <string>
+#include <vector>
 
 
 class EventIrcModeChanged : public IClientEvent {
@@ -11,7 +12,7 @@ class EventIrcModeChanged : public IClientEvent {
     std::string username;
     std::string channel;
     std::string mode;
-    std::string arg;
+    std::vector<std::string> args;
 public:
     static UUID uuid;
     virtual UUID getEventUuid() const override;
@@ -20,13 +21,14 @@ public:
                         const std::string& username,
                         const std::string& channel,
                         const std::string& mode,
-                        const std::string& arg);
+                        std::vector<std::string>::const_iterator argsBegin,
+                        std::vector<std::string>::const_iterator argsEnd);
     virtual size_t getUserId() const override;
     size_t getServerId() const;
     std::string getUsername() const;
     std::string getChannel() const;
     std::string getMode() const;
-    std::string getArg() const;
+    const std::vector<std::string>& getArgs() const;
 };
 
 #endif

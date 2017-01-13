@@ -25,17 +25,13 @@ std::string IrcUserStore::getMode() const {
     return mode;
 }
 
-void IrcUserStore::addMode(const std::string& str) {
-    for (char c : str) {
-        if (mode.find(c) == string::npos)
-            mode.push_back(c);
-    }
+void IrcUserStore::addMode(char modeChar) {
+    if (mode.find(modeChar) == string::npos)
+        mode.push_back(modeChar);
 }
 
-void IrcUserStore::removeMode(const std::string& str) {
-    std::remove_if(mode.begin(), mode.end(), [&str](char c) {
-            return str.find(c) != string::npos;
-        });
+void IrcUserStore::removeMode(char modeChar) {
+    mode.erase(std::remove(mode.begin(), mode.end(), modeChar), mode.end());
 }
 
 std::string IrcChannelStore::nickToLower(const std::string& nick) {
@@ -88,19 +84,16 @@ void IrcChannelStore::renameUser(const std::string& nick, const std::string& new
     }
 }
 
-void IrcChannelStore::changeUserMode(const std::string& nick, const std::string& mode) {
+void IrcChannelStore::changeUserMode(const std::string& nick, char mode, bool add) {
     string nickLower = nickToLower(nick);
-    auto it = users.find(nickLower);
-    if (it != users.end()) {
-        if (mode.size() < 1) return;
+    auto userIt = users.find(nickLower);
+    if (userIt != users.end()) {
+        auto& user = userIt->second;
 
-        auto& user = it->second;
-        char operation = mode[0];
-
-        if (operation == '+') {
-            user.addMode(mode.substr(1));
-        } else if (operation == '-') {
-            user.removeMode(mode.substr(1));
+        if (add) {
+            user.addMode(mode);
+        } else {
+            user.removeMode(mode);
         }
     }
 }

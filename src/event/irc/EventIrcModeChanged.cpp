@@ -8,16 +8,17 @@ UUID EventIrcModeChanged::getEventUuid() const {
 }
 
 EventIrcModeChanged::EventIrcModeChanged(size_t userId, size_t serverId,
-										 const std::string& username,
-										 const std::string& channel,
-										 const std::string& mode,
-										 const std::string& arg)
-	: userId{userId}
+                                         const std::string& username,
+                                         const std::string& channel,
+                                         const std::string& mode,
+                                         std::vector<std::string>::const_iterator argsBegin,
+                                         std::vector<std::string>::const_iterator argsEnd)
+    : userId{userId}
     , serverId{serverId}
     , username{username}
     , channel{channel}
     , mode{mode}
-    , arg{arg}
+    , args{argsBegin, argsEnd}
 {
 }
 
@@ -41,7 +42,7 @@ std::string EventIrcModeChanged::getMode() const {
     return mode;
 }
 
-std::string EventIrcModeChanged::getArg() const {
-    return arg;
+const std::vector<std::string>& EventIrcModeChanged::getArgs() const {
+    return args;
 }
 
