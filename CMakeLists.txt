@@ -1,8 +1,11 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.0)
 project(Harpoon)
 include(ExternalProject)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
+
+
+# READ VERSION FROM SOURCE
 
 file(STRINGS src/version.hpp VERSION)
 string(REPLACE " " ";" VERSION "${VERSION}")
@@ -12,6 +15,40 @@ list(GET VERSION 10 CPACK_PACKAGE_VERSION_MINOR)
 list(GET VERSION 16 CPACK_PACKAGE_VERSION_PATCH)
 set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 message("Harpoon Version ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+
+
+# CONFIGURATION
+
+macro(process_flag level flag default description)
+    # crete cache entry
+    set(${flag} "${default}" CACHE BOOL "${description}")
+    # display flag information
+    set(_description "${description} (${flag})")
+    if(${flag})
+        set(_description "[x] ${_description}")
+    else()
+        set(_description "[ ] ${_description}")
+    endif()
+    # indentation
+    foreach(i RANGE ${level})
+        set(_description "  ${_description}")
+    endforeach()
+    # print final message
+    message(${_description})
+endmacro()
+
+
+# REPORTING
+
+process_flag(0 USE_WEBSOCKET_SERVER 1 "Using websocket server")
+  process_flag(1 USE_WEBSOCKET_SERVER_VERBOSE 0 "Verbose websocket messages")
+  process_flag(1 Seasocks_GIT 0 "Get seasocks from git")
+
+process_flag(0 USE_POSTGRES_DATABASE 1 "Using postgres")
+process_flag(0 BUILD_TEST 0 "Build tests")
+
+
+# SOURCES
 
 set(SOURCE_FILES src/version.hpp
     src/app/Application.cpp src/app/Application.hpp
@@ -92,6 +129,13 @@ set(SOURCE_FILES src/version.hpp
     src/event/irc/IrcServerListing.cpp src/event/irc/IrcServerListing.hpp
     src/event/EventQuit.cpp src/event/EventQuit.hpp)
 
+set(TEST_SOURCE_FILES
+    src/test.cpp src/test.hpp
+    src/tests/TestModules.cpp)
+
+
+# LIBRARIES
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 set(LINK_LIBRARIES "Threads::Threads")
@@ -99,77 +143,75 @@ set(INCLUDE_DIRECTORIES "")
 
 
 
-if(${USE_POSTGRES_DATABASE})
-    message("Postgres included")
-    set(SOURCE_FILES ${SOURCE_FILES}
+if(USE_POSTGRES_DATABASE)
+    list(APPEND SOURCE_FILES
         src/db/handler/Postgres.hpp
-        src/db/handler/Postgres.cpp
-        )
+        src/db/handler/Postgres.cpp)
     add_definitions(-DUSE_POSTGRES_DATABASE)
 endif()
 
 
 
-if(${USE_WEBSOCKET_SERVER})
-    message("Websocket server included")
-    if(${USE_WEBSOCKET_SERVER_VERBOSE})
-        message("Websocket server verbose")
+if(USE_POSTGRES_DATABASE)
+    find_package(Soci REQUIRED)
+    if(SOCI_FOUND)
+        list(APPEND INCLUDE_DIRECTORIES ${SOCI_INCLUDE_DIRS})
+        list(APPEND LINK_LIBRARIES ${SOCI_LIBRARY} ${SOCI_postgresql_PLUGIN})
+    else()
+        message(FATAL_ERROR "SOCI NOT FOUND")
+        set(MISSING_LIB 1)
+    endif()
+
+    list(APPEND TEST_SOURCE_FILES
+        src/tests/TestPostgres.cpp)
+endif()
+
+
+
+if(USE_WEBSOCKET_SERVER)
+    if(USE_WEBSOCKET_SERVER_VERBOSE)
         add_definitions(-DUSE_WEBSOCKET_SERVER_VERBOSE)
     endif()
-    set(SOURCE_FILES ${SOURCE_FILES}
+    list(APPEND SOURCE_FILES
         src/server/ws/WebsocketServer.cpp
         src/server/ws/WebsocketServer_Impl.cpp
         src/server/ws/WebsocketHandler.cpp
         src/server/ws/WebsocketServer.hpp
         src/server/ws/WebsocketServer_Impl.hpp)
     add_definitions(-DUSE_WEBSOCKET_SERVER)
-    if(${Seasocks_GIT})
-        message("Using Seasocks from GIT")
-    else()
-        message("Using local Seasocks")
+    if(NOT Seasocks_GIT)
         find_package(Seasocks REQUIRED)
+        if(NOT Seasocks_FOUND)
+            message(FATAL_ERROR "SEASOCKS NOT FOUND")
+            set(MISSING_LIB 1)
+        endif()
     endif()
     find_package(JsonCpp REQUIRED)
 endif()
 
 
 
-add_library(HarpoonCore SHARED ${SOURCE_FILES})
-add_executable(Harpoon src/main.cpp)
-target_link_libraries(Harpoon HarpoonCore)
-if(${BUILD_TEST})
-  set(TEST_SOURCE_FILES
-      src/tests/TestPostgres.cpp
-      src/tests/TestModules.cpp)
-  add_executable(HarpoonTest
-                 src/test.cpp src/test.hpp
-                 ${TEST_SOURCE_FILES})
-  target_link_libraries(HarpoonTest HarpoonCore)
-endif()
-
-
-
-if(${USE_WEBSOCKET_SERVER})
-  if(${Seasocks_GIT})
+if(USE_WEBSOCKET_SERVER)
+  if(Seasocks_GIT)
     ExternalProject_Add(Seasocks
       GIT_REPOSITORY "https://github.com/mattgodbolt/seasocks"
       GIT_TAG "master"
       UPDATE_COMMAND ""
       INSTALL_COMMAND "")
   else()
-    if(${Seasocks_FOUND})
+    if(Seasocks_FOUND)
       list(APPEND INCLUDE_DIRECTORIES ${Seasocks_INCLUDE_DIR})
       list(APPEND LINK_LIBRARIES ${Seasocks_LIBRARY})
     else()
-      message(WARNING "SEASOCKS NOT FOUND")
+      message(FATAL_ERROR "SEASOCKS NOT FOUND")
       set(MISSING_LIB 1)
     endif()
   endif()
-  if(${JsonCpp_FOUND})
+  if(JsonCpp_FOUND)
     list(APPEND INCLUDE_DIRECTORIES ${JsonCpp_INCLUDE_DIR})
     list(APPEND LINK_LIBRARIES ${JsonCpp_LIBRARY})
   else()
-    message(WARNING "JSONCPP NOT FOUND")
+    message(FATAL_ERROR "JSONCPP NOT FOUND")
     set(MISSING_LIB 1)
   endif()
 endif()
@@ -177,50 +219,56 @@ endif()
 
 
 find_package(OpenSSL REQUIRED)
-if(${OPENSSL_FOUND})
+if(OPENSSL_FOUND)
   list(APPEND INCLUDE_DIRECTORIES ${OPENSSL_INCLUDE_DIR})
   list(APPEND LINK_LIBRARIES ${OPENSSL_LIBRARIES})
 else()
-  message(WARNING "OPENSSL NOT FOUND")
-  set(MISSING_LIB 1)
-endif()
-
-
-
-find_package(Soci REQUIRED)
-if(${SOCI_FOUND})
-  list(APPEND INCLUDE_DIRECTORIES ${SOCI_INCLUDE_DIRS})
-  list(APPEND LINK_LIBRARIES ${SOCI_LIBRARY} ${SOCI_postgresql_PLUGIN})
-else()
-  message(WARNING "SOCI NOT FOUND")
+  message(FATAL_ERROR "OPENSSL NOT FOUND")
   set(MISSING_LIB 1)
 endif()
 
 
 
 find_package(LibIrcClient REQUIRED)
-if(${LibIrcClient_FOUND})
+if(LibIrcClient_FOUND)
   list(APPEND INCLUDE_DIRECTORIES ${LibIrcClient_INCLUDE_DIRS})
   list(APPEND LINK_LIBRARIES ${LibIrcClient_LIBRARY})
 else()
-  message(WARNING "LibIrcClient NOT FOUND")
+  message(FATAL_ERROR "LibIrcClient NOT FOUND")
   set(MISSING_LIB 1)
 endif()
 
 
+# EXECUTABLES
+
+add_library(HarpoonCore SHARED ${SOURCE_FILES})
+add_executable(Harpoon src/main.cpp)
+target_link_libraries(Harpoon HarpoonCore)
+if(BUILD_TEST)
+    add_executable(HarpoonTest
+                   ${TEST_SOURCE_FILES})
+    target_link_libraries(HarpoonTest HarpoonCore)
+endif()
+
+
+## Default
 
 target_link_libraries(HarpoonCore ${LINK_LIBRARIES})
 target_include_directories(HarpoonCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
 set_target_properties(HarpoonCore PROPERTIES COMPILE_FLAGS "-std=c++11 -pedantic -Wall")
 set_target_properties(Harpoon PROPERTIES COMPILE_FLAGS "-std=c++11 -pedantic -Wall")
 
-if(${BUILD_TEST})
+
+## Test
+
+if(BUILD_TEST)
   target_link_libraries(HarpoonTest ${LINK_LIBRARIES})
   target_include_directories(HarpoonTest PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
   set_target_properties(HarpoonTest PROPERTIES COMPILE_FLAGS "-std=c++11 -pedantic -Wall")
 endif()
 
 
+# SETUP
 
 INSTALL(TARGETS Harpoon HarpoonCore
     RUNTIME DESTINATION bin
