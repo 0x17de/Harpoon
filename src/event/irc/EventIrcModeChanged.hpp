@@ -2,11 +2,12 @@
 #define EVENTIRCMODECHANGED_H
 
 #include "../IClientEvent.hpp"
+#include "IrcLoggable.hpp"
 #include <string>
 #include <vector>
 
 
-class EventIrcModeChanged : public IClientEvent {
+class EventIrcModeChanged : public IClientEvent, public IrcLoggable {
     size_t userId;
     size_t serverId;
     std::string username;
@@ -23,6 +24,7 @@ public:
                         const std::string& mode,
                         std::vector<std::string>::const_iterator argsBegin,
                         std::vector<std::string>::const_iterator argsEnd);
+
     virtual size_t getUserId() const override;
     size_t getServerId() const;
     std::string getUsername() const;
