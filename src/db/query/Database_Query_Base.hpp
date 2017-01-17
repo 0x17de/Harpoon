@@ -65,7 +65,7 @@ namespace Query {
         std::string name;
         inline Constant()
         { }
-        inline Constant(const std::string& name)
+        explicit inline Constant(const std::string& name)
             : name{name}
         { }
 
@@ -77,7 +77,7 @@ namespace Query {
         std::string name;
         Var()
         { }
-        Var(const std::string& name)
+        explicit inline Var(const std::string& name)
             : name{name}
         { }
 

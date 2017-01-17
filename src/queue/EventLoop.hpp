@@ -25,7 +25,7 @@ protected:
     virtual bool onEvent(std::shared_ptr<IEvent> event) = 0;
 public:
     EventLoop();
-    EventLoop(const std::set<UUID>& processableEvents, const std::list<bool(*)(IEvent*)>& = {}, bool threaded = true);
+    explicit EventLoop(const std::set<UUID>& processableEvents, const std::list<bool(*)(IEvent*)>& = {}, bool threaded = true);
     virtual ~EventLoop();
     void run();
     EventQueue* getEventQueue();

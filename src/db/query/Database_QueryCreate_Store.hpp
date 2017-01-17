@@ -18,6 +18,12 @@ namespace Query {
     struct QueryCreate_Field {
         std::string name;
         FieldType type;
+
+        inline QueryCreate_Field(const std::string& name,
+                                 FieldType type)
+            : name{name}
+            , type{type}
+        { }
     };
 
     struct QueryCreate_Store {

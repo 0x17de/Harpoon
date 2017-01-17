@@ -14,7 +14,7 @@ namespace details {
     struct TmpQueryCreate_CREATE {
         std::unique_ptr<QueryCreate_Store> store;
 
-        inline TmpQueryCreate_CREATE(const std::string& name)
+        explicit inline TmpQueryCreate_CREATE(const std::string& name)
             : store{cpp11::make_unique<QueryCreate_Store>()}
         {
             store->name = name;
@@ -25,6 +25,7 @@ namespace details {
         }
 
         inline TmpQueryCreate_CREATE& field(const std::string& str, FieldType type) {
+            store->fields.emplace_back(str, type);
             return *this;
         }
     };

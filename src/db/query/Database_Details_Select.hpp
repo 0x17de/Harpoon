@@ -14,7 +14,7 @@ namespace details {
     struct TmpQuerySelect_ORDER {
         std::unique_ptr<QuerySelect_Store> store;
 
-        inline TmpQuerySelect_ORDER(std::unique_ptr<QuerySelect_Store> store)
+        explicit inline TmpQuerySelect_ORDER(std::unique_ptr<QuerySelect_Store> store)
             : store{std::move(store)}
         { }
 
@@ -31,7 +31,7 @@ namespace details {
     struct TmpQuerySelect_FILTER {
         std::unique_ptr<QuerySelect_Store> store;
 
-        inline TmpQuerySelect_FILTER(std::unique_ptr<QuerySelect_Store> store)
+        explicit inline TmpQuerySelect_FILTER(std::unique_ptr<QuerySelect_Store> store)
             : store{std::move(store)}
         { }
 
@@ -57,7 +57,7 @@ namespace details {
     struct TmpQuerySelect_JOIN {
         std::unique_ptr<QuerySelect_Store> store;
 
-        inline TmpQuerySelect_JOIN(std::unique_ptr<QuerySelect_Store> store)
+        explicit inline TmpQuerySelect_JOIN(std::unique_ptr<QuerySelect_Store> store)
             : store{std::move(store)}
         { }
 
@@ -89,7 +89,7 @@ namespace details {
     struct TmpQuerySelect_FROM {
         std::unique_ptr<QuerySelect_Store> store;
 
-        inline TmpQuerySelect_FROM(std::unique_ptr<QuerySelect_Store> store)
+        explicit inline TmpQuerySelect_FROM(std::unique_ptr<QuerySelect_Store> store)
             : store{std::move(store)}
         { }
 

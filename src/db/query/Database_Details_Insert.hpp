@@ -14,7 +14,7 @@ namespace details {
     struct TmpQueryInsert_DATA {
         std::unique_ptr<QueryInsert_Store> store;
 
-        inline TmpQueryInsert_DATA(std::unique_ptr<QueryInsert_Store> store)
+        explicit inline TmpQueryInsert_DATA(std::unique_ptr<QueryInsert_Store> store)
             : store{std::move(store)}
         { }
 
@@ -34,7 +34,7 @@ namespace details {
     struct TmpQueryInsert_JOIN {
         std::unique_ptr<QueryInsert_Store> store;
 
-        inline TmpQueryInsert_JOIN(std::unique_ptr<QueryInsert_Store> store)
+        explicit inline TmpQueryInsert_JOIN(std::unique_ptr<QueryInsert_Store> store)
             : store{std::move(store)}
         { }
 
@@ -55,7 +55,7 @@ namespace details {
     struct TmpQueryInsert_FORMAT {
         std::unique_ptr<QueryInsert_Store> store;
 
-        inline TmpQueryInsert_FORMAT(std::unique_ptr<QueryInsert_Store> store)
+        explicit inline TmpQueryInsert_FORMAT(std::unique_ptr<QueryInsert_Store> store)
             : store{std::move(store)}
         { }
 
@@ -89,7 +89,7 @@ namespace details {
     struct TmpQueryInsert_INTO {
         std::unique_ptr<QueryInsert_Store> store;
 
-        inline TmpQueryInsert_INTO(std::unique_ptr<QueryInsert_Store> store)
+        explicit inline TmpQueryInsert_INTO(std::unique_ptr<QueryInsert_Store> store)
             : store{std::move(store)}
         { }
 
