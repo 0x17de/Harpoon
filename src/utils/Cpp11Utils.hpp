@@ -1,3 +1,6 @@
+#ifndef CPP11UTILS_H
+#define CPP11UTILS_H
+
 #include <memory>
 
 
@@ -7,3 +10,5 @@ namespace cpp11 {
         return std::unique_ptr<R>(new R(std::forward<T>(t)...));
     }
 }
+
+#endif
