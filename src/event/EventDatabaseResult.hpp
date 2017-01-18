@@ -2,7 +2,6 @@
 #define EVENTDATABASERESULT_H
 
 #include "IDatabaseEvent.hpp"
-#include "db/DatabaseQuery.hpp"
 #include <memory>
 #include <list>
 

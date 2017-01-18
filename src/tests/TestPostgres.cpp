@@ -12,7 +12,6 @@ using namespace std;
 #include "event/EventInit.hpp"
 #include "event/EventDatabaseQuery.hpp"
 #include "event/EventDatabaseResult.hpp"
-#include "db/DatabaseQuery.hpp"
 #include "db/handler/Postgres.hpp"
 #include "utils/Ini.hpp"
 
@@ -218,13 +217,14 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         // create table
         {
-            auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
+            //auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            // TODO: create
+            /*/* auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
                                                           "test_postgreshandler"));
             query.add(Database::OperationType::Assign, "id", "id");
             query.add(Database::OperationType::Assign, "key", "text");
 
-            handler.getEventQueue()->sendEvent(eventSetup);
+            handler.getEventQueue()->sendEvent(eventSetup); */
         }
 
         // wait till table is created
@@ -244,8 +244,9 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         // insert test elements
         {
-            auto eventInsert = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            auto& query = eventInsert->add(Database::Query(Database::QueryType::Insert,
+            //auto eventInsert = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            // TODO: select
+            /* auto& query = eventInsert->add(Database::Query(Database::QueryType::Insert,
                                                            "test_postgreshandler",
                                                            std::list<string>{"id", "key"}));
             query.add(Database::OperationType::Assign, "1");
@@ -253,7 +254,7 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             query.add(Database::OperationType::Assign, "2");
             query.add(Database::OperationType::Assign, "test1");
 
-            handler.getEventQueue()->sendEvent(eventInsert);
+            handler.getEventQueue()->sendEvent(eventInsert); */
         }
 
         ASSERT_EQUAL(true, waitForEvent());
@@ -284,13 +285,13 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         {
             // fetch first element
-            auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
+            //auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            /* auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
                                                           "test_postgreshandler",
                                                           std::list<string>{"id", "key"}));
             query.add(Database::OperationType::Assign, "id", "1");
 
-            handler.getEventQueue()->sendEvent(eventFetch);
+            handler.getEventQueue()->sendEvent(eventFetch); */
         }
 
         ASSERT_EQUAL(true, waitForEvent());
@@ -315,13 +316,13 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         // test limit
         {
-            auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
+            //auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            /* auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
                                                           "test_postgreshandler",
                                                           std::list<string>{"id"}));
             query.add(Database::OperationType::Limit, "2");
 
-            handler.getEventQueue()->sendEvent(eventFetch);
+            handler.getEventQueue()->sendEvent(eventFetch); */
         }
 
         ASSERT_EQUAL(true, waitForEvent());
@@ -338,13 +339,13 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         // test compare lower
         {
-            auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
+            //auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            /* auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
                                                           "test_postgreshandler",
                                                           std::list<string>{"id", "key"}));
             query.add(Database::OperationType::CompareLower, "id", "2");
 
-            handler.getEventQueue()->sendEvent(eventFetch);
+            handler.getEventQueue()->sendEvent(eventFetch); */
         }
 
         ASSERT_EQUAL(true, waitForEvent());
@@ -363,13 +364,13 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         // test compare greater
         {
-            auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
+            //auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            /* auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
                                                           "test_postgreshandler",
                                                           std::list<string>{"id"}));
             query.add(Database::OperationType::CompareGreater, "id", "1");
 
-            handler.getEventQueue()->sendEvent(eventFetch);
+            handler.getEventQueue()->sendEvent(eventFetch); */
         }
 
         ASSERT_EQUAL(true, waitForEvent());
@@ -387,12 +388,12 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         // delete test elements
         {
-            auto eventDelete = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            auto& query = eventDelete->add(Database::Query(Database::QueryType::Delete,
+            //auto eventDelete = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            /* auto& query = eventDelete->add(Database::Query(Database::QueryType::Delete,
                                                            "test_postgreshandler"));
             query.add(Database::OperationType::Assign, "id", "2");
 
-            handler.getEventQueue()->sendEvent(eventDelete);
+            handler.getEventQueue()->sendEvent(eventDelete); */
         }
 
         ASSERT_EQUAL(true, waitForEvent());
@@ -430,14 +431,14 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         // create table
         {
-            auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
+            //auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            /* auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
                                                           "test_postgresjoin"));
             query.add(Database::OperationType::Assign, "id", "id");
             query.add(Database::OperationType::Assign, "key", "text");
             query.add(Database::OperationType::Join, "name", "text", "test_postgresjoin_name");
 
-            handler.getEventQueue()->sendEvent(eventSetup);
+            handler.getEventQueue()->sendEvent(eventSetup); */
         }
 
         // wait till table is created
@@ -463,8 +464,8 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         // insert test elements
         {
-            auto eventInsert = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            auto& query = eventInsert->add(Database::Query(Database::QueryType::Insert,
+            //auto eventInsert = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            /* auto& query = eventInsert->add(Database::Query(Database::QueryType::Insert,
                                                            "test_postgresjoin",
                                                            std::list<string>{"id", "key", "name_ref"}));
             query.add(Database::OperationType::Assign, "1");
@@ -472,7 +473,7 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             query.add(Database::OperationType::Assign, "", "", "0");
             query.add(Database::OperationType::Join, "name", "testname", "test_postgresjoin_name");
 
-            handler.getEventQueue()->sendEvent(eventInsert);
+            handler.getEventQueue()->sendEvent(eventInsert); */
         }
 
         ASSERT_EQUAL(true, waitForEvent());
@@ -561,15 +562,15 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         // create table
         {
-            auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
+            //auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
+            /* auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
                                                           "test_postgrestypes"));
             query.add(Database::OperationType::Assign, "id", "id");
             query.add(Database::OperationType::Assign, "key", "text");
             query.add(Database::OperationType::Assign, "time", "time");
             query.add(Database::OperationType::Assign, "number", "int");
 
-            handler.getEventQueue()->sendEvent(eventSetup);
+            handler.getEventQueue()->sendEvent(eventSetup); */
         }
 
         ASSERT_EQUAL(true, waitForEvent());

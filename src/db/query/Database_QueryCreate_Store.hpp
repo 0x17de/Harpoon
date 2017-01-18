@@ -5,6 +5,8 @@
 #include <string>
 #include <memory>
 
+#include "Database_QueryBase.hpp"
+
 
 namespace Query {
     enum class FieldType {
@@ -26,7 +28,7 @@ namespace Query {
         { }
     };
 
-    struct QueryCreate_Store {
+    struct QueryCreate_Store : public QueryBase {
         std::string name;
         std::list<QueryCreate_Field> fields;
     };

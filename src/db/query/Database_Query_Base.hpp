@@ -10,12 +10,34 @@ namespace Query {
     struct Statement;
     using StatementPtr = std::unique_ptr<Statement>;
     using OrderStatement = std::tuple<std::string, std::string>;
-    using JoinStatement = std::tuple<std::string, StatementPtr>;
+
+    struct Join {
+        std::string table;
+        StatementPtr on;
+        std::list<std::string> fields;
+
+        inline void addFields() {}
+        template<class R, class... T>
+        void addFields(R&& field, T&&... t) {
+            fields.emplace_back(field);
+            addFields(std::forward<T>(t)...);
+        }
+
+        template<class R, class... T>
+        Join(R&& table, StatementPtr&& on, T&&... t)
+            : table(std::forward<R>(table))
+            , on(std::move(on))
+        {
+            addFields(std::forward<T>(t)...);
+        }
+    };
 
     enum class Op {
         EQ,
-        LT,
         NEQ,
+        LT,
+        GT,
+        AND,
         OR
     };
 
@@ -96,13 +118,22 @@ namespace Query {
     }
 
 
-    StatementPtr operator==(StatementPtr&& left, StatementPtr&& right) {
+    inline StatementPtr operator==(StatementPtr&& left, StatementPtr&& right) {
         return cpp11::make_unique<Expression>(std::move(left), std::move(right), Op::EQ);
     }
-    StatementPtr operator<(StatementPtr&& left, StatementPtr&& right) {
+    inline StatementPtr operator!=(StatementPtr&& left, StatementPtr&& right) {
+        return cpp11::make_unique<Expression>(std::move(left), std::move(right), Op::NEQ);
+    }
+    inline StatementPtr operator<(StatementPtr&& left, StatementPtr&& right) {
         return cpp11::make_unique<Expression>(std::move(left), std::move(right), Op::LT);
     }
-    StatementPtr operator||(StatementPtr&& left, StatementPtr&& right) {
+    inline StatementPtr operator>(StatementPtr&& left, StatementPtr&& right) {
+        return cpp11::make_unique<Expression>(std::move(left), std::move(right), Op::GT);
+    }
+    inline StatementPtr operator&&(StatementPtr&& left, StatementPtr&& right) {
+        return cpp11::make_unique<Expression>(std::move(left), std::move(right), Op::OR);
+    }
+    inline StatementPtr operator||(StatementPtr&& left, StatementPtr&& right) {
         return cpp11::make_unique<Expression>(std::move(left), std::move(right), Op::OR);
     }
 }

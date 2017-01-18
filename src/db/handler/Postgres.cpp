@@ -1,4 +1,5 @@
 #include "Postgres.hpp"
+#include "db/query/Database_Query.hpp"
 #include "utils/ModuleProvider.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventInit.hpp"
@@ -26,23 +27,11 @@ namespace Database {
         bool onEvent(std::shared_ptr<IEvent> event);
         void handleQuery(std::shared_ptr<IEvent> event);
 
-        void query_setupTable(const Database::Query& query, EventDatabaseResult* result);
-        void query_insert(const Database::Query& query, EventDatabaseResult* result);
-        void query_fetch(const Database::Query& query, EventDatabaseResult* result);
-        void query_lastId(const Database::Query& query, EventDatabaseResult* result);
-        void query_delete(const Database::Query& query, EventDatabaseResult* result);
+        void query_createTable(Query::QueryCreate_Store* store, EventDatabaseResult* result);
+        void query_insert(Query::QueryInsert_Store* store, EventDatabaseResult* result);
+        void query_select(Query::QuerySelect_Store* store, EventDatabaseResult* result);
+        //void query_delete(const std::unique_ptr<Query::QueryDelete_Store>& query, EventDatabaseResult* result);
 
-        static void query_scanOperations(const Database::Query& query,
-                                         std::list<Database::Operation const *>& join,
-                                         Database::Operation const *& where,
-                                         Database::Operation const *& limit);
-        template<class T>
-        void query_handleWhere(T& temp_type,
-                               const Database::Operation& op,
-                               size_t& index,
-                               std::vector<size_t>* ids = 0);
-
-        static const std::map<std::string, std::string> typeMap;
         std::list<std::shared_ptr<IEvent>> heldBackQueries;
 
         friend Postgres;
@@ -66,317 +55,62 @@ namespace Database {
         return impl->onEvent(event);
     }
 
-    const map<string, string> Postgres_Impl::typeMap {
-        {"id", "serial"},
-        {"time", "timestamp"},
-        {"int", "integer"},
-        {"text", "text"},
-        {"bool", "boolean"}
-    };
+    void Postgres_Impl::query_createTable(Query::QueryCreate_Store* store, EventDatabaseResult* result) {
+        using namespace Query;
 
-    void Postgres_Impl::query_setupTable(const Database::Query& query, EventDatabaseResult* result) {
-        Database::Operation const *where = 0, *limit = 0;
-        std::list<Database::Operation const *> join;
-        query_scanOperations(query, join, where, limit);
-
-        for (auto& op : join) {
-            auto q = sqlSession->once << "CREATE TABLE IF NOT EXISTS "
-                                      << op->getExtra() << " ("
-                                      << op->getLeft() << "_id serial, "
-                                      << op->getLeft() << " " << typeMap.at(op->getRight())
-                                      << ")";
-        }
-
-        {
-            auto q = sqlSession->once << "CREATE TABLE IF NOT EXISTS " << query.getTable() << " (";
-            bool first = true;
-            for (auto& op : query.getOperations()) {
-                if (op.getOperation() != Database::OperationType::Assign)
-                    continue;
-                if (first) {
-                    first = false;
-                } else {
-                    q << ", ";
-                }
-                q << op.getLeft() << " " << typeMap.at(op.getRight());
-            }
-            for (auto& op : join) {
-                if (first) {
-                    first = false;
-                } else {
-                    q << ", ";
-                }
-                q << op->getLeft() << "_ref integer";
-            }
-            q << ")";
-        }
-
-        result->setSuccess(true);
-    }
-
-    void Postgres_Impl::query_insert(const Database::Query& query, EventDatabaseResult* result) {
-        Database::Operation const *where = 0, *limit = 0;
-        std::list<Database::Operation const *> join;
-        query_scanOperations(query, join, where, limit);
-
-        std::vector<size_t> ids;
-        size_t joinIndex = 0;
-        for (auto& op : join) {
-            size_t id = 0;
-            sqlSession->once << "SELECT " << op->getLeft() << "_id FROM "
-                             << op->getExtra() << " WHERE "
-                             << op->getLeft() << " = :sel" << joinIndex, soci::into(id), soci::use(op->getRight());
-            if (!sqlSession->got_data()) { // not found
-                long lid;
-                stringstream ss;
-                ss << op->getExtra() << "_" << op->getLeft() <<  "_id_seq";
-                if (sqlSession->get_next_sequence_value(ss.str(), lid)) {
-                    sqlSession->once << "INSERT INTO "
-                                     << op->getExtra() << "(" << op->getLeft() << "_id, " << op->getLeft() << ")"
-                                     << " VALUES (:insId" << joinIndex << ", :ins" << joinIndex << ")", soci::use(lid), soci::use(op->getRight());
-                    id = lid;
-                } else {
-                    sqlSession->once << "INSERT INTO "
-                                     << op->getExtra() << "(" << op->getLeft() << ")"
-                                     << " VALUES (:ins" << joinIndex << ")", soci::use(op->getRight());
-                    if (sqlSession->get_last_insert_id(op->getExtra(), lid))
-                        id = lid;
-                }
-            }
-            ids.push_back(id);
-            ++joinIndex;
-        }
-
-        {
-            auto q = sqlSession->once << "INSERT INTO " << query.getTable() << " " << "(";
-            bool first = true;
-            for (auto& col : query.getColumns()) {
-                if (first) {
-                    first = false;
-                } else {
-                    q << ", ";
-                }
-                q << col;
-            }
-            q << ") VALUES (";
-
-            auto& operations = query.getOperations();
-            size_t columnCount = query.getColumns().size();
-            size_t index = 0;
-            for (auto& op : operations) {
-                if (op.getOperation() != Database::OperationType::Assign)
-                    continue;
-                if (index > 0 && index % columnCount == 0)
-                    q << ")";
-                if (index != 0)
-                    q << ", ";
-                if (index > 0 && index % columnCount == 0)
-                    q << "(";
-                q << ":op" << index;
-                if (op.getExtra().size() > 0) {
-                    size_t idsIndex;
-                    istringstream(op.getExtra()) >> idsIndex;
-                    size_t& id = ids.at(idsIndex); // needs to live till the end of the request
-                    q, soci::use(id);
-                } else {
-                    q, soci::use(op.getLeft());
-                }
-                ++index;
-            }
-            q << ")";
-        }
-
-        result->setSuccess(true);
-    }
-
-    void Postgres_Impl::query_lastId(const Database::Query& query, EventDatabaseResult* result) {
-        auto& columns = query.getColumns();
-        if (columns.size() == 0) return;
-
-        std::string outId;
-
-        soci::statement st = (sqlSession->prepare
-                              << "SELECT " << columns.front()
-                              << " FROM " << query.getTable()
-                              << " ORDER BY " << columns.front()
-                              << " DESC LIMIT 1", soci::into(outId));
-
-        st.execute();
-        if (st.fetch())
-            result->addResult(outId);
-        else
-            result->addResult("0");
-        result->setSuccess(true);
-    }
-
-    void Postgres_Impl::query_fetch(const Database::Query& query, EventDatabaseResult* result) {
-        auto& columns = query.getColumns();
-        vector<string> temp(columns.size());
-
-        auto q = sqlSession->prepare << "SELECT ";
-        bool first = true;
-        for (auto& column : query.getColumns()) {
-            if (first) {
-                first = false;
-            } else {
-                q << ", ";
-            }
-            q << column;
-        }
-        q << " FROM " << query.getTable();
-
-        Database::Operation const *where = 0, *limit = 0;
-        std::list<Database::Operation const *> join;
-        query_scanOperations(query, join, where, limit);
-
-        for (auto& op : join) {
-            q << " INNER JOIN " << op->getExtra()
-              << " ON " << op->getLeft()
-              << "_id = " << op->getLeft()
-              << "_ref";
-        }
-
-        if (where) {
-            q << " WHERE ";
-            size_t index;
-            query_handleWhere(q, *where, index);
-        }
-
-        if (limit) {
-            q << " LIMIT " << limit->getLeft();
-        }
-
-        for (size_t i = 0; i < columns.size(); ++i)
-            q, soci::into(temp[i]);
-
-        soci::statement st = q;
-        st.execute();
-        while (st.fetch()) {
-            for (auto& s : temp)
-                result->addResult(s);
-        }
-
-        result->setSuccess(true);
-    }
-
-    void Postgres_Impl::query_delete(const Database::Query& query, EventDatabaseResult* result) {
-        Database::Operation const *where = 0, *limit = 0;
-        std::list<Database::Operation const *> join;
-        query_scanOperations(query, join, where, limit);
-
-        std::vector<size_t> ids;
-        size_t joinIndex = 0;
-        for (auto& op : join) {
-            ids.push_back(0);
-            sqlSession->once << "SELECT id FROM "
-                             << op->getExtra() << " WHERE "
-                             << op->getLeft() << " = :sel" << joinIndex, soci::into(ids.back()), soci::use(op->getRight());
-            if (ids.back() == 0) { // not found
-                return; // ERR: something went wrong
-            }
-            ++joinIndex;
-        }
-
-        auto q = sqlSession->once << "DELETE FROM " << query.getTable();
-
-        if (where) {
-            q << " WHERE ";
-            size_t index;
-            query_handleWhere(q, *where, index, &ids);
-        }
-
-        result->setSuccess(true);
-    }
-
-    void Postgres_Impl::query_scanOperations(const Database::Query& query,
-                                             std::list<Database::Operation const *>& join,
-                                             Database::Operation const *& where,
-                                             Database::Operation const *& limit) {
-        for (auto& op : query.getOperations()) {
-            switch (op.getOperation()) {
-            case Database::OperationType::Assign:
-            case Database::OperationType::CompareAnd:
-            case Database::OperationType::CompareOr:
-            case Database::OperationType::CompareGreater:
-            case Database::OperationType::CompareLower:
-                if (where == 0)
-                    where = &op;
+        size_t index = 0;
+        stringstream ss;
+        ss << "CREATE TABLE IF NOT EXISTS " << store->name << " (";
+        for (auto& field : store->fields) {
+            switch(field.type) {
+            case FieldType::Id:
+                ss << field.name << " serial" << endl;
                 break;
-            case Database::OperationType::Join:
-                join.push_back(&op);
+            case FieldType::Time:
+                ss << field.name << " timestamp" << endl;
                 break;
-            case Database::OperationType::Limit:
-                if (limit == 0)
-                    limit = &op;
+            case FieldType::Integer:
+                ss << field.name << " integer" << endl;
                 break;
-            default:
+            case FieldType::Text:
+                ss << field.name << " text" << endl;
+                break;
+            case FieldType::Bool:
+                ss << field.name << " boolean" << endl;
                 break;
             }
+
+            ++index;
+            if (index < store->fields.size())
+                cout << ", ";
         }
+        ss << ")" << endl;
+
+        cout << ss.str() << endl;
+        sqlSession->once << ss.str();
+
+        result->setSuccess(true);
     }
 
-    template<class T>
-    void Postgres_Impl::query_handleWhere(T& q,
-                                          const Database::Operation& op,
-                                          size_t& index,
-                                          std::vector<size_t>* ids) {
-        static_assert(is_same<T, soci::details::once_temp_type>::value
-                      || is_same<T, soci::details::prepare_temp_type>::value,
-                      "Type must be once_temp_type or prepare_temp_type");
-        if (op.getOperation() == Database::OperationType::Assign) {
-            q << op.getLeft() << " = " << ":where" << index;
-            if (op.getExtra().size() > 0) {
-                size_t idsIndex;
-                istringstream(op.getExtra()) >> idsIndex;
-                size_t& id = ids->at(idsIndex); // needs to live till the end of the request
-                q, soci::use(id);
-            } else {
-                q, soci::use(op.getRight());
-            }
-            return;
-        } else if (op.getOperation() == Database::OperationType::CompareGreater) {
-            q << op.getLeft() << " > " << ":where" << index;
-            if (op.getExtra().size() > 0) {
-                size_t idsIndex;
-                istringstream(op.getExtra()) >> idsIndex;
-                size_t& id = ids->at(idsIndex); // needs to live till the end of the request
-                q, soci::use(id);
-            } else {
-                q, soci::use(op.getRight());
-            }
-            return;
-        } else if (op.getOperation() == Database::OperationType::CompareLower) {
-            q << op.getLeft() << " < " << ":where" << index;
-            if (op.getExtra().size() > 0) {
-                size_t idsIndex;
-                istringstream(op.getExtra()) >> idsIndex;
-                size_t& id = ids->at(idsIndex); // needs to live till the end of the request
-                q, soci::use(id);
-            } else {
-                q, soci::use(op.getRight());
-            }
-            return;
-        }
+    void Postgres_Impl::query_insert(Query::QueryInsert_Store* store, EventDatabaseResult* result) {
+        // TODO: insert
 
-        auto& subOps = op.getSuboperations();
-        if (subOps.size() == 0) return;
-
-        bool first = true;
-        q << "(";
-        for (auto& subOp : subOps) {
-            if (first) {
-                first = false;
-            } else {
-                if (op.getOperation() == Database::OperationType::CompareOr) {
-                    q << " OR ";
-                } else {
-                    q << " AND ";
-                }
-            }
-            query_handleWhere(q, subOp, index, ids);
-        }
-        q << ")";
+        result->setSuccess(true);
     }
+
+    void Postgres_Impl::query_select(Query::QuerySelect_Store* store, EventDatabaseResult* result) {
+        // TODO: select
+
+        result->setSuccess(true);
+    }
+
+    /*
+    void Postgres_Impl::query_delete(const std::unique_ptr<Query::QueryBase>& query, EventDatabaseResult* result) {
+        // TODO: delete
+
+        result->setSuccess(true);
+    }
+    */
 
     void Postgres_Impl::handleQuery(std::shared_ptr<IEvent> event) {
         EventDatabaseQuery* query = event->as<EventDatabaseQuery>();
@@ -388,25 +122,21 @@ namespace Database {
             return;
         }
 
-        for (const auto& query : db->getQueries()) {
-            switch (query.getType()) {
-            case Database::QueryType::SetupTable:
-                query_setupTable(query, result.get());
-                break;
-            case Database::QueryType::Fetch:
-                query_fetch(query, result.get());
-                break;
-            case Database::QueryType::LastId:
-                query_lastId(query, result.get());
-                break;
-            case Database::QueryType::Insert:
-                query_insert(query, result.get());
-                break;
-            case Database::QueryType::Delete:
-                query_delete(query, result.get());
-                break;
-            default:
-                break;
+        for (const auto& subQuery : db->getQueries()) {
+            auto ptr = subQuery.get();
+            auto insert = dynamic_cast<Query::QueryInsert_Store*>(ptr);
+            if (insert) {
+                query_insert(insert, result.get());
+            } else {
+                auto select = dynamic_cast<Query::QuerySelect_Store*>(ptr);
+                if (insert) {
+                    query_select(select, result.get());
+                } else {
+                    auto create = dynamic_cast<Query::QueryCreate_Store*>(ptr);
+                    if (create) {
+                        query_createTable(create, result.get());
+                    }
+                }
             }
         }
 

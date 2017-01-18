@@ -54,8 +54,7 @@ set(SOURCE_FILES src/version.hpp
     src/app/Application.cpp src/app/Application.hpp
     src/app/ApplicationGuard.cpp src/app/ApplicationGuard.hpp
     src/queue/EventLoop.cpp src/queue/EventLoop.hpp
-    src/db/DatabaseQuery.cpp src/db/DatabaseQuery.hpp
-    src/db/query/Database_Query.hpp src/db/query/Database_Query_Base.hpp
+    src/db/query/Database_Query.hpp src/db/query/Database_Query_Base.hpp src/db/query/Database_QueryBase.cpp
     src/db/query/Database_Details_Create.hpp src/db/query/Database_QueryCreate_Store.hpp
     src/db/query/Database_Details_Insert.hpp src/db/query/Database_QueryInsert_Store.hpp
     src/db/query/Database_Details_Select.hpp src/db/query/Database_QuerySelect_Store.hpp

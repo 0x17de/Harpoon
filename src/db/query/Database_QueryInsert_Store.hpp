@@ -5,11 +5,13 @@
 #include <string>
 #include <memory>
 
+#include "Database_QueryBase.hpp"
+
 
 namespace Query {
-    struct QueryInsert_Store {
+    struct QueryInsert_Store : public QueryBase {
         std::string into;
-        std::list<JoinStatement> on;
+        std::list<Join> on;
         std::list<std::string> format;
         std::vector<std::string> data;
     };
