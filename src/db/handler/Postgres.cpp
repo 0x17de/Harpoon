@@ -93,7 +93,45 @@ namespace Database {
     }
 
     void Postgres_Impl::query_insert(Query::QueryInsert_Store* store, EventDatabaseResult* result) {
-        // TODO: insert
+        using namespace Query;
+        stringstream ss;
+
+        ss << "BEGIN;";
+
+        // TODO: insert data required for join
+
+        ss << "INSERT INTO " << store->into << " (";
+        size_t index = 0;
+        for (auto& s : store->format) {
+            cout << s;
+            ++index;
+            if (index < store->format.size())
+                cout << ", ";
+        }
+        ss << ") VALUES ";
+
+        size_t dataIndex = 0;
+        decltype(store->data.cend()) end;
+        for (auto it = store->data.cbegin(); it != store->data.cend(); it = end + store->on.size()) {
+            end = it + store->format.size();
+
+            ss << "(";
+
+            size_t subIndex = 0;
+            for (auto q = it; q != end; ++q) {
+                ss << *q;
+                ++subIndex;
+                if (subIndex < store->format.size())
+                    ss << ", ";
+            }
+
+            ss << ") ";
+            ++dataIndex;
+        }
+
+        ss << ";";
+        ss << "COMMIT;";
+        sqlSession->once << ss.str();
 
         result->setSuccess(true);
     }
