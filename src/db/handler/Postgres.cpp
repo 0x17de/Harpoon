@@ -137,7 +137,57 @@ namespace Database {
     }
 
     void Postgres_Impl::query_select(Query::QuerySelect_Store* store, EventDatabaseResult* result) {
-        // TODO: select
+        using namespace Query;
+
+        stringstream ss;
+        ss << "SELECT ";
+        size_t whatIndex = 0;
+        for (auto& s : store->what) {
+            cout << s;
+            ++whatIndex;
+            if (whatIndex < store->what.size())
+                cout << ", ";
+        }
+        ss << " FROM " << store->from;
+
+        // TODO: join
+
+        if (store->filter) {
+            size_t filterDataIndex = 0;
+            ss << "WHERE ";
+            store->filter->traverse(TraverseCallbacks{
+                    // up
+                    []{cout << '(';},
+                    // down
+                    []{cout << ')';},
+                    // variable
+                    [&ss](const std::string& name){ss << '`' << name << '`';},
+                    // contant
+                    [&ss, &filterDataIndex](const std::string& name){ss << ":data" << filterDataIndex++; },
+                    // operation
+                    [&ss](Op op){
+                        switch(op) {
+                        case Query::Op::EQ: ss << " == "; break;
+                        case Query::Op::NEQ: ss << " != "; break;
+                        case Query::Op::GT: ss << " > "; break;
+                        case Query::Op::LT: ss << " < "; break;
+                        case Query::Op::AND: ss << " && "; break;
+                        case Query::Op::OR: ss << " || "; break;
+                        }
+                    }
+                });
+        }
+
+        {
+            auto query = sqlSession->once << ss.str();
+            store->filter->traverse(TraverseCallbacks{
+                    []{},
+                    []{},
+                    [](const std::string& name){ },
+                    [&query](const std::string& name){ query, name; },
+                    [](Op op) {}
+                });
+        }
 
         result->setSuccess(true);
     }
