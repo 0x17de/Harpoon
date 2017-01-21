@@ -4,6 +4,7 @@
 #include "IDatabaseEvent.hpp"
 #include <memory>
 #include <list>
+#include "db/query/Database_QueryBase.hpp"
 
 
 namespace Query { struct QueryBase; }
@@ -13,7 +14,9 @@ class EventDatabaseQuery : public IDatabaseEvent {
     std::list<std::unique_ptr<Query::QueryBase>> queries;
     std::shared_ptr<IEvent> eventOrigin;
 
-    inline void addQuery() { }
+    inline void addQuery(std::unique_ptr<Query::QueryBase>&& query) {
+        queries.emplace_back(std::move(query));
+    }
     template<class S, class... T>
     void addQuery(std::unique_ptr<Query::QueryBase>&& query, T&&... t) {
         queries.emplace_back(std::move(query));
@@ -28,7 +31,10 @@ public:
     EventDatabaseQuery(EventQueue* target, const std::shared_ptr<IEvent>& eventOrigin, T&&... t)
         : target{target}
         , eventOrigin{eventOrigin}
-    { }
+    {
+        addQuery(std::forward<T>(t)...);
+    }
+
     EventQueue* getTarget() const;
     std::shared_ptr<IEvent> getEventOrigin() const;
     const std::list<std::unique_ptr<Query::QueryBase>>& getQueries() const;

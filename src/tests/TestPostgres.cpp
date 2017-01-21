@@ -13,6 +13,7 @@ using namespace std;
 #include "event/EventDatabaseQuery.hpp"
 #include "event/EventDatabaseResult.hpp"
 #include "db/handler/Postgres.hpp"
+#include "db/query/Database_Query.hpp"
 #include "utils/Ini.hpp"
 
 
@@ -213,18 +214,18 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
     }
 
     void testHandler() {
+        using namespace Query;
+
         tryDrop("test_postgreshandler");
 
         // create table
         {
-            //auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            // TODO: create
-            /*/* auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
-                                                          "test_postgreshandler"));
-            query.add(Database::OperationType::Assign, "id", "id");
-            query.add(Database::OperationType::Assign, "key", "text");
+            Create stmt = create("test_postgreshandler")
+                .field("id", FieldType::Id)
+                .field("key", FieldType::Text);
+            auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>(), std::move(stmt));
 
-            handler.getEventQueue()->sendEvent(eventSetup); */
+            handler.getEventQueue()->sendEvent(eventSetup);
         }
 
         // wait till table is created
@@ -244,17 +245,13 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         // insert test elements
         {
-            //auto eventInsert = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            // TODO: select
-            /* auto& query = eventInsert->add(Database::Query(Database::QueryType::Insert,
-                                                           "test_postgreshandler",
-                                                           std::list<string>{"id", "key"}));
-            query.add(Database::OperationType::Assign, "1");
-            query.add(Database::OperationType::Assign, "test0");
-            query.add(Database::OperationType::Assign, "2");
-            query.add(Database::OperationType::Assign, "test1");
+            Insert stmt = insert()
+                .into("test_postgreshandler")
+                .format("id", "key")
+                .data(vector<string>{"1", "test0", "2", "test1"});
+            auto eventInsert = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>(), std::move(stmt));
 
-            handler.getEventQueue()->sendEvent(eventInsert); */
+            handler.getEventQueue()->sendEvent(eventInsert);
         }
 
         ASSERT_EQUAL(true, waitForEvent());

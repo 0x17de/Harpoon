@@ -53,7 +53,7 @@ std::string IrcBacklogService::convertTimestamp(std::chrono::time_point<std::chr
 }
 
 void IrcBacklogService::setupTable(std::shared_ptr<IEvent> event) {
-    auto eventSetup = std::make_shared<EventDatabaseQuery>(getEventQueue(), event);
+    //auto eventSetup = std::make_shared<EventDatabaseQuery>(getEventQueue(), event);
     // TODO: create table
     /*auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
                                                   "harpoon_irc_backlog"));
@@ -191,7 +191,7 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                     .join("Harpoon_irc_channel", make_var("sender_id") == make_var("sender_ref"), "sender_name")
                     .data(data.begin(), data.end());
 
-                appQueue->sendEvent(std::make_shared<EventDatabaseQuery>(getEventQueue(), event, stmt));
+                appQueue->sendEvent(std::make_shared<EventDatabaseQuery>(getEventQueue(), event, std::move(stmt)));
             } else if (eventType == EventIrcRequestBacklog::uuid) {
                 auto request = event->as<EventIrcRequestBacklog>();
                 // TODO: select backlog

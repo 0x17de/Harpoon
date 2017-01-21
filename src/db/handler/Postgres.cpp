@@ -64,25 +64,25 @@ namespace Database {
         for (auto& field : store->fields) {
             switch(field.type) {
             case FieldType::Id:
-                ss << field.name << " serial" << endl;
+                ss << field.name << " serial";
                 break;
             case FieldType::Time:
-                ss << field.name << " timestamp" << endl;
+                ss << field.name << " timestamp";
                 break;
             case FieldType::Integer:
-                ss << field.name << " integer" << endl;
+                ss << field.name << " integer";
                 break;
             case FieldType::Text:
-                ss << field.name << " text" << endl;
+                ss << field.name << " text";
                 break;
             case FieldType::Bool:
-                ss << field.name << " boolean" << endl;
+                ss << field.name << " boolean";
                 break;
             }
 
             ++index;
             if (index < store->fields.size())
-                cout << ", ";
+                ss << ", ";
         }
         ss << ")" << endl;
 
@@ -96,17 +96,15 @@ namespace Database {
         using namespace Query;
         stringstream ss;
 
-        ss << "BEGIN;";
-
         // TODO: insert data required for join
 
         ss << "INSERT INTO " << store->into << " (";
         size_t index = 0;
         for (auto& s : store->format) {
-            cout << s;
+            ss << s;
             ++index;
             if (index < store->format.size())
-                cout << ", ";
+                ss << ", ";
         }
         ss << ") VALUES ";
 
@@ -119,19 +117,32 @@ namespace Database {
 
             size_t subIndex = 0;
             for (auto q = it; q != end; ++q) {
-                ss << *q;
+                ss << ":data" << dataIndex << '_' << subIndex;
                 ++subIndex;
                 if (subIndex < store->format.size())
                     ss << ", ";
             }
 
-            ss << ") ";
-            ++dataIndex;
-        }
+            ss << ")";
 
+            ++dataIndex;
+            if (dataIndex < store->format.size())
+                ss << ", ";
+        }
         ss << ";";
-        ss << "COMMIT;";
-        sqlSession->once << ss.str();
+
+        cout << ss.str() << endl;
+        {
+            auto query = sqlSession->once << ss.str();
+
+            decltype(store->data.cend()) end;
+            for (auto it = store->data.cbegin(); it != store->data.cend(); it = end + store->on.size()) {
+                end = it + store->format.size();
+
+                for (auto q = it; q != end; ++q)
+                    query, soci::use(*q);
+            }
+        }
 
         result->setSuccess(true);
     }

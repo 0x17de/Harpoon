@@ -22,6 +22,17 @@ namespace details {
             return std::move(store);
         }
 
+        TmpQueryInsert_DATA& data(std::vector<std::string>&& data)
+        {
+            if (store->data.size() == 0) {
+                store->data.swap(data);
+            } else {
+                store->data.reserve(store->data.size()+std::distance(data.cbegin(), data.cend()));
+                store->data.insert(store->data.end(), data.cbegin(), data.cend());
+            }
+            return *this;
+        }
+
         TmpQueryInsert_DATA& data(std::vector<std::string>::iterator start,
                                   std::vector<std::string>::iterator end)
         {
