@@ -8,6 +8,7 @@
 #include "utils/Ini.hpp"
 
 #include <iostream>
+#include <limits>
 #include <type_traits>
 #include <soci/soci.h>
 
@@ -154,10 +155,10 @@ namespace Database {
         ss << "SELECT ";
         size_t whatIndex = 0;
         for (auto& s : store->what) {
-            cout << s;
+            ss << s;
             ++whatIndex;
             if (whatIndex < store->what.size())
-                cout << ", ";
+                ss << ", ";
         }
         ss << " FROM " << store->from;
 
@@ -165,20 +166,20 @@ namespace Database {
 
         if (store->filter) {
             size_t filterDataIndex = 0;
-            ss << "WHERE ";
+            ss << " WHERE ";
             store->filter->traverse(TraverseCallbacks{
                     // up
-                    []{cout << '(';},
+                    [&ss]{ss << '(';},
                     // down
-                    []{cout << ')';},
+                    [&ss]{ss << ')';},
                     // variable
-                    [&ss](const std::string& name){ss << '`' << name << '`';},
+                    [&ss](const std::string& name){ss << name;},
                     // contant
                     [&ss, &filterDataIndex](const std::string& name){ss << ":data" << filterDataIndex++; },
                     // operation
                     [&ss](Op op){
                         switch(op) {
-                        case Query::Op::EQ: ss << " == "; break;
+                        case Query::Op::EQ: ss << " = "; break;
                         case Query::Op::NEQ: ss << " != "; break;
                         case Query::Op::GT: ss << " > "; break;
                         case Query::Op::LT: ss << " < "; break;
@@ -189,15 +190,34 @@ namespace Database {
                 });
         }
 
+        if (store->limit != std::numeric_limits<size_t>::max())
+            ss << " LIMIT " << store->limit;
+
+        cout << ss.str() << endl;
+
         {
-            auto query = sqlSession->once << ss.str();
-            store->filter->traverse(TraverseCallbacks{
-                    []{},
-                    []{},
-                    [](const std::string& name){ },
-                    [&query](const std::string& name){ query, name; },
-                    [](Op op) {}
-                });
+            auto query = sqlSession->prepare << ss.str();
+            if (store->filter) {
+                store->filter->traverse(TraverseCallbacks{
+                        []{},
+                        []{},
+                        [](const std::string& name){ },
+                        [&query](const std::string& name){ query, soci::use(name); },
+                        [](Op op) {}
+                    });
+            }
+
+            std::list<std::string> temp(store->what.size());
+            for (auto& s : temp)
+                query, soci::into(s);
+
+            soci::statement st = query; // cast
+            st.execute();
+            while (st.fetch()) {
+                for (auto& s : temp)
+                    result->addResult(s);
+            }
+
         }
 
         result->setSuccess(true);
@@ -228,7 +248,7 @@ namespace Database {
                 query_insert(insert, result.get());
             } else {
                 auto select = dynamic_cast<Query::QuerySelect_Store*>(ptr);
-                if (insert) {
+                if (select) {
                     query_select(select, result.get());
                 } else {
                     auto create = dynamic_cast<Query::QueryCreate_Store*>(ptr);

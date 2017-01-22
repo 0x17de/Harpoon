@@ -281,14 +281,12 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
         }
 
         {
-            // fetch first element
-            //auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            /* auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
-                                                          "test_postgreshandler",
-                                                          std::list<string>{"id", "key"}));
-            query.add(Database::OperationType::Assign, "id", "1");
+            Select stmt = select("id", "key")
+                .from("test_postgreshandler")
+                .where(make_var("id") == make_constant("1"));
+            auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>(), std::move(stmt));
 
-            handler.getEventQueue()->sendEvent(eventFetch); */
+            handler.getEventQueue()->sendEvent(eventFetch);
         }
 
         ASSERT_EQUAL(true, waitForEvent());
@@ -313,13 +311,12 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         // test limit
         {
-            //auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            /* auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
-                                                          "test_postgreshandler",
-                                                          std::list<string>{"id"}));
-            query.add(Database::OperationType::Limit, "2");
+            Select stmt = select("id")
+                .from("test_postgreshandler")
+                .limit(2);
+            auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>(), std::move(stmt));
 
-            handler.getEventQueue()->sendEvent(eventFetch); */
+            handler.getEventQueue()->sendEvent(eventFetch);
         }
 
         ASSERT_EQUAL(true, waitForEvent());
@@ -336,13 +333,12 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         // test compare lower
         {
-            //auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            /* auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
-                                                          "test_postgreshandler",
-                                                          std::list<string>{"id", "key"}));
-            query.add(Database::OperationType::CompareLower, "id", "2");
+            Select stmt = select("id", "key")
+                .from("test_postgreshandler")
+                .where(make_var("id") < make_constant("2"));
+            auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>(), std::move(stmt));
 
-            handler.getEventQueue()->sendEvent(eventFetch); */
+            handler.getEventQueue()->sendEvent(eventFetch);
         }
 
         ASSERT_EQUAL(true, waitForEvent());
@@ -361,13 +357,12 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         // test compare greater
         {
-            //auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            /* auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
-                                                          "test_postgreshandler",
-                                                          std::list<string>{"id"}));
-            query.add(Database::OperationType::CompareGreater, "id", "1");
+            Select stmt = select("id")
+                .from("test_postgreshandler")
+                .where(make_var("id") > make_constant("1"));
+            auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>(), std::move(stmt));
 
-            handler.getEventQueue()->sendEvent(eventFetch); */
+            handler.getEventQueue()->sendEvent(eventFetch);
         }
 
         ASSERT_EQUAL(true, waitForEvent());

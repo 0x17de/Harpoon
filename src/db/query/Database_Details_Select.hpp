@@ -11,6 +11,23 @@
 namespace details {
     using namespace Query;
 
+    struct TmpQuerySelect_LIMIT {
+        std::unique_ptr<QuerySelect_Store> store;
+
+        explicit inline TmpQuerySelect_LIMIT(std::unique_ptr<QuerySelect_Store> store)
+            : store{std::move(store)}
+        { }
+
+        inline operator Query::Select() {
+            return std::move(store);
+        }
+
+        inline TmpQuerySelect_LIMIT& limit(size_t count) {
+            store->limit = count;
+            return *this;
+        }
+    };
+
     struct TmpQuerySelect_ORDER {
         std::unique_ptr<QuerySelect_Store> store;
 
@@ -25,6 +42,13 @@ namespace details {
         inline TmpQuerySelect_ORDER& order_by(const std::string& by, const std::string& dir) {
             store->order.emplace_back(by, dir);
             return *this;
+        }
+
+        template<class... T>
+        TmpQuerySelect_LIMIT limit(T&&... t) {
+            auto temp = TmpQuerySelect_LIMIT(std::move(store));
+            temp.limit(std::forward<T>(t)...);
+            return temp;
         }
     };
 
@@ -50,6 +74,13 @@ namespace details {
         TmpQuerySelect_ORDER order_by(T&&... t) {
             auto temp = TmpQuerySelect_ORDER(std::move(store));
             temp.order_by(std::forward<T>(t)...);
+            return temp;
+        }
+
+        template<class... T>
+        TmpQuerySelect_LIMIT limit(T&&... t) {
+            auto temp = TmpQuerySelect_LIMIT(std::move(store));
+            temp.limit(std::forward<T>(t)...);
             return temp;
         }
     };
@@ -82,6 +113,13 @@ namespace details {
         TmpQuerySelect_ORDER order_by(T&&... t) {
             auto temp = TmpQuerySelect_ORDER(std::move(store));
             temp.order_by(std::forward<T>(t)...);
+            return temp;
+        }
+
+        template<class... T>
+        TmpQuerySelect_LIMIT limit(T&&... t) {
+            auto temp = TmpQuerySelect_LIMIT(std::move(store));
+            temp.limit(std::forward<T>(t)...);
             return temp;
         }
     };
@@ -122,6 +160,13 @@ namespace details {
         TmpQuerySelect_ORDER order_by(T&&... t) {
             auto temp = TmpQuerySelect_ORDER(std::move(store));
             temp.order_by(std::forward<T>(t)...);
+            return temp;
+        }
+
+        template<class... T>
+        TmpQuerySelect_LIMIT limit(T&&... t) {
+            auto temp = TmpQuerySelect_LIMIT(std::move(store));
+            temp.limit(std::forward<T>(t)...);
             return temp;
         }
     };

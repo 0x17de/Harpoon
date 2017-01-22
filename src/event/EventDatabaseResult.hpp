@@ -18,6 +18,7 @@ public:
     explicit EventDatabaseResult(std::shared_ptr<IEvent> eventOrigin);
     void setSuccess(bool success);
     void addResult(const std::string& result);
+    void setResult(std::list<std::string>& result);
     bool getSuccess() const;
     std::shared_ptr<IEvent> getEventOrigin() const;
     const std::list<std::string>& getResults() const;
