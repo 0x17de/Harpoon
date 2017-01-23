@@ -380,12 +380,12 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         // delete test elements
         {
-            //auto eventDelete = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            /* auto& query = eventDelete->add(Database::Query(Database::QueryType::Delete,
-                                                           "test_postgreshandler"));
-            query.add(Database::OperationType::Assign, "id", "2");
+            Delete stmt = erase()
+                .from("test_postgreshandler")
+                .where(make_var("id") == make_constant("2"));
+            auto eventDelete = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>(), std::move(stmt));
 
-            handler.getEventQueue()->sendEvent(eventDelete); */
+            handler.getEventQueue()->sendEvent(eventDelete);
         }
 
         ASSERT_EQUAL(true, waitForEvent());

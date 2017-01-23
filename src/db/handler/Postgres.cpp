@@ -31,7 +31,7 @@ namespace Database {
         void query_createTable(Query::QueryCreate_Store* store, EventDatabaseResult* result);
         void query_insert(Query::QueryInsert_Store* store, EventDatabaseResult* result);
         void query_select(Query::QuerySelect_Store* store, EventDatabaseResult* result);
-        //void query_delete(const std::unique_ptr<Query::QueryDelete_Store>& query, EventDatabaseResult* result);
+        void query_delete(Query::QueryDelete_Store* store, EventDatabaseResult* result);
 
         std::list<std::shared_ptr<IEvent>> heldBackQueries;
 
@@ -223,13 +223,60 @@ namespace Database {
         result->setSuccess(true);
     }
 
-    /*
-    void Postgres_Impl::query_delete(const std::unique_ptr<Query::QueryBase>& query, EventDatabaseResult* result) {
-        // TODO: delete
+    void Postgres_Impl::query_delete(Query::QueryDelete_Store* store, EventDatabaseResult* result) {
+        using namespace Query;
+
+        stringstream ss;
+        ss << "DELETE FROM " << store->from;
+
+        // TODO: join
+
+        if (store->filter) {
+            size_t filterDataIndex = 0;
+            ss << " WHERE ";
+            store->filter->traverse(TraverseCallbacks{
+                    // up
+                    [&ss]{ss << '(';},
+                    // down
+                    [&ss]{ss << ')';},
+                    // variable
+                    [&ss](const std::string& name){ss << name;},
+                    // contant
+                    [&ss, &filterDataIndex](const std::string& name){ss << ":data" << filterDataIndex++; },
+                    // operation
+                    [&ss](Op op){
+                        switch(op) {
+                        case Query::Op::EQ: ss << " = "; break;
+                        case Query::Op::NEQ: ss << " != "; break;
+                        case Query::Op::GT: ss << " > "; break;
+                        case Query::Op::LT: ss << " < "; break;
+                        case Query::Op::AND: ss << " && "; break;
+                        case Query::Op::OR: ss << " || "; break;
+                        }
+                    }
+                });
+        }
+
+        if (store->limit != std::numeric_limits<size_t>::max())
+            ss << " LIMIT " << store->limit;
+
+        cout << ss.str() << endl;
+
+        {
+            auto query = sqlSession->once << ss.str();
+            if (store->filter) {
+                store->filter->traverse(TraverseCallbacks{
+                        []{},
+                        []{},
+                        [](const std::string& name){ },
+                        [&query](const std::string& name){ query, soci::use(name); },
+                        [](Op op) {}
+                    });
+            }
+        }
 
         result->setSuccess(true);
     }
-    */
 
     void Postgres_Impl::handleQuery(std::shared_ptr<IEvent> event) {
         EventDatabaseQuery* query = event->as<EventDatabaseQuery>();
@@ -251,9 +298,14 @@ namespace Database {
                 if (select) {
                     query_select(select, result.get());
                 } else {
-                    auto create = dynamic_cast<Query::QueryCreate_Store*>(ptr);
-                    if (create) {
-                        query_createTable(create, result.get());
+                    auto erase = dynamic_cast<Query::QueryDelete_Store*>(ptr);
+                    if (erase) {
+                        query_delete(erase, result.get());
+                    } else {
+                        auto create = dynamic_cast<Query::QueryCreate_Store*>(ptr);
+                        if (create) {
+                            query_createTable(create, result.get());
+                        }
                     }
                 }
             }

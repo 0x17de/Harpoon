@@ -6,6 +6,7 @@
 #include "Database_Details_Create.hpp"
 #include "Database_Details_Select.hpp"
 #include "Database_Details_Insert.hpp"
+#include "Database_Details_Delete.hpp"
 
 
 namespace Query {
@@ -25,6 +26,12 @@ namespace Query {
     template<class... T>
     details::TmpQueryInsert_INSERT insert(T&&... t) {
         details::TmpQueryInsert_INSERT temp;
+        return temp;
+    }
+
+    template<class... T>
+    details::TmpQueryDelete_DELETE erase(T&&... t) {
+        details::TmpQueryDelete_DELETE temp;
         return temp;
     }
 }
