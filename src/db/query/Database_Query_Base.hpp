@@ -9,7 +9,7 @@
 namespace Query {
     struct Statement;
     using StatementPtr = std::unique_ptr<Statement>;
-    using OrderStatement = std::tuple<std::string, std::string>;
+    using OrderStatement = std::pair<std::string, std::string>; // TODO: 2nd as enum
 
     struct Join {
         std::string table;

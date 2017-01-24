@@ -331,6 +331,30 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
         }
 
 
+        // test order
+        {
+            Select stmt = select("id")
+                .from("test_postgreshandler")
+                .order_by("id", "DESC")
+                .limit(1);
+            auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>(), std::move(stmt));
+
+            handler.getEventQueue()->sendEvent(eventFetch);
+        }
+
+        ASSERT_EQUAL(true, waitForEvent());
+
+        // check result
+        {
+            ASSERT_EQUAL(true, results.size() == 1);
+            auto dbResult = results.back()->as<EventDatabaseResult>();
+            ASSERT_EQUAL(true, dbResult->getSuccess());
+            ASSERT_EQUAL(1uL, dbResult->getResults().size());
+            ASSERT_EQUAL("2", dbResult->getResults().front());
+            results.clear();
+        }
+
+
         // test compare lower
         {
             Select stmt = select("id", "key")

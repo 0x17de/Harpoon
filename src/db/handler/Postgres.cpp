@@ -33,10 +33,36 @@ namespace Database {
         void query_select(Query::QuerySelect_Store* store, EventDatabaseResult* result);
         void query_delete(Query::QueryDelete_Store* store, EventDatabaseResult* result);
 
+        static Query::TraverseCallbacks getTraverseCallbacks(stringstream& ss, size_t& filterDataIndex);
+
         std::list<std::shared_ptr<IEvent>> heldBackQueries;
 
         friend Postgres;
     };
+
+    Query::TraverseCallbacks Postgres_Impl::getTraverseCallbacks(stringstream& ss, size_t& filterDataIndex) {
+        return {
+            // up
+            [&ss]{ss << '(';},
+            // down
+            [&ss]{ss << ')';},
+            // variable
+            [&ss](const std::string& name){ss << name;},
+            // contant
+            [&ss, &filterDataIndex](const std::string& name){ss << ":data" << filterDataIndex++; },
+            // operation
+            [&ss](Query::Op op){
+                switch(op) {
+                case Query::Op::EQ: ss << " = "; break;
+                case Query::Op::NEQ: ss << " != "; break;
+                case Query::Op::GT: ss << " > "; break;
+                case Query::Op::LT: ss << " < "; break;
+                case Query::Op::AND: ss << " && "; break;
+                case Query::Op::OR: ss << " || "; break;
+                }
+            }
+        };
+    }
 
     Postgres::Postgres(EventQueue* appQueue)
         : EventLoop{
@@ -167,27 +193,13 @@ namespace Database {
         if (store->filter) {
             size_t filterDataIndex = 0;
             ss << " WHERE ";
-            store->filter->traverse(TraverseCallbacks{
-                    // up
-                    [&ss]{ss << '(';},
-                    // down
-                    [&ss]{ss << ')';},
-                    // variable
-                    [&ss](const std::string& name){ss << name;},
-                    // contant
-                    [&ss, &filterDataIndex](const std::string& name){ss << ":data" << filterDataIndex++; },
-                    // operation
-                    [&ss](Op op){
-                        switch(op) {
-                        case Query::Op::EQ: ss << " = "; break;
-                        case Query::Op::NEQ: ss << " != "; break;
-                        case Query::Op::GT: ss << " > "; break;
-                        case Query::Op::LT: ss << " < "; break;
-                        case Query::Op::AND: ss << " && "; break;
-                        case Query::Op::OR: ss << " || "; break;
-                        }
-                    }
-                });
+            store->filter->traverse(getTraverseCallbacks(ss, filterDataIndex));
+        }
+
+        if (store->order.size() > 0) {
+            ss << " ORDER BY";
+            for (auto& order : store->order)
+                ss << " " << order.first << " " << order.second;
         }
 
         if (store->limit != std::numeric_limits<size_t>::max())
@@ -234,27 +246,7 @@ namespace Database {
         if (store->filter) {
             size_t filterDataIndex = 0;
             ss << " WHERE ";
-            store->filter->traverse(TraverseCallbacks{
-                    // up
-                    [&ss]{ss << '(';},
-                    // down
-                    [&ss]{ss << ')';},
-                    // variable
-                    [&ss](const std::string& name){ss << name;},
-                    // contant
-                    [&ss, &filterDataIndex](const std::string& name){ss << ":data" << filterDataIndex++; },
-                    // operation
-                    [&ss](Op op){
-                        switch(op) {
-                        case Query::Op::EQ: ss << " = "; break;
-                        case Query::Op::NEQ: ss << " != "; break;
-                        case Query::Op::GT: ss << " > "; break;
-                        case Query::Op::LT: ss << " < "; break;
-                        case Query::Op::AND: ss << " && "; break;
-                        case Query::Op::OR: ss << " || "; break;
-                        }
-                    }
-                });
+            store->filter->traverse(getTraverseCallbacks(ss, filterDataIndex));
         }
 
         if (store->limit != std::numeric_limits<size_t>::max())
