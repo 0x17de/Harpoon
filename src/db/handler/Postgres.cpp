@@ -121,53 +121,133 @@ namespace Database {
 
     void Postgres_Impl::query_insert(Query::QueryInsert_Store* store, EventDatabaseResult* result) {
         using namespace Query;
-        stringstream ss;
 
-        // TODO: insert data required for join
+        std::vector<size_t> joinIds(store->on.size());
 
-        ss << "INSERT INTO " << store->into << " (";
-        size_t index = 0;
-        for (auto& s : store->format) {
-            ss << s;
-            ++index;
-            if (index < store->format.size())
-                ss << ", ";
+        { // SELECT(JOIN)
+            stringstream ss;
+            size_t resultId;
+
+            size_t joinIndex = 0;
+            for (auto& join : store->on) {
+                ss << "SELECT id FROM " << join.table << " WHERE ";
+                size_t joinWhereIndex = 0;
+                join.on->traverse(getTraverseCallbacks(ss, joinWhereIndex));
+                ss << " LIMIT 1";
+
+                {
+                    auto query = sqlSession->prepare << ss.str();
+                    join.on->traverse(TraverseCallbacks{
+                        []{},
+                        []{},
+                        [](const std::string& name){ },
+                        [&query](const std::string& name){ query, soci::use(name); },
+                        [](Op op) {}
+                    });
+
+                    soci::statement st = (query, soci::into(joinIds[joinIndex])); // cast
+                    st.execute();
+                    st.fetch(); // will write joinId
+                }
+
+                ++joinIndex;
+            }
         }
-        ss << ") VALUES ";
 
-        size_t dataIndex = 0;
-        decltype(store->data.cend()) end;
-        for (auto it = store->data.cbegin(); it != store->data.cend(); it = end + store->on.size()) {
-            end = it + store->format.size();
+        { // JOIN
+            stringstream ss;
 
-            ss << "(";
+            size_t joinIndex = 0;
+            for (auto& join : store->on) {
+                if (joinIds[joinIndex] != 0) continue; // already found in database
 
-            size_t subIndex = 0;
-            for (auto q = it; q != end; ++q) {
-                ss << ":data" << dataIndex << '_' << subIndex;
-                ++subIndex;
-                if (subIndex < store->format.size())
+                ss << "INSERT INTO " << join.table << " (";
+                size_t index = 0;
+                for (auto& s : join.fields) {
+                    ss << s;
+                    ++index;
+                    if (index < store->format.size())
+                        ss << ", ";
+                }
+                ss << ") VALUES (";
+                size_t valueIndex = 0;
+                for (auto& s : join.fields) {
+                    ss << ":data" << valueIndex;
+                    ++valueIndex;
+                    if (valueIndex < join.fields.size())
+                        ss << ", ";
+                }
+                ss << ")";
+
+                {
+                    auto query = sqlSession->prepare << ss.str();
+                    join.on->traverse(TraverseCallbacks{
+                        []{},
+                        []{},
+                        [](const std::string& name){ },
+                        [&query](const std::string& name){ query, soci::use(name); },
+                        [](Op op) {}
+                    });
+
+                    soci::statement st = query; // cast
+                    st.execute();
+
+                    long lastInsertId; // long is restriction of soci
+                    sqlSession->get_last_insert_id(join.table, lastInsertId);
+                    joinIds[joinIndex] = lastInsertId;
+                }
+
+                ++joinIndex;
+            }
+        }
+
+        { // INSERT
+            stringstream ss;
+
+            ss << "INSERT INTO " << store->into << " (";
+            size_t index = 0;
+            for (auto& s : store->format) {
+                ss << s;
+                ++index;
+                if (index < store->format.size())
                     ss << ", ";
             }
+            ss << ") VALUES ";
 
-            ss << ")";
-
-            ++dataIndex;
-            if (dataIndex < store->format.size())
-                ss << ", ";
-        }
-        ss << ";";
-
-        cout << ss.str() << endl;
-        {
-            auto query = sqlSession->once << ss.str();
-
+            size_t dataIndex = 0;
             decltype(store->data.cend()) end;
             for (auto it = store->data.cbegin(); it != store->data.cend(); it = end + store->on.size()) {
                 end = it + store->format.size();
 
-                for (auto q = it; q != end; ++q)
-                    query, soci::use(*q);
+                ss << "(";
+
+                size_t subIndex = 0;
+                for (auto q = it; q != end; ++q) {
+                    ss << ":data" << dataIndex << '_' << subIndex;
+                    ++subIndex;
+                    if (subIndex < store->format.size())
+                        ss << ", ";
+                }
+
+                ss << ")";
+
+                ++dataIndex;
+                if (dataIndex < store->format.size())
+                    ss << ", ";
+            }
+            ss << ";";
+
+            cout << ss.str() << endl;
+            {
+                auto query = sqlSession->once << ss.str();
+
+                decltype(store->data.cend()) end;
+                for (auto it = store->data.cbegin(); it != store->data.cend(); it = end + store->on.size()) {
+                    end = it + store->format.size();
+
+                    for (auto q = it; q != end; ++q)
+                        query, soci::use(*q);
+                }
             }
         }
 
