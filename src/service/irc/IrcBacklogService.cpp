@@ -184,11 +184,9 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                             "time",
                             "message",
                             "type",
-                            "flags",
-                            "channel_name",
-                            "sender_name")
-                    .join("Harpoon_irc_channel", make_var("channel_id") == make_var("channel_ref"), "channel_name")
-                    .join("Harpoon_irc_channel", make_var("sender_id") == make_var("sender_ref"), "sender_name")
+                            "flags")
+                    .join("Harpoon_irc_channel", "channel", message->getChannel())
+                    .join("Harpoon_irc_channel", "sender", message->getFrom())
                     .data(data.begin(), data.end());
 
                 appQueue->sendEvent(std::make_shared<EventDatabaseQuery>(getEventQueue(), event, std::move(stmt)));

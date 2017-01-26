@@ -28,6 +28,8 @@ namespace Database {
         bool onEvent(std::shared_ptr<IEvent> event);
         void handleQuery(std::shared_ptr<IEvent> event);
 
+        static std::string fieldTypeName(Query::FieldType type);
+
         void query_createTable(Query::QueryCreate_Store* store, EventDatabaseResult* result);
         void query_insert(Query::QueryInsert_Store* store, EventDatabaseResult* result);
         void query_select(Query::QuerySelect_Store* store, EventDatabaseResult* result);
@@ -82,6 +84,24 @@ namespace Database {
         return impl->onEvent(event);
     }
 
+    std::string Postgres_Impl::fieldTypeName(Query::FieldType type) {
+        using namespace Query;
+
+        switch(type) {
+        case FieldType::Id:
+            return "serial primary key";
+        case FieldType::Time:
+            return "timestamp";
+        case FieldType::Integer:
+            return "integer";
+        case FieldType::Text:
+            return "text";
+        case FieldType::Bool:
+            return "boolean";
+        }
+        return "INVALID";
+    }
+
     void Postgres_Impl::query_createTable(Query::QueryCreate_Store* store, EventDatabaseResult* result) {
         using namespace Query;
 
@@ -89,31 +109,13 @@ namespace Database {
         stringstream ss;
         ss << "CREATE TABLE IF NOT EXISTS " << store->name << " (";
         for (auto& field : store->fields) {
-            switch(field.type) {
-            case FieldType::Id:
-                ss << field.name << " serial";
-                break;
-            case FieldType::Time:
-                ss << field.name << " timestamp";
-                break;
-            case FieldType::Integer:
-                ss << field.name << " integer";
-                break;
-            case FieldType::Text:
-                ss << field.name << " text";
-                break;
-            case FieldType::Bool:
-                ss << field.name << " boolean";
-                break;
-            }
-
+            ss << field.name << " " << fieldTypeName(field.type);
             ++index;
             if (index < store->fields.size())
                 ss << ", ";
         }
         ss << ")" << endl;
 
-        cout << ss.str() << endl;
         sqlSession->once << ss.str();
 
         result->setSuccess(true);
@@ -126,29 +128,16 @@ namespace Database {
 
         { // SELECT(JOIN)
             stringstream ss;
-            size_t resultId;
 
             size_t joinIndex = 0;
             for (auto& join : store->on) {
-                ss << "SELECT id FROM " << join.table << " WHERE ";
-                size_t joinWhereIndex = 0;
-                join.on->traverse(getTraverseCallbacks(ss, joinWhereIndex));
-                ss << " LIMIT 1";
+                ss << "SELECT " << join.field << "_id FROM "
+                   << join.table
+                   << " WHERE " << join.field << " = :data" << joinIndex << " LIMIT 1";
 
-                {
-                    auto query = sqlSession->prepare << ss.str();
-                    join.on->traverse(TraverseCallbacks{
-                        []{},
-                        []{},
-                        [](const std::string& name){ },
-                        [&query](const std::string& name){ query, soci::use(name); },
-                        [](Op op) {}
-                    });
-
-                    soci::statement st = (query, soci::into(joinIds[joinIndex])); // cast
-                    st.execute();
-                    st.fetch(); // will write joinId
-                }
+                    soci::statement st = (sqlSession->prepare << ss.str(), soci::use(join.on), soci::into(joinIds[joinIndex])); // cast
+                st.execute();
+                st.fetch(); // will write joinId
 
                 ++joinIndex;
             }
@@ -161,41 +150,12 @@ namespace Database {
             for (auto& join : store->on) {
                 if (joinIds[joinIndex] != 0) continue; // already found in database
 
-                ss << "INSERT INTO " << join.table << " (";
-                size_t index = 0;
-                for (auto& s : join.fields) {
-                    ss << s;
-                    ++index;
-                    if (index < store->format.size())
-                        ss << ", ";
-                }
-                ss << ") VALUES (";
-                size_t valueIndex = 0;
-                for (auto& s : join.fields) {
-                    ss << ":data" << valueIndex;
-                    ++valueIndex;
-                    if (valueIndex < join.fields.size())
-                        ss << ", ";
-                }
-                ss << ")";
+                ss << "INSERT INTO "
+                   << join.table
+                   << " (" << join.field << ") VALUES (:data)";
 
-                {
-                    auto query = sqlSession->prepare << ss.str();
-                    join.on->traverse(TraverseCallbacks{
-                        []{},
-                        []{},
-                        [](const std::string& name){ },
-                        [&query](const std::string& name){ query, soci::use(name); },
-                        [](Op op) {}
-                    });
-
-                    soci::statement st = query; // cast
-                    st.execute();
-
-                    long lastInsertId; // long is restriction of soci
-                    sqlSession->get_last_insert_id(join.table, lastInsertId);
-                    joinIds[joinIndex] = lastInsertId;
-                }
+                    sqlSession->once << ss.str(), soci::use(join.on);
+                sqlSession->once << "SELECT CURRVAL('" << join.table << "_" << join.field << "_id_seq')", soci::into(joinIds[joinIndex]);
 
                 ++joinIndex;
             }
@@ -212,12 +172,14 @@ namespace Database {
                 if (index < store->format.size())
                     ss << ", ";
             }
+            for (auto& join : store->on)
+                ss << ", " << join.field << "_ref";
             ss << ") VALUES ";
 
             size_t dataIndex = 0;
             decltype(store->data.cend()) end;
-            for (auto it = store->data.cbegin(); it != store->data.cend(); it = end + store->on.size()) {
-                end = it + store->format.size();
+            for (auto it = store->data.cbegin(); it != store->data.cend(); it = end) {
+                end = std::next(it, store->format.size());
 
                 ss << "(";
 
@@ -228,26 +190,21 @@ namespace Database {
                     if (subIndex < store->format.size())
                         ss << ", ";
                 }
+                for (size_t i : joinIds)
+                    ss << ", " << i; // is the join id (number). can not be exploited
 
                 ss << ")";
 
                 ++dataIndex;
-                if (dataIndex < store->format.size())
+                if (end != store->data.end())
                     ss << ", ";
             }
             ss << ";";
 
-            cout << ss.str() << endl;
             {
                 auto query = sqlSession->once << ss.str();
-
-                decltype(store->data.cend()) end;
-                for (auto it = store->data.cbegin(); it != store->data.cend(); it = end + store->on.size()) {
-                    end = it + store->format.size();
-
-                    for (auto q = it; q != end; ++q)
-                        query, soci::use(*q);
-                }
+                for (auto& s : store->data)
+                    query, soci::use(s);
             }
         }
 
@@ -284,8 +241,6 @@ namespace Database {
 
         if (store->limit != std::numeric_limits<size_t>::max())
             ss << " LIMIT " << store->limit;
-
-        cout << ss.str() << endl;
 
         {
             auto query = sqlSession->prepare << ss.str();
@@ -331,8 +286,6 @@ namespace Database {
 
         if (store->limit != std::numeric_limits<size_t>::max())
             ss << " LIMIT " << store->limit;
-
-        cout << ss.str() << endl;
 
         {
             auto query = sqlSession->once << ss.str();

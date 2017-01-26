@@ -14,13 +14,13 @@ class EventDatabaseQuery : public IDatabaseEvent {
     std::list<std::unique_ptr<Query::QueryBase>> queries;
     std::shared_ptr<IEvent> eventOrigin;
 
-    inline void addQuery(std::unique_ptr<Query::QueryBase>&& query) {
-        queries.emplace_back(std::move(query));
+    template<int n, class... T>
+    typename std::enable_if<n == sizeof...(T)>::type addQueries(std::tuple<T...>& query) {
     }
-    template<class S, class... T>
-    void addQuery(std::unique_ptr<Query::QueryBase>&& query, T&&... t) {
-        queries.emplace_back(std::move(query));
-        addQuery(std::forward<T>(t)...);
+    template<int n, class... T>
+    typename std::enable_if<n != sizeof...(T)>::type addQueries(std::tuple<T...>& query) {
+        queries.push_back(std::move(std::get<n>(query)));
+        addQueries<n+1>(query);
     }
 
 public:
@@ -32,7 +32,8 @@ public:
         : target{target}
         , eventOrigin{eventOrigin}
     {
-        addQuery(std::forward<T>(t)...);
+        std::tuple<T&...> tuple(t...);
+        addQueries<0>(tuple);
     }
 
     EventQueue* getTarget() const;

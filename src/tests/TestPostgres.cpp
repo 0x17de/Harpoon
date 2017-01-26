@@ -442,19 +442,27 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
     }
 
     void testJoin() {
+        using namespace Query;
+
         tryDrop("test_postgresjoin");
         tryDrop("test_postgresjoin_name");
 
         // create table
         {
-            //auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            /* auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
-                                                          "test_postgresjoin"));
-            query.add(Database::OperationType::Assign, "id", "id");
-            query.add(Database::OperationType::Assign, "key", "text");
-            query.add(Database::OperationType::Join, "name", "text", "test_postgresjoin_name");
+            Create stmt1 = create("test_postgresjoin")
+                .field("id", FieldType::Id)
+                .field("key", FieldType::Text)
+                .field("name_ref", FieldType::Integer);
+            Create stmt2 = create("test_postgresjoin_name")
+                .field("name_id", FieldType::Id)
+                .field("name", FieldType::Text);
 
-            handler.getEventQueue()->sendEvent(eventSetup); */
+            auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(),
+                                                              make_shared<EventInit>(),
+                                                              std::move(stmt1),
+                                                              std::move(stmt2));
+
+            handler.getEventQueue()->sendEvent(eventSetup);
         }
 
         // wait till table is created
@@ -480,16 +488,14 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
         // insert test elements
         {
-            //auto eventInsert = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            /* auto& query = eventInsert->add(Database::Query(Database::QueryType::Insert,
-                                                           "test_postgresjoin",
-                                                           std::list<string>{"id", "key", "name_ref"}));
-            query.add(Database::OperationType::Assign, "1");
-            query.add(Database::OperationType::Assign, "test0");
-            query.add(Database::OperationType::Assign, "", "", "0");
-            query.add(Database::OperationType::Join, "name", "testname", "test_postgresjoin_name");
+            Insert stmt = insert()
+                .into("test_postgresjoin")
+                .format("id", "key")
+                .join("test_postgresjoin_name", "name", "testname")
+                .data(std::vector<std::string>{"1", "test0"});
+            auto eventInsert = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>(), std::move(stmt));
 
-            handler.getEventQueue()->sendEvent(eventInsert); */
+            handler.getEventQueue()->sendEvent(eventInsert);
         }
 
         ASSERT_EQUAL(true, waitForEvent());
@@ -574,19 +580,20 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
     }
 
     void testTypes() {
+        using namespace Query;
+
         tryDrop("test_postgrestypes");
 
         // create table
         {
-            //auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>());
-            /* auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
-                                                          "test_postgrestypes"));
-            query.add(Database::OperationType::Assign, "id", "id");
-            query.add(Database::OperationType::Assign, "key", "text");
-            query.add(Database::OperationType::Assign, "time", "time");
-            query.add(Database::OperationType::Assign, "number", "int");
+            Create stmt = create("test_postgrestypes")
+                .field("id", FieldType::Id)
+                .field("key", FieldType::Text)
+                .field("time", FieldType::Time)
+                .field("number", FieldType::Integer);
+            auto eventSetup = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>(), std::move(stmt));
 
-            handler.getEventQueue()->sendEvent(eventSetup); */
+            handler.getEventQueue()->sendEvent(eventSetup);
         }
 
         ASSERT_EQUAL(true, waitForEvent());

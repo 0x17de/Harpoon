@@ -13,23 +13,15 @@ namespace Query {
 
     struct Join {
         std::string table;
-        StatementPtr on;
-        std::list<std::string> fields;
+        std::string field;
+        std::string on;
 
-        inline void addFields() {}
-        template<class R, class... T>
-        void addFields(R&& field, T&&... t) {
-            fields.emplace_back(field);
-            addFields(std::forward<T>(t)...);
-        }
-
-        template<class R, class... T>
-        Join(R&& table, StatementPtr&& on, T&&... t)
+        template<class R, class S, class T>
+        Join(R&& table, S&& field, T&& on = std::string())
             : table(std::forward<R>(table))
-            , on(std::move(on))
-        {
-            addFields(std::forward<T>(t)...);
-        }
+            , field(std::forward<S>(field))
+            , on(std::forward<T>(on))
+        { }
     };
 
     enum class Op {
