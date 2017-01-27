@@ -23,6 +23,7 @@
 
 
 PROVIDE_MODULE("irc_backlog", "default", IrcBacklogService);
+using namespace Query;
 
 
 
@@ -53,19 +54,27 @@ std::string IrcBacklogService::convertTimestamp(std::chrono::time_point<std::chr
 }
 
 void IrcBacklogService::setupTable(std::shared_ptr<IEvent> event) {
-    //auto eventSetup = std::make_shared<EventDatabaseQuery>(getEventQueue(), event);
-    // TODO: create table
-    /*auto& query = eventSetup->add(Database::Query(Database::QueryType::SetupTable,
-                                                  "harpoon_irc_backlog"));
-    query.add(Database::OperationType::Assign, "message_id", "id");
-    query.add(Database::OperationType::Assign, "time", "time");
-    query.add(Database::OperationType::Assign, "message", "text");
-    query.add(Database::OperationType::Assign, "type", "int");
-    query.add(Database::OperationType::Assign, "flags", "int");
-    query.add(Database::OperationType::Join, "channel", "text", "harpoon_irc_channel");
-    query.add(Database::OperationType::Join, "sender", "text", "harpoon_irc_sender");
+    Create stmtChannel = create("harpoon_irc_channel")
+        .field("channel_id", FieldType::Id)
+        .field("channel", FieldType::Text);
+    Create stmtSender = create("harpoon_irc_sender")
+        .field("sender_id", FieldType::Id)
+        .field("sender", FieldType::Text);
+    Create stmt = create("harpoon_irc_backlog")
+        .field("message_id", FieldType::Id)
+        .field("time", FieldType::Time)
+        .field("message", FieldType::Text)
+        .field("type", FieldType::Integer)
+        .field("flags", FieldType::Integer)
+        .field("channel_ref", FieldType::Integer)
+        .field("sender_ref", FieldType::Integer);
+    auto eventSetup = std::make_shared<EventDatabaseQuery>(getEventQueue(),
+                                                           event,
+                                                           std::move(stmtChannel),
+                                                           std::move(stmtSender),
+                                                           std::move(stmt));
 
-    appQueue->sendEvent(eventSetup);*/
+    appQueue->sendEvent(eventSetup);
 
     auto fakeResult = std::make_shared<EventDatabaseResult>(event);
     fakeResult->setSuccess(true);
@@ -80,12 +89,15 @@ bool IrcBacklogService::setupTable_processResult(std::shared_ptr<IEvent> event) 
     if (originType == EventInit::uuid) {
         if (success) {
             // request the last backlog entry id
-            // TODO: select last id
-            /* auto eventQueryLastId = std::make_shared<EventDatabaseQuery>(getEventQueue(), result->getEventOrigin());
-            eventQueryLastId->add(Database::Query(Database::QueryType::LastId,
-                                                  "harpoon_irc_backlog",
-                                                  std::list<std::string>{"message_id"}));
-            appQueue->sendEvent(eventQueryLastId); */
+            Select stmt = select("message_id")
+                .from("harpoon_irc_backlog")
+                .order_by("message_id", "DESC")
+                .limit(1);
+            auto eventQueryLastId = std::make_shared<EventDatabaseQuery>(getEventQueue(),
+                                                                    event,
+                                                                    std::move(stmt));
+
+            appQueue->sendEvent(eventQueryLastId);
 
             auto fakeResult = std::make_shared<EventDatabaseResult>(result->getEventOrigin());
             fakeResult->setSuccess(true);
@@ -162,8 +174,6 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
     } else {
         auto loggable = event->as<IrcLoggable>();
         if (loggable != nullptr) {
-            using namespace Query;
-
             if (eventType == EventIrcMessage::uuid) {
                 auto message = event->as<EventIrcMessage>();
 
