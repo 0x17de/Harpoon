@@ -226,16 +226,16 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                              message->getChannel());
             } else if (eventType == EventIrcRequestBacklog::uuid) {
                 auto request = event->as<EventIrcRequestBacklog>();
-                // TODO: select backlog
-                /*auto eventFetch = std::make_shared<EventDatabaseQuery>(getEventQueue(), event);
-                auto& query = eventFetch->add(Database::Query(Database::QueryType::Fetch,
-                                                              "harpoon_irc_backlog",
-                                                              std::list<std::string>{"message_id", "time", "message", "type", "flags", "channel"}));
-                query.add(Database::OperationType::Join, "channel", "", "harpoon_irc_channel");
-                query.add(Database::OperationType::CompareLower, "message_id", std::to_string(request->getFromId()+1));
-                query.add(Database::OperationType::Limit, std::to_string(request->getCount()));
 
-                appQueue->sendEvent(eventFetch);*/
+                Select stmt = select("message_id", "time", "message", "type", "flags", "channel", "sender")
+                    .from("harpoon_irc_backlog")
+                    .join("harpoon_irc_channel", "channel")
+                    .join("harpoon_irc_sender", "sender")
+                    .order_by("message_id", "DESC")
+                    .limit(5);
+                auto eventFetch = std::make_shared<EventDatabaseQuery>(getEventQueue(), event, std::move(stmt));
+
+                appQueue->sendEvent(eventFetch);
             } else if (eventType == EventIrcAction::uuid) {
                 auto action = event->as<EventIrcAction>();
                 writeBacklog(event,

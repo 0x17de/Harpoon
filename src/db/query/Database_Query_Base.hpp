@@ -16,8 +16,14 @@ namespace Query {
         std::string field;
         std::string on;
 
+        template<class R, class S>
+        Join(R&& table, S&& field)
+            : table(std::forward<R>(table))
+            , field(std::forward<S>(field))
+        { }
+
         template<class R, class S, class T>
-        Join(R&& table, S&& field, T&& on = std::string())
+        Join(R&& table, S&& field, T&& on)
             : table(std::forward<R>(table))
             , field(std::forward<S>(field))
             , on(std::forward<T>(on))

@@ -222,8 +222,6 @@ namespace Database {
             if (whatIndex < store->what.size())
                 ss << ", ";
         }
-        for (auto& join : store->on)
-            ss << ", " << join.field;
         ss << " FROM " << store->from;
 
         size_t joinIndex = 0;
