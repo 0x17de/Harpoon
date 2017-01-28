@@ -222,9 +222,15 @@ namespace Database {
             if (whatIndex < store->what.size())
                 ss << ", ";
         }
+        for (auto& join : store->on)
+            ss << ", " << join.field;
         ss << " FROM " << store->from;
 
-        // TODO: join
+        size_t joinIndex = 0;
+        for (auto& join : store->on) {
+            ss << " LEFT JOIN " << join.table << " ON " << join.field << "_id = " << join.field << "_ref";
+            ++joinIndex;
+        }
 
         if (store->filter) {
             size_t filterDataIndex = 0;
@@ -243,6 +249,7 @@ namespace Database {
 
         {
             auto query = sqlSession->prepare << ss.str();
+
             if (store->filter) {
                 store->filter->traverse(TraverseCallbacks{
                         []{},
@@ -253,7 +260,7 @@ namespace Database {
                     });
             }
 
-            std::list<std::string> temp(store->what.size());
+            std::list<std::string> temp(store->what.size() + store->on.size());
             for (auto& s : temp)
                 query, soci::into(s);
 
