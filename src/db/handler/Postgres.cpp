@@ -134,9 +134,7 @@ namespace Database {
                    << join.table
                    << " WHERE " << join.field << " = :data" << joinIndex << " LIMIT 1";
 
-                soci::statement st = (sqlSession->prepare << ss.str(), soci::use(join.on), soci::into(joinIds[joinIndex])); // cast
-                st.execute();
-                st.fetch(); // will write joinId
+                sqlSession->once << ss.str(), soci::into(joinIds[joinIndex]), soci::use(join.on);
 
                 ++joinIndex;
             }
@@ -145,14 +143,17 @@ namespace Database {
         { // JOIN
             size_t joinIndex = 0;
             for (auto& join : store->on) {
-                if (joinIds[joinIndex] != 0) continue; // already found in database
+                if (joinIds[joinIndex] != 0) {
+                    ++joinIndex;
+                    continue; // already found in database
+                }
 
                 stringstream ss;
                 ss << "INSERT INTO "
                    << join.table
                    << " (" << join.field << ") VALUES (:data)";
 
-                    sqlSession->once << ss.str(), soci::use(join.on);
+                sqlSession->once << ss.str(), soci::use(join.on);
                 sqlSession->once << "SELECT CURRVAL('" << join.table << "_" << join.field << "_id_seq')", soci::into(joinIds[joinIndex]);
 
                 ++joinIndex;
