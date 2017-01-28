@@ -127,15 +127,14 @@ namespace Database {
         std::vector<size_t> joinIds(store->on.size());
 
         { // SELECT(JOIN)
-            stringstream ss;
-
             size_t joinIndex = 0;
             for (auto& join : store->on) {
+                stringstream ss;
                 ss << "SELECT " << join.field << "_id FROM "
                    << join.table
                    << " WHERE " << join.field << " = :data" << joinIndex << " LIMIT 1";
 
-                    soci::statement st = (sqlSession->prepare << ss.str(), soci::use(join.on), soci::into(joinIds[joinIndex])); // cast
+                soci::statement st = (sqlSession->prepare << ss.str(), soci::use(join.on), soci::into(joinIds[joinIndex])); // cast
                 st.execute();
                 st.fetch(); // will write joinId
 
@@ -144,12 +143,11 @@ namespace Database {
         }
 
         { // JOIN
-            stringstream ss;
-
             size_t joinIndex = 0;
             for (auto& join : store->on) {
                 if (joinIds[joinIndex] != 0) continue; // already found in database
 
+                stringstream ss;
                 ss << "INSERT INTO "
                    << join.table
                    << " (" << join.field << ") VALUES (:data)";

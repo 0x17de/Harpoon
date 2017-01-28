@@ -7,6 +7,8 @@
 #include <chrono>
 
 
+class IrcLoggable;
+enum class IrcDatabaseMessageType : int;
 class IrcBacklogService : public EventLoop {
     EventQueue* appQueue;
     bool databaseInitialized;
@@ -18,6 +20,13 @@ class IrcBacklogService : public EventLoop {
     void setupTable(std::shared_ptr<IEvent> event);
     bool setupTable_processResult(std::shared_ptr<IEvent> event);
     bool setupTable_processId(std::shared_ptr<IEvent> event);
+    void writeBacklog(std::shared_ptr<IEvent> event,
+                      IrcLoggable* loggable,
+                      const std::string& message,
+                      IrcDatabaseMessageType type,
+                      const std::string& flags,
+                      const std::string& from,
+                      const std::string& channel);
 
 public:
     explicit IrcBacklogService(EventQueue* appQueue);
