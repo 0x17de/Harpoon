@@ -572,6 +572,32 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             ASSERT_EQUAL(true, count == 1);
         }
 
+        {
+            Select stmt = select("id", "key", "name")
+                .from("test_postgresjoin")
+                .join("test_postgresjoin_name", "name")
+                .where(make_var("id") == make_constant("1"));
+            auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>(), std::move(stmt));
+
+            handler.getEventQueue()->sendEvent(eventFetch);
+        }
+
+        ASSERT_EQUAL(true, waitForEvent());
+
+        // check result
+        {
+            ASSERT_EQUAL(true, results.size() == 1);
+            auto dbResult = results.back()->as<EventDatabaseResult>();
+            ASSERT_EQUAL(true, dbResult->getSuccess());
+            ASSERT_EQUAL(3uL, dbResult->getResults().size());
+
+            auto it = dbResult->getResults().begin();
+            ASSERT_EQUAL("1", *it++);
+            ASSERT_EQUAL("test0", *it++);
+            ASSERT_EQUAL("testname", *it++);
+            results.clear();
+        }
+
         // cleanup
         session->once << "DROP TABLE test_postgresjoin";
         session->once << "DROP TABLE test_postgresjoin_name";

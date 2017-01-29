@@ -258,7 +258,7 @@ namespace Database {
                     });
             }
 
-            std::list<std::string> temp(store->what.size() + store->on.size());
+            std::list<std::string> temp(store->what.size());
             for (auto& s : temp)
                 query, soci::into(s);
 
