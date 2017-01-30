@@ -11,6 +11,25 @@
 namespace details {
     using namespace Query;
 
+    struct TmpQueryUpdate_FILTER {
+        std::unique_ptr<QueryUpdate_Store> store;
+
+        explicit inline TmpQueryUpdate_FILTER(std::unique_ptr<QueryUpdate_Store> store)
+            : store{std::move(store)}
+        { }
+
+        inline operator Query::Update() {
+            return std::move(store);
+        }
+
+        inline TmpQueryUpdate_FILTER& where(StatementPtr&& filter) {
+            if (store->filter)
+                throw std::runtime_error("Query already contains filter");
+            store->filter = std::move(filter);
+            return *this;
+        }
+    };
+
     struct TmpQueryUpdate_DATA {
         std::unique_ptr<QueryUpdate_Store> store;
 
@@ -39,6 +58,13 @@ namespace details {
             store->data.reserve(store->data.size()+std::distance(start, end));
             store->data.insert(store->data.end(), start, end);
             return *this;
+        }
+
+        template<class... T>
+        TmpQuerySelect_FILTER where(T&&... t) {
+            auto temp = TmpQuerySelect_FILTER(std::move(store));
+            temp.where(std::forward<T>(t)...);
+            return temp;
         }
     };
 

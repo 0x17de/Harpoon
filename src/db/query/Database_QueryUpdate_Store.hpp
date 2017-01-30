@@ -13,6 +13,7 @@ namespace Query {
         std::string table;
         std::list<std::string> format;
         std::vector<std::string> data;
+        std::unique_ptr<Query::Statement> filter;
     };
     using Update = std::unique_ptr<QueryUpdate_Store>;
 }

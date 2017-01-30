@@ -32,6 +32,7 @@ namespace Database {
 
         void query_createTable(Query::QueryCreate_Store* store, EventDatabaseResult* result);
         void query_insert(Query::QueryInsert_Store* store, EventDatabaseResult* result);
+        void query_update(Query::QueryUpdate_Store* store, EventDatabaseResult* result);
         void query_select(Query::QuerySelect_Store* store, EventDatabaseResult* result);
         void query_delete(Query::QueryDelete_Store* store, EventDatabaseResult* result);
 
@@ -210,6 +211,55 @@ namespace Database {
         result->setSuccess(true);
     }
 
+    void Postgres_Impl::query_update(Query::QueryUpdate_Store* store, EventDatabaseResult* result) {
+        using namespace Query;
+
+        { // UPDATE
+            stringstream ss;
+
+            ss << "UPDATE " << store->table << " SET ";
+            {
+                size_t index = 0;
+                for (auto& s : store->format) {
+                    ss << s;
+                    ++index;
+                    if (index < store->format.size())
+                        ss << " = :data" << index << " ";
+                }
+            }
+
+            // WHERE
+            if (store->filter) {
+                size_t filterDataIndex = 0;
+                ss << " WHERE ";
+                store->filter->traverse(getTraverseCallbacks(ss, filterDataIndex));
+            }
+
+            ss << ";";
+
+            {
+                auto query = sqlSession->once << ss.str();
+
+                // UPDATE DATA
+                for (auto& s : store->data)
+                    query, soci::use(s);
+
+                // WHERE DATA
+                if (store->filter) {
+                    store->filter->traverse(TraverseCallbacks{
+                            []{},
+                            []{},
+                            [](const std::string& name){ },
+                            [&query](const std::string& name){ query, soci::use(name); },
+                            [](Op op) {}
+                        });
+                }
+            }
+        }
+
+        result->setSuccess(true);
+    }
+
     void Postgres_Impl::query_select(Query::QuerySelect_Store* store, EventDatabaseResult* result) {
         using namespace Query;
 
@@ -320,20 +370,25 @@ namespace Database {
         for (const auto& subQuery : db->getQueries()) {
             auto ptr = subQuery.get();
             auto insert = dynamic_cast<Query::QueryInsert_Store*>(ptr);
-            if (insert) {
+            if (insert) { // INSERT
                 query_insert(insert, result.get());
             } else {
                 auto select = dynamic_cast<Query::QuerySelect_Store*>(ptr);
-                if (select) {
+                if (select) { // SELECT
                     query_select(select, result.get());
                 } else {
-                    auto erase = dynamic_cast<Query::QueryDelete_Store*>(ptr);
-                    if (erase) {
-                        query_delete(erase, result.get());
+                    auto update = dynamic_cast<Query::QueryUpdate_Store*>(ptr);
+                    if (update) { // UPDATE
+                        query_update(update, result.get());
                     } else {
-                        auto create = dynamic_cast<Query::QueryCreate_Store*>(ptr);
-                        if (create) {
-                            query_createTable(create, result.get());
+                        auto erase = dynamic_cast<Query::QueryDelete_Store*>(ptr);
+                        if (erase) { // DELETE
+                            query_delete(erase, result.get());
+                        } else {
+                            auto create = dynamic_cast<Query::QueryCreate_Store*>(ptr);
+                            if (create) { // CREATE
+                                query_createTable(create, result.get());
+                            }
                         }
                     }
                 }
