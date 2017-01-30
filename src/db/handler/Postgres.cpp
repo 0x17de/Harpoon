@@ -221,10 +221,10 @@ namespace Database {
             {
                 size_t index = 0;
                 for (auto& s : store->format) {
-                    ss << s;
+                    ss << s << " = :data" << index;
                     ++index;
                     if (index < store->format.size())
-                        ss << " = :data" << index << " ";
+                        ss << ", ";
                 }
             }
 

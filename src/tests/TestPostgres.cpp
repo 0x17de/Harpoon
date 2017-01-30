@@ -402,6 +402,40 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
         }
 
 
+        // test update element
+        {
+            Update stmt1 = update("test_postgreshandler")
+                .format("key")
+                .data(std::vector<std::string>{"replaced"})
+                .where(make_var("id") == make_constant("1"));
+            auto eventUpdate = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>(), std::move(stmt1));
+
+            handler.getEventQueue()->sendEvent(eventUpdate);
+
+            ASSERT_EQUAL(true, waitForEvent());
+            results.clear();
+
+            Select stmt2 = select("key")
+                .from("test_postgreshandler")
+                .where(make_var("id") == make_constant("1"));
+            auto eventFetch = make_shared<EventDatabaseQuery>(getEventQueue(), make_shared<EventInit>(), std::move(stmt2));
+
+            handler.getEventQueue()->sendEvent(eventFetch);
+        }
+
+        ASSERT_EQUAL(true, waitForEvent());
+
+        // check result
+        {
+            ASSERT_EQUAL(true, results.size() == 1);
+            auto dbResult = results.back()->as<EventDatabaseResult>();
+            ASSERT_EQUAL(true, dbResult->getSuccess());
+            ASSERT_EQUAL(1uL, dbResult->getResults().size());
+            ASSERT_EQUAL("replaced", dbResult->getResults().back());
+            results.clear();
+        }
+
+
         // delete test elements
         {
             Delete stmt = erase()
@@ -428,7 +462,7 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             st.execute();
             while (st.fetch()) {
                 if (id == 1)
-                    ASSERT_EQUAL("test0", key);
+                    ASSERT_EQUAL("replaced", key);
                 else
                     ASSERT_INVALID("Unreachable");
                 ++count;

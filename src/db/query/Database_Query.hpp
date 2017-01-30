@@ -32,7 +32,7 @@ namespace Query {
 
     template<class... T>
     details::TmpQueryUpdate_UPDATE update(T&&... t) {
-        details::TmpQueryUpdate_UPDATE temp;
+        details::TmpQueryUpdate_UPDATE temp(std::forward<T>(t)...);
         return temp;
     }
 

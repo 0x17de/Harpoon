@@ -61,8 +61,8 @@ namespace details {
         }
 
         template<class... T>
-        TmpQuerySelect_FILTER where(T&&... t) {
-            auto temp = TmpQuerySelect_FILTER(std::move(store));
+        TmpQueryUpdate_FILTER where(T&&... t) {
+            auto temp = TmpQueryUpdate_FILTER(std::move(store));
             temp.where(std::forward<T>(t)...);
             return temp;
         }
@@ -74,18 +74,6 @@ namespace details {
         explicit inline TmpQueryUpdate_FORMAT(std::unique_ptr<QueryUpdate_Store> store)
             : store{std::move(store)}
         { }
-
-        inline TmpQueryUpdate_FORMAT& format(const std::string& column) {
-            store->format.emplace_back(column);
-            return *this;
-        }
-
-        template<class... T>
-        inline TmpQueryUpdate_FORMAT& format(const std::string& column, T&&... t) {
-            store->format.emplace_back(column);
-            format(std::forward<T>(t)...);
-            return *this;
-        }
 
         template<class... T>
         TmpQueryUpdate_DATA data(T&&... t) {
@@ -102,6 +90,17 @@ namespace details {
             : store{std::move(store)}
         { }
 
+        inline TmpQueryUpdate_FORMAT format(const std::string& column) {
+            store->format.emplace_back(column);
+            return TmpQueryUpdate_FORMAT(std::move(store));
+        }
+
+        template<class... T>
+        inline TmpQueryUpdate_FORMAT format(const std::string& column, T&&... t) {
+            store->format.emplace_back(column);
+            return format(std::forward<T>(t)...);
+        }
+
         inline TmpQueryUpdate_FORMAT into(const std::string& table) {
             if (!store->table.empty())
                 throw std::runtime_error("Table for query was already defined");
@@ -114,14 +113,17 @@ namespace details {
     struct TmpQueryUpdate_UPDATE {
         std::unique_ptr<QueryUpdate_Store> store;
 
-        inline TmpQueryUpdate_UPDATE()
+        template<class T>
+        TmpQueryUpdate_UPDATE(T&& table)
             : store{cpp11::make_unique<QueryUpdate_Store>()}
-        { }
+        {
+            store->table = std::forward<T>(table);
+        }
 
         template<class... T>
-        TmpQueryUpdate_FORMAT into(T&&... t) {
+        TmpQueryUpdate_FORMAT format(T&&... t) {
             auto temp = TmpQueryUpdate_INTO(std::move(store));
-            return temp.into(std::forward<T>(t)...);
+            return temp.format(std::forward<T>(t)...);
         }
     };
 }
