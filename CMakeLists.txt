@@ -45,6 +45,8 @@ process_flag(0 USE_WEBSOCKET_SERVER 1 "Using websocket server")
   process_flag(1 Seasocks_GIT 0 "Get seasocks from git")
 
 process_flag(0 USE_POSTGRES_DATABASE 1 "Using postgres")
+  process_flag(1 DATABASE_VERBOSE_QUERY 0 "Verbose SQL printing")
+
 process_flag(0 BUILD_TEST 0 "Build tests")
 
 
@@ -153,6 +155,9 @@ if(USE_POSTGRES_DATABASE)
         src/db/handler/Postgres.hpp
         src/db/handler/Postgres.cpp)
     add_definitions(-DUSE_POSTGRES_DATABASE)
+endif()
+if(DATABASE_VERBOSE_QUERY)
+    add_definitions(-DDATABASE_VERBOSE_QUERY)
 endif()
 
 

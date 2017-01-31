@@ -85,10 +85,6 @@ void IrcBacklogService::setupTable(std::shared_ptr<IEvent> event) {
                                                            std::move(stmt));
 
     appQueue->sendEvent(eventSetup);
-
-    auto fakeResult = std::make_shared<EventDatabaseResult>(event);
-    fakeResult->setSuccess(true);
-    getEventQueue()->sendEvent(fakeResult);
 }
 
 bool IrcBacklogService::setupTable_processResult(std::shared_ptr<IEvent> event) {
@@ -104,15 +100,10 @@ bool IrcBacklogService::setupTable_processResult(std::shared_ptr<IEvent> event) 
                 .order_by("message_id", "DESC")
                 .limit(1);
             auto eventQueryLastId = std::make_shared<EventDatabaseQuery>(getEventQueue(),
-                                                                    event,
-                                                                    std::move(stmt));
+                                                                         result->getEventOrigin(),
+                                                                         std::move(stmt));
 
             appQueue->sendEvent(eventQueryLastId);
-
-            auto fakeResult = std::make_shared<EventDatabaseResult>(result->getEventOrigin());
-            fakeResult->setSuccess(true);
-            fakeResult->addResult("1"); // LastID
-            getEventQueue()->sendEvent(fakeResult);
 
             databaseInitialized = true;
         } else {

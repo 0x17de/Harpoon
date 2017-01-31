@@ -117,6 +117,10 @@ namespace Database {
         }
         ss << ")" << endl;
 
+#ifdef DATABASE_VERBOSE_QUERY
+        cout << ss.str() << endl;
+#endif
+
         sqlSession->once << ss.str();
 
         result->setSuccess(true);
@@ -134,6 +138,10 @@ namespace Database {
                 ss << "SELECT " << join.field << "_id FROM "
                    << join.table
                    << " WHERE " << join.field << " = :data" << joinIndex << " LIMIT 1";
+
+#ifdef DATABASE_VERBOSE_QUERY
+        cout << ss.str() << endl;
+#endif
 
                 sqlSession->once << ss.str(), soci::into(joinIds[joinIndex]), soci::use(join.on);
 
@@ -154,7 +162,13 @@ namespace Database {
                    << join.table
                    << " (" << join.field << ") VALUES (:data)";
 
+#ifdef DATABASE_VERBOSE_QUERY
+                cout << ss.str() << endl;
+#endif
                 sqlSession->once << ss.str(), soci::use(join.on);
+#ifdef DATABASE_VERBOSE_QUERY
+                cout << "SELECT CURRVAL('" << join.table << "_" << join.field << "_id_seq')" << endl;
+#endif
                 sqlSession->once << "SELECT CURRVAL('" << join.table << "_" << join.field << "_id_seq')", soci::into(joinIds[joinIndex]);
 
                 ++joinIndex;
@@ -201,6 +215,10 @@ namespace Database {
             }
             ss << ";";
 
+#ifdef DATABASE_VERBOSE_QUERY
+            cout << ss.str() << endl;
+#endif
+
             {
                 auto query = sqlSession->once << ss.str();
                 for (auto& s : store->data)
@@ -236,6 +254,10 @@ namespace Database {
             }
 
             ss << ";";
+
+#ifdef DATABASE_VERBOSE_QUERY
+            cout << ss.str() << endl;
+#endif
 
             {
                 auto query = sqlSession->once << ss.str();
@@ -295,6 +317,10 @@ namespace Database {
         if (store->limit != std::numeric_limits<size_t>::max())
             ss << " LIMIT " << store->limit;
 
+#ifdef DATABASE_VERBOSE_QUERY
+        cout << ss.str() << endl;
+#endif
+
         {
             auto query = sqlSession->prepare << ss.str();
 
@@ -340,6 +366,10 @@ namespace Database {
 
         if (store->limit != std::numeric_limits<size_t>::max())
             ss << " LIMIT " << store->limit;
+
+#ifdef DATABASE_VERBOSE_QUERY
+        cout << ss.str() << endl;
+#endif
 
         {
             auto query = sqlSession->once << ss.str();
