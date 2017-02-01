@@ -111,6 +111,7 @@ set(SOURCE_FILES src/version.hpp
     src/event/irc/EventIrcParted.cpp src/event/irc/EventIrcParted.hpp
     src/event/irc/EventIrcChangeNick.cpp src/event/irc/EventIrcChangeNick.hpp
     src/event/irc/EventIrcRequestBacklog.cpp src/event/irc/EventIrcRequestBacklog.hpp
+    src/event/irc/EventIrcBacklogResponse.cpp src/event/irc/EventIrcBacklogResponse.hpp
     src/event/irc/EventIrcNickChanged.cpp src/event/irc/EventIrcNickChanged.hpp
     src/event/irc/EventIrcPartChannel.cpp src/event/irc/EventIrcPartChannel.hpp
     src/event/irc/EventIrcKicked.cpp src/event/irc/EventIrcKicked.hpp

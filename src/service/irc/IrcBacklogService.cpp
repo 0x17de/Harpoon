@@ -13,6 +13,7 @@
 #include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcKicked.hpp"
 #include "event/irc/EventIrcRequestBacklog.hpp"
+#include "event/irc/EventIrcBacklogResponse.hpp"
 #include "utils/IdProvider.hpp"
 #include "utils/ModuleProvider.hpp"
 
@@ -227,6 +228,21 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                 auto eventFetch = std::make_shared<EventDatabaseQuery>(getEventQueue(), event, std::move(stmt));
 
                 appQueue->sendEvent(eventFetch);
+            } else if (eventType == EventDatabaseResult::uuid) { // RESULTS
+                auto result = event->as<EventDatabaseResult>();
+                auto origin = result->getEventOrigin();
+                if (origin->getEventUuid() == EventIrcRequestBacklog::uuid) {
+                    auto request = origin->as<EventIrcRequestBacklog>();
+
+                    std::list<std::shared_ptr<IEvent>> events;
+
+
+
+                    auto response = std::make_shared<EventIrcBacklogResponse>(request->getUserId(),
+                                                                              request->getServerId(),
+                                                                              request->getChannelName(),
+                                                                              std::move(events));
+                }
             } else if (eventType == EventIrcAction::uuid) {
                 auto action = event->as<EventIrcAction>();
                 writeBacklog(event,

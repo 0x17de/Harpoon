@@ -19,6 +19,7 @@
 #include "event/irc/EventIrcUserlistReceived.hpp"
 #include "event/irc/EventIrcNickModified.hpp"
 #include "event/irc/EventIrcModeChanged.hpp"
+#include "event/irc/EventIrcBacklogResponse.hpp"
 #include "event/EventLoginResult.hpp"
 #include "event/EventLogout.hpp"
 #include "event/EventQuery.hpp"
@@ -327,6 +328,8 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["target"] = kick->getTarget();
         root["msg"] = kick->getReason();
         root["channel"] = kick->getChannel();
+    } else if (eventType == EventIrcBacklogResponse::uuid) {
+        auto response = event->as<EventIrcBacklogResponse>();
     } else {
         return "";
     }
