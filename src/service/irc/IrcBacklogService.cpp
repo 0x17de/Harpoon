@@ -1,4 +1,5 @@
 #include "IrcBacklogService.hpp"
+#include "IrcDatabaseMessageType.hpp"
 #include "db/query/Database_Query.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventInit.hpp"
@@ -25,17 +26,6 @@
 
 PROVIDE_MODULE("irc_backlog", "default", IrcBacklogService);
 using namespace Query;
-
-
-enum class IrcDatabaseMessageType : int {
-    Message = 0,
-    Join = 1,
-    Part = 2,
-    Quit = 3,
-    Kick = 4,
-    Notice = 5,
-    Action = 6
-};
 
 
 IrcBacklogService::IrcBacklogService(EventQueue* appQueue)
@@ -219,9 +209,8 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
             } else if (eventType == EventIrcRequestBacklog::uuid) {
                 auto request = event->as<EventIrcRequestBacklog>();
 
-                Select stmt = select("message_id", "time", "message", "type", "flags", "channel", "sender")
+                Select stmt = select("message_id", "time", "message", "type", "flags", "sender")
                     .from("harpoon_irc_backlog")
-                    .join("harpoon_irc_channel", "channel")
                     .join("harpoon_irc_sender", "sender")
                     .order_by("message_id", "DESC")
                     .limit(5);
@@ -230,18 +219,40 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                 appQueue->sendEvent(eventFetch);
             } else if (eventType == EventDatabaseResult::uuid) { // RESULTS
                 auto result = event->as<EventDatabaseResult>();
-                auto origin = result->getEventOrigin();
-                if (origin->getEventUuid() == EventIrcRequestBacklog::uuid) {
-                    auto request = origin->as<EventIrcRequestBacklog>();
+                if (result->getSuccess()) {
+                    auto origin = result->getEventOrigin();
+                    if (origin->getEventUuid() == EventIrcRequestBacklog::uuid) {
+                        auto request = origin->as<EventIrcRequestBacklog>();
 
-                    std::list<std::shared_ptr<IEvent>> events;
+                        std::list<MessageData> data;
 
+                        auto it = result->getResults().begin();
+                        auto end = result->getResults().end();
+                        while (it != end) {
+                            size_t messageId;
+                            size_t type;
+                            size_t flags;
 
+                            std::istringstream(*it++) >> messageId;
+                            std::string time = *it++;
+                            std::string message = *it++;
+                            std::istringstream(*it++) >> type;
+                            std::istringstream(*it++) >> flags;
+                            std::string sender = *it++;
 
-                    auto response = std::make_shared<EventIrcBacklogResponse>(request->getUserId(),
-                                                                              request->getServerId(),
-                                                                              request->getChannelName(),
-                                                                              std::move(events));
+                            data.emplace_back(messageId,
+                                              time,
+                                              message,
+                                              static_cast<MessageType>(type),
+                                              flags,
+                                              sender);
+                        }
+
+                        auto response = std::make_shared<EventIrcBacklogResponse>(request->getUserId(),
+                                                                                  request->getServerId(),
+                                                                                  request->getChannelName(),
+                                                                                  std::move(data));
+                    }
                 }
             } else if (eventType == EventIrcAction::uuid) {
                 auto action = event->as<EventIrcAction>();

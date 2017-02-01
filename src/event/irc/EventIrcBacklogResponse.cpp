@@ -1,4 +1,5 @@
 #include "EventIrcBacklogResponse.hpp"
+#include "service/irc/IrcDatabaseMessageType.hpp"
 #include "utils/uuidGen.hpp"
 
 
@@ -10,7 +11,7 @@ UUID EventIrcBacklogResponse::getEventUuid() const {
 EventIrcBacklogResponse::EventIrcBacklogResponse(size_t userId,
                                                  size_t serverId,
                                                  const std::string& channel,
-                                                 std::list<std::shared_ptr<IEvent>>&& events)
+                                                 std::list<MessageData>&& events)
     : userId{userId}
     , serverId{serverId}
     , channel{channel}
@@ -30,6 +31,6 @@ std::string EventIrcBacklogResponse::getChannel() const {
     return channel;
 }
 
-const std::list<std::shared_ptr<IEvent>>& EventIrcBacklogResponse::getEvents() const {
+const std::list<MessageData>& EventIrcBacklogResponse::getData() const {
     return events;
 }
