@@ -1,5 +1,4 @@
 #include "EventIrcAddHost.hpp"
-#include "utils/uuidGen.hpp"
 
 
 EventIrcAddHost::EventIrcAddHost(size_t userId,
@@ -19,7 +18,6 @@ EventIrcAddHost::EventIrcAddHost(size_t userId,
 {
 }
 
-UUID EventIrcAddHost::uuid = ::uuid.get();
 UUID EventIrcAddHost::getEventUuid() const {
     return this->uuid;
 }

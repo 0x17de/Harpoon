@@ -9,7 +9,7 @@ class EventIrcConnected : public IClientEvent {
     size_t userId;
     size_t serverId;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 17;
     virtual UUID getEventUuid() const override;
 
     EventIrcConnected(size_t userId, size_t serverId);

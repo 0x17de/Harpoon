@@ -14,7 +14,7 @@ class EventIrcHostAdded : public IClientEvent {
     bool ipV6;
     bool ssl;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 21;
     virtual UUID getEventUuid() const override;
 
     EventIrcHostAdded(size_t userId,

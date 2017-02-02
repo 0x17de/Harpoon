@@ -11,7 +11,7 @@ class EventIrcSendAction : public IIrcCommand {
     std::string channel;
     std::string message;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 38;
     virtual UUID getEventUuid() const override;
 
     EventIrcSendAction(size_t userId, size_t serverId, const std::string& channel, const std::string& message);

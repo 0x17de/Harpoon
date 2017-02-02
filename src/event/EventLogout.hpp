@@ -8,7 +8,7 @@
 class EventLogout : public IEvent {
     void* data;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 6;
     virtual UUID getEventUuid() const override;
 
     explicit EventLogout(void* data);

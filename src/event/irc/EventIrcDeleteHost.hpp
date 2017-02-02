@@ -11,7 +11,7 @@ class EventIrcDeleteHost : public IUserEvent {
     std::string host;
     int port;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 19;
     virtual UUID getEventUuid() const override;
 
     EventIrcDeleteHost(size_t userId,

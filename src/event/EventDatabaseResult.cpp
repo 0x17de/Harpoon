@@ -1,8 +1,6 @@
 #include "EventDatabaseResult.hpp"
-#include "utils/uuidGen.hpp"
 
 
-UUID EventDatabaseResult::uuid = ::uuid.get();
 UUID EventDatabaseResult::getEventUuid() const {
     return this->uuid;
 }

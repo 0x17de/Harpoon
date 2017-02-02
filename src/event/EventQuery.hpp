@@ -11,7 +11,7 @@ class EventQuery : public IUserEvent {
     void* data;
     EventQueryType type;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 7;
     virtual UUID getEventUuid() const override;
 
     EventQuery(size_t userId, void* data, EventQueryType type);

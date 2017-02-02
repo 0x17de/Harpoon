@@ -11,7 +11,7 @@ class EventLoginResult : public ISingleClientEvent {
     size_t userId;
     void* data;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 5;
     virtual UUID getEventUuid() const override;
 
     EventLoginResult(bool success, size_t userId, void* data);

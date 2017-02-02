@@ -13,7 +13,7 @@ class EventIrcAction : public IClientEvent, public IrcLoggable {
     std::string channel;
     std::string message;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 10;
     virtual UUID getEventUuid() const override;
 
     EventIrcAction(size_t userId,

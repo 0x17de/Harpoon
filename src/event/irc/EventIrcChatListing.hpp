@@ -13,7 +13,7 @@ class EventIrcChatListing : public ISingleClientEvent {
     std::list<IrcServerListing> servers;
     void* data;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 16;
     virtual UUID getEventUuid() const override;
 
     EventIrcChatListing(size_t firstId,

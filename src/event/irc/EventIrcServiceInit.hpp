@@ -6,7 +6,7 @@
 
 class EventIrcServiceInit : public IEvent {
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 42;
     virtual UUID getEventUuid() const override;
 };
 

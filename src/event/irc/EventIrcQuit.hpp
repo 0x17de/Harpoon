@@ -14,7 +14,7 @@ class EventIrcQuit : public IClientEvent, public IrcLoggable {
     std::string who;
     std::string reason;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 35;
     virtual UUID getEventUuid() const override;
 
     EventIrcQuit(size_t userId, size_t serverId, const std::string& who, const std::string& reason);

@@ -15,7 +15,7 @@ class EventIrcMessage : public IClientEvent, public IrcLoggable {
     std::string message;
     MessageType type;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 27;
     virtual UUID getEventUuid() const override;
 
     EventIrcMessage(size_t userId,

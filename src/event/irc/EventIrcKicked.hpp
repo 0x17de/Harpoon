@@ -14,7 +14,7 @@ class EventIrcKicked : public IClientEvent, public IrcLoggable {
     std::string target;
     std::string reason;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 26;
     virtual UUID getEventUuid() const override;
 
     EventIrcKicked(size_t userId, size_t serverId, const std::string& username, const std::string& channel, const std::string& target, const std::string& reason);

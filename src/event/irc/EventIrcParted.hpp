@@ -12,7 +12,7 @@ class EventIrcParted : public IClientEvent, public IrcLoggable {
     std::string username;
     std::string channel;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 34;
     virtual UUID getEventUuid() const override;
 
     EventIrcParted(size_t userId, size_t serverId, const std::string& username, const std::string& channel);

@@ -13,7 +13,7 @@ class EventIrcNumeric : public IClientEvent {
     std::string from;
     std::vector<std::string> parameters;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 32;
     virtual UUID getEventUuid() const override;
 
     EventIrcNumeric(size_t userId, size_t serverId,

@@ -1,11 +1,9 @@
 #include "EventIrcSettingsListing.hpp"
-#include "utils/uuidGen.hpp"
 #include "service/irc/IrcChannelLoginData.hpp"
 #include "service/irc/IrcServerHostConfiguration.hpp"
 #include "service/irc/IrcServerConfiguration.hpp"
 
 
-UUID EventIrcSettingsListing::uuid = ::uuid.get();
 UUID EventIrcSettingsListing::getEventUuid() const {
     return this->uuid;
 }

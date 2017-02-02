@@ -1,5 +1,4 @@
 #include "EventIrcJoinChannel.hpp"
-#include "utils/uuidGen.hpp"
 #include "service/irc/IrcChannelLoginData.hpp"
 
 
@@ -22,7 +21,6 @@ EventIrcJoinChannel::EventIrcJoinChannel(size_t userId, size_t serverId)
 {
 }
 
-UUID EventIrcJoinChannel::uuid = ::uuid.get();
 UUID EventIrcJoinChannel::getEventUuid() const {
     return this->uuid;
 }

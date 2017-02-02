@@ -1,8 +1,6 @@
 #include "EventIrcMessage.hpp"
-#include "utils/uuidGen.hpp"
 
 
-UUID EventIrcMessage::uuid = ::uuid.get();
 UUID EventIrcMessage::getEventUuid() const {
     return this->uuid;
 }

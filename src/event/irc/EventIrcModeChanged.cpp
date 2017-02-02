@@ -1,8 +1,6 @@
 #include "EventIrcModeChanged.hpp"
-#include "utils/uuidGen.hpp"
 
 
-UUID EventIrcModeChanged::uuid = ::uuid.get();
 UUID EventIrcModeChanged::getEventUuid() const {
     return this->uuid;
 }

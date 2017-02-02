@@ -1,5 +1,4 @@
 #include "EventIrcActivateService.hpp"
-#include "utils/uuidGen.hpp"
 #include "service/irc/IrcService.hpp"
 #include "service/irc/IrcConnection.hpp"
 #include "service/irc/IrcChannelLoginData.hpp"
@@ -9,7 +8,6 @@
 using namespace std;
 
 
-UUID EventIrcActivateService::uuid = ::uuid.get();
 UUID EventIrcActivateService::getEventUuid() const {
     return this->uuid;
 }

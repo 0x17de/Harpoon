@@ -1,5 +1,4 @@
 #include "EventIrcChangeNick.hpp"
-#include "utils/uuidGen.hpp"
 
 
 EventIrcChangeNick::EventIrcChangeNick(size_t userId,
@@ -11,7 +10,6 @@ EventIrcChangeNick::EventIrcChangeNick(size_t userId,
 {
 }
 
-UUID EventIrcChangeNick::uuid = ::uuid.get();
 UUID EventIrcChangeNick::getEventUuid() const {
     return this->uuid;
 }

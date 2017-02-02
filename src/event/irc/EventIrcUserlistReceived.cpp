@@ -1,5 +1,4 @@
 #include "EventIrcUserlistReceived.hpp"
-#include "utils/uuidGen.hpp"
 
 
 EventIrcUserlistReceived::User::User(const std::string& nick,
@@ -8,7 +7,6 @@ EventIrcUserlistReceived::User::User(const std::string& nick,
     , mode{mode}
 { }
 
-UUID EventIrcUserlistReceived::uuid = ::uuid.get();
 UUID EventIrcUserlistReceived::getEventUuid() const {
     return this->uuid;
 }

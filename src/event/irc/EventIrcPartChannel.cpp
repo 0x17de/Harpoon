@@ -1,5 +1,4 @@
 #include "EventIrcPartChannel.hpp"
-#include "utils/uuidGen.hpp"
 
 
 EventIrcPartChannel::EventIrcPartChannel(size_t userId,
@@ -9,7 +8,6 @@ EventIrcPartChannel::EventIrcPartChannel(size_t userId,
 {
 }
 
-UUID EventIrcPartChannel::uuid = ::uuid.get();
 UUID EventIrcPartChannel::getEventUuid() const {
     return this->uuid;
 }

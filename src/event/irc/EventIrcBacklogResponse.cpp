@@ -1,9 +1,7 @@
 #include "EventIrcBacklogResponse.hpp"
 #include "service/irc/IrcDatabaseMessageType.hpp"
-#include "utils/uuidGen.hpp"
 
 
-UUID EventIrcBacklogResponse::uuid = ::uuid.get();
 UUID EventIrcBacklogResponse::getEventUuid() const {
     return this->uuid;
 }

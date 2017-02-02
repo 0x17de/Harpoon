@@ -1,5 +1,4 @@
 #include "EventIrcAddServer.hpp"
-#include "utils/uuidGen.hpp"
 
 
 EventIrcAddServer::EventIrcAddServer(size_t userId,
@@ -9,7 +8,6 @@ EventIrcAddServer::EventIrcAddServer(size_t userId,
 {
 }
 
-UUID EventIrcAddServer::uuid = ::uuid.get();
 UUID EventIrcAddServer::getEventUuid() const {
     return this->uuid;
 }

@@ -13,7 +13,7 @@ class EventIrcActivateService : public IActivateServiceEvent {
     size_t userId;
     std::map<size_t, IrcServerConfiguration> loginData;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 11;
     virtual UUID getEventUuid() const override;
 
     explicit EventIrcActivateService(size_t userId);

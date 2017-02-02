@@ -10,7 +10,7 @@ class EventIrcServerAdded : public IClientEvent {
     size_t serverId;
     std::string serverName;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 40;
     virtual UUID getEventUuid() const override;
 
     EventIrcServerAdded(size_t userId, size_t serverId, const std::string& serverName);

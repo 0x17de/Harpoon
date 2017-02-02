@@ -21,7 +21,7 @@ class EventIrcJoinChannel : public IIrcCommand {
     size_t serverId;
     std::list<IrcChannelJoinData> loginData;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 24;
     virtual UUID getEventUuid() const override;
 
     explicit EventIrcJoinChannel(size_t userId, size_t serverId);

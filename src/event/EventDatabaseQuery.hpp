@@ -24,7 +24,7 @@ class EventDatabaseQuery : public IDatabaseEvent {
     }
 
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 1;
     virtual UUID getEventUuid() const override;
 
     template<class... T>

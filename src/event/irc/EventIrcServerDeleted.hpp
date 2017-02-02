@@ -10,7 +10,7 @@ class EventIrcServerDeleted : public IClientEvent {
     size_t serverId;
     std::string serverName;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 41;
     virtual UUID getEventUuid() const override;
 
     EventIrcServerDeleted(size_t userId, size_t serverId);

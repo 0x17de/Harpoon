@@ -1,8 +1,6 @@
 #include "EventIrcKicked.hpp"
-#include "utils/uuidGen.hpp"
 
 
-UUID EventIrcKicked::uuid = ::uuid.get();
 UUID EventIrcKicked::getEventUuid() const {
     return this->uuid;
 }

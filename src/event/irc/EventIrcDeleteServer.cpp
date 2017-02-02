@@ -1,5 +1,4 @@
 #include "EventIrcDeleteServer.hpp"
-#include "utils/uuidGen.hpp"
 
 
 EventIrcDeleteServer::EventIrcDeleteServer(size_t userId, size_t serverId)
@@ -8,7 +7,6 @@ EventIrcDeleteServer::EventIrcDeleteServer(size_t userId, size_t serverId)
 {
 }
 
-UUID EventIrcDeleteServer::uuid = ::uuid.get();
 UUID EventIrcDeleteServer::getEventUuid() const {
     return this->uuid;
 }

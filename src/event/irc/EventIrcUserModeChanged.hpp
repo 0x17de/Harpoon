@@ -12,7 +12,7 @@ class EventIrcUserModeChanged : public IClientEvent {
     std::string channel;
     std::string mode;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 46;
     virtual UUID getEventUuid() const override;
 
     EventIrcUserModeChanged(size_t userId, size_t serverId,

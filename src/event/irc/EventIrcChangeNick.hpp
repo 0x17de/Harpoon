@@ -10,7 +10,7 @@ class EventIrcChangeNick : public IIrcCommand {
     size_t serverId;
     std::string nick;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 15;
     virtual UUID getEventUuid() const override;
 
     EventIrcChangeNick(size_t userId,

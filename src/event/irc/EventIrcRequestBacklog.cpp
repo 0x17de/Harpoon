@@ -1,5 +1,4 @@
 #include "EventIrcRequestBacklog.hpp"
-#include "utils/uuidGen.hpp"
 
 
 EventIrcRequestBacklog::EventIrcRequestBacklog(size_t userId,
@@ -15,7 +14,6 @@ EventIrcRequestBacklog::EventIrcRequestBacklog(size_t userId,
 {
 }
 
-UUID EventIrcRequestBacklog::uuid = ::uuid.get();
 UUID EventIrcRequestBacklog::getEventUuid() const {
     return this->uuid;
 }

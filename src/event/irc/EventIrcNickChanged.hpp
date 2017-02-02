@@ -12,7 +12,7 @@ class EventIrcNickChanged : public IClientEvent, public IrcLoggable {
     std::string username;
     std::string newNick;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 30;
     virtual UUID getEventUuid() const override;
 
     EventIrcNickChanged(size_t userId, size_t serverId, const std::string& username, const std::string& newNick);

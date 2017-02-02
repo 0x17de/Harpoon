@@ -1,5 +1,4 @@
 #include "EventIrcDeleteHost.hpp"
-#include "utils/uuidGen.hpp"
 
 
 EventIrcDeleteHost::EventIrcDeleteHost(size_t userId,
@@ -13,7 +12,6 @@ EventIrcDeleteHost::EventIrcDeleteHost(size_t userId,
 {
 }
 
-UUID EventIrcDeleteHost::uuid = ::uuid.get();
 UUID EventIrcDeleteHost::getEventUuid() const {
     return this->uuid;
 }

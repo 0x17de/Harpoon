@@ -37,7 +37,7 @@ class EventIrcBacklogResponse : public IClientEvent {
     std::list<MessageData> events;
 
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 14;
     virtual UUID getEventUuid() const override;
 
     EventIrcBacklogResponse(size_t userId,

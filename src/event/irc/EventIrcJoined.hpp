@@ -12,7 +12,7 @@ class EventIrcJoined : public IClientEvent, public IrcLoggable {
     std::string username;
     std::string channel;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 25;
     virtual UUID getEventUuid() const override;
 
     EventIrcJoined(size_t userId, size_t serverId, const std::string& username, const std::string& channel);

@@ -6,7 +6,7 @@
 
 class EventInit : public IEvent {
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 3;
     virtual UUID getEventUuid() const override;
 };
 

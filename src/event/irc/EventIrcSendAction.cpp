@@ -1,8 +1,6 @@
 #include "EventIrcSendAction.hpp"
-#include "utils/uuidGen.hpp"
 
 
-UUID EventIrcSendAction::uuid = ::uuid.get();
 UUID EventIrcSendAction::getEventUuid() const {
     return this->uuid;
 }

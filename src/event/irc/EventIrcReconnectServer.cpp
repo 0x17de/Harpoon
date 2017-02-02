@@ -1,5 +1,4 @@
 #include "EventIrcReconnectServer.hpp"
-#include "utils/uuidGen.hpp"
 
 
 EventIrcReconnectServer::EventIrcReconnectServer(size_t userId,
@@ -9,7 +8,6 @@ EventIrcReconnectServer::EventIrcReconnectServer(size_t userId,
 {
 }
 
-UUID EventIrcReconnectServer::uuid = ::uuid.get();
 UUID EventIrcReconnectServer::getEventUuid() const {
     return this->uuid;
 }

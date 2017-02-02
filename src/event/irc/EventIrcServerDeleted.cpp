@@ -1,8 +1,6 @@
 #include "EventIrcServerDeleted.hpp"
-#include "utils/uuidGen.hpp"
 
 
-UUID EventIrcServerDeleted::uuid = ::uuid.get();
 UUID EventIrcServerDeleted::getEventUuid() const {
     return this->uuid;
 }

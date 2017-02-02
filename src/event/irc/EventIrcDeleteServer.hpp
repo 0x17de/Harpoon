@@ -8,7 +8,7 @@ class EventIrcDeleteServer : public IUserEvent {
     size_t userId;
     size_t serverId;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 20;
     virtual UUID getEventUuid() const override;
 
     EventIrcDeleteServer(size_t userId, size_t serverId);

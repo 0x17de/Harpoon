@@ -11,7 +11,7 @@ class EventIrcPartChannel : public IIrcCommand {
 	size_t serverId;
 	std::list<std::string> channels;
 public:
-	static UUID uuid;
+	static constexpr UUID uuid = 33;
 	virtual UUID getEventUuid() const override;
 
 	EventIrcPartChannel(size_t userId, size_t serverId);

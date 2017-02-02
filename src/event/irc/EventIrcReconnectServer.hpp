@@ -9,7 +9,7 @@ class EventIrcReconnectServer : public IIrcCommand {
     size_t userId;
     size_t serverId;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 36;
     virtual UUID getEventUuid() const override;
 
     EventIrcReconnectServer(size_t userId,

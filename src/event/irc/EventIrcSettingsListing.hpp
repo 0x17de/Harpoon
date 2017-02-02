@@ -12,7 +12,7 @@ class EventIrcSettingsListing : public ISingleClientEvent {
 	std::list<IrcServerConfiguration> servers;
     void* data;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 43;
     virtual UUID getEventUuid() const override;
 
     EventIrcSettingsListing(size_t userId, void* data);

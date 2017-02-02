@@ -195,110 +195,135 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
     } else {
         auto loggable = event->as<IrcLoggable>();
         if (loggable != nullptr) {
-            if (eventType == EventIrcMessage::uuid) {
-                auto message = event->as<EventIrcMessage>();
-                writeBacklog(event,
-                             loggable,
-                             message->getMessage(),
-                             message->getType() == MessageType::Message
-                             ? IrcDatabaseMessageType::Message
-                             : IrcDatabaseMessageType::Notice,
-                             "0",
-                             message->getFrom(),
-                             message->getChannel());
-            } else if (eventType == EventIrcRequestBacklog::uuid) {
-                auto request = event->as<EventIrcRequestBacklog>();
-
-                Select stmt = select("message_id", "time", "message", "type", "flags", "sender")
-                    .from("harpoon_irc_backlog")
-                    .join("harpoon_irc_sender", "sender")
-                    .order_by("message_id", "DESC")
-                    .limit(5);
-                auto eventFetch = std::make_shared<EventDatabaseQuery>(getEventQueue(), event, std::move(stmt));
-
-                appQueue->sendEvent(eventFetch);
-            } else if (eventType == EventDatabaseResult::uuid) { // RESULTS
-                auto result = event->as<EventDatabaseResult>();
-                if (result->getSuccess()) {
-                    auto origin = result->getEventOrigin();
-                    if (origin->getEventUuid() == EventIrcRequestBacklog::uuid) {
-                        auto request = origin->as<EventIrcRequestBacklog>();
-
-                        std::list<MessageData> data;
-
-                        auto it = result->getResults().begin();
-                        auto end = result->getResults().end();
-                        while (it != end) {
-                            size_t messageId;
-                            size_t type;
-                            size_t flags;
-
-                            std::istringstream(*it++) >> messageId;
-                            std::string time = *it++;
-                            std::string message = *it++;
-                            std::istringstream(*it++) >> type;
-                            std::istringstream(*it++) >> flags;
-                            std::string sender = *it++;
-
-                            data.emplace_back(messageId,
-                                              time,
-                                              message,
-                                              static_cast<MessageType>(type),
-                                              flags,
-                                              sender);
-                        }
-
-                        auto response = std::make_shared<EventIrcBacklogResponse>(request->getUserId(),
-                                                                                  request->getServerId(),
-                                                                                  request->getChannelName(),
-                                                                                  std::move(data));
-                    }
+            switch(eventType) {
+            case EventIrcMessage::uuid:
+                {
+                    auto message = event->as<EventIrcMessage>();
+                    writeBacklog(event,
+                                 loggable,
+                                 message->getMessage(),
+                                 message->getType() == MessageType::Message
+                                 ? IrcDatabaseMessageType::Message
+                                 : IrcDatabaseMessageType::Notice,
+                                 "0",
+                                 message->getFrom(),
+                                 message->getChannel());
+                    break;
                 }
-            } else if (eventType == EventIrcAction::uuid) {
-                auto action = event->as<EventIrcAction>();
-                writeBacklog(event,
-                             loggable,
-                             action->getMessage(),
-                             IrcDatabaseMessageType::Action,
-                             "0",
-                             action->getUsername(),
-                             action->getChannel());
-            } else if (eventType == EventIrcJoined::uuid) {
-                auto joined = event->as<EventIrcJoined>();
-                writeBacklog(event,
-                             loggable,
-                             "",
-                             IrcDatabaseMessageType::Join,
-                             "0",
-                             joined->getUsername(),
-                             joined->getChannel());
-            } else if (eventType == EventIrcParted::uuid) {
-                auto parted = event->as<EventIrcParted>();
-                writeBacklog(event,
-                             loggable,
-                             "",
-                             IrcDatabaseMessageType::Part,
-                             "0",
-                             parted->getUsername(),
-                             parted->getChannel());
-            } else if (eventType == EventIrcQuit::uuid) {
-                auto quit = event->as<EventIrcQuit>();
-                writeBacklog(event,
-                             loggable,
-                             "",
-                             IrcDatabaseMessageType::Quit,
-                             "0",
-                             quit->getWho(),
-                             "");
-            } else if (eventType == EventIrcKicked::uuid) {
-                auto kicked = event->as<EventIrcKicked>();
-                writeBacklog(event,
-                             loggable,
-                             kicked->getReason(),
-                             IrcDatabaseMessageType::Kick,
-                             "0",
-                             kicked->getUsername(),
-                             kicked->getChannel());
+            case EventIrcRequestBacklog::uuid:
+                {
+                    auto request = event->as<EventIrcRequestBacklog>();
+
+                    Select stmt = select("message_id", "time", "message", "type", "flags", "sender")
+                        .from("harpoon_irc_backlog")
+                        .join("harpoon_irc_sender", "sender")
+                        .order_by("message_id", "DESC")
+                        .limit(5);
+                    auto eventFetch = std::make_shared<EventDatabaseQuery>(getEventQueue(), event, std::move(stmt));
+
+                    appQueue->sendEvent(eventFetch);
+                    break;
+                }
+            case EventDatabaseResult::uuid: // RESULT
+                {
+                    auto result = event->as<EventDatabaseResult>();
+                    if (result->getSuccess()) {
+                        auto origin = result->getEventOrigin();
+                        if (origin->getEventUuid() == EventIrcRequestBacklog::uuid) {
+                            auto request = origin->as<EventIrcRequestBacklog>();
+
+                            std::list<MessageData> data;
+
+                            auto it = result->getResults().begin();
+                            auto end = result->getResults().end();
+                            while (it != end) {
+                                size_t messageId;
+                                size_t type;
+                                size_t flags;
+
+                                std::istringstream(*it++) >> messageId;
+                                std::string time = *it++;
+                                std::string message = *it++;
+                                std::istringstream(*it++) >> type;
+                                std::istringstream(*it++) >> flags;
+                                std::string sender = *it++;
+
+                                data.emplace_back(messageId,
+                                                  time,
+                                                  message,
+                                                  static_cast<MessageType>(type),
+                                                  flags,
+                                                  sender);
+                            }
+
+                            auto response = std::make_shared<EventIrcBacklogResponse>(request->getUserId(),
+                                                                                      request->getServerId(),
+                                                                                      request->getChannelName(),
+                                                                                      std::move(data));
+                        }
+                    }
+                    break;
+                }
+            case EventIrcAction::uuid:
+                {
+                    auto action = event->as<EventIrcAction>();
+                    writeBacklog(event,
+                                 loggable,
+                                 action->getMessage(),
+                                 IrcDatabaseMessageType::Action,
+                                 "0",
+                                 action->getUsername(),
+                                 action->getChannel());
+                    break;
+                }
+            case EventIrcJoined::uuid:
+                {
+                    auto joined = event->as<EventIrcJoined>();
+                    writeBacklog(event,
+                                 loggable,
+                                 "",
+                                 IrcDatabaseMessageType::Join,
+                                 "0",
+                                 joined->getUsername(),
+                                 joined->getChannel());
+                    break;
+                }
+            case EventIrcParted::uuid:
+                {
+                    auto parted = event->as<EventIrcParted>();
+                    writeBacklog(event,
+                                 loggable,
+                                 "",
+                                 IrcDatabaseMessageType::Part,
+                                 "0",
+                                 parted->getUsername(),
+                                 parted->getChannel());
+                    break;
+                }
+            case EventIrcQuit::uuid:
+                {
+                    auto quit = event->as<EventIrcQuit>();
+                    writeBacklog(event,
+                                 loggable,
+                                 "",
+                                 IrcDatabaseMessageType::Quit,
+                                 "0",
+                                 quit->getWho(),
+                                 "");
+                    break;
+                }
+            case EventIrcKicked::uuid:
+                {
+                    auto kicked = event->as<EventIrcKicked>();
+                    writeBacklog(event,
+                                 loggable,
+                                 kicked->getReason(),
+                                 IrcDatabaseMessageType::Kick,
+                                 "0",
+                                 kicked->getUsername(),
+                                 kicked->getChannel());
+                    break;
+                }
             }
         }
     }

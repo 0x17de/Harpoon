@@ -9,7 +9,7 @@ class EventTemplate : public IEvent {
     size_t userId;
     size_t serverId;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 9;
     virtual UUID getEventUuid() const override;
 
     EventTemplate(size_t userId, size_t serverId);

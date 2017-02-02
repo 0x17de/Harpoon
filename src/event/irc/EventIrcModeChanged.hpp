@@ -15,7 +15,7 @@ class EventIrcModeChanged : public IClientEvent, public IrcLoggable {
     std::string mode;
     std::vector<std::string> args;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 28;
     virtual UUID getEventUuid() const override;
 
     EventIrcModeChanged(size_t userId, size_t serverId,

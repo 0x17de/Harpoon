@@ -10,7 +10,7 @@ class EventIrcDeleteChannel : public IIrcCommand {
     size_t serverId;
     std::string channelName;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 18;
     virtual UUID getEventUuid() const override;
 
     EventIrcDeleteChannel(size_t userId,

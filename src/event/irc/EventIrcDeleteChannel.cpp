@@ -1,5 +1,4 @@
 #include "EventIrcDeleteChannel.hpp"
-#include "utils/uuidGen.hpp"
 
 
 EventIrcDeleteChannel::EventIrcDeleteChannel(size_t userId,
@@ -11,7 +10,6 @@ EventIrcDeleteChannel::EventIrcDeleteChannel(size_t userId,
 {
 }
 
-UUID EventIrcDeleteChannel::uuid = ::uuid.get();
 UUID EventIrcDeleteChannel::getEventUuid() const {
     return this->uuid;
 }

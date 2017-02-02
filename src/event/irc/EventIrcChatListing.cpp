@@ -1,9 +1,7 @@
 #include "EventIrcChatListing.hpp"
 #include "IrcServerListing.hpp"
-#include "utils/uuidGen.hpp"
 
 
-UUID EventIrcChatListing::uuid = ::uuid.get();
 UUID EventIrcChatListing::getEventUuid() const {
     return this->uuid;
 }

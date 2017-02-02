@@ -12,7 +12,7 @@ class EventIrcRequestBacklog : public IIrcCommand {
     size_t fromId;
     int count;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 37;
     virtual UUID getEventUuid() const override;
 
     EventIrcRequestBacklog(size_t userId,

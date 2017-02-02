@@ -12,7 +12,7 @@ class EventDatabaseResult : public IDatabaseEvent {
     std::shared_ptr<IEvent> eventOrigin;
     std::list<std::string> results;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 2;
     virtual UUID getEventUuid() const override;
 
     explicit EventDatabaseResult(std::shared_ptr<IEvent> eventOrigin);

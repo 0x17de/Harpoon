@@ -19,7 +19,7 @@ class EventIrcUserlistReceived : public IClientEvent {
     std::string channel;
     std::list<User> users;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 45;
     virtual UUID getEventUuid() const override;
 
     EventIrcUserlistReceived(size_t userId,

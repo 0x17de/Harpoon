@@ -13,7 +13,7 @@ class EventLogin : public IEvent {
 public:
     EventLogin(void* data, const std::string& username, const std::string& password);
 
-    static UUID uuid;
+    static constexpr UUID uuid = 4;
     virtual UUID getEventUuid() const override;
 
     EventQueue* getTarget() const;

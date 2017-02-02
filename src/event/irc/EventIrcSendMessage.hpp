@@ -13,7 +13,7 @@ class EventIrcSendMessage : public IIrcCommand {
     std::string message;
     MessageType type;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 39;
     virtual UUID getEventUuid() const override;
 
     EventIrcSendMessage(size_t userId, size_t serverId, const std::string& channel, const std::string& message, MessageType type);

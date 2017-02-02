@@ -11,7 +11,7 @@ class EventIrcNickModified : public IClientEvent {
     std::string oldNick;
     std::string newNick;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 31;
     virtual UUID getEventUuid() const override;
 
     EventIrcNickModified(size_t userId, size_t serverId, const std::string& oldNick, const std::string& newNick);

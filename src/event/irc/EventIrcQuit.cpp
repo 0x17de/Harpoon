@@ -1,8 +1,6 @@
 #include "EventIrcQuit.hpp"
-#include "utils/uuidGen.hpp"
 
 
-UUID EventIrcQuit::uuid = ::uuid.get();
 UUID EventIrcQuit::getEventUuid() const {
     return this->uuid;
 }

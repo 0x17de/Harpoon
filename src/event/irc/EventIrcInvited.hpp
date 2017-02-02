@@ -12,7 +12,7 @@ class EventIrcInvited : public IClientEvent {
     std::string target;
     std::string channel;
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 23;
     virtual UUID getEventUuid() const override;
 
     EventIrcInvited(size_t userId, size_t serverId,
