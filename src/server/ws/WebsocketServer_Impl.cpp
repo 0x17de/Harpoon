@@ -76,24 +76,26 @@ bool WebsocketServer_Impl::onEvent(std::shared_ptr<IEvent> event) {
         auto it = userToClients.find(userEvent->getUserId());
         if (it != userToClients.end()) {
             std::string json = eventToJson(event);
-            list<WebsocketClientData>& clientDataList = it->second;
-            auto singleClientEvent = event->as<ISingleClientEvent>();
-            if (singleClientEvent) {
-                void* data = singleClientEvent->getData();
-                for (auto& clientData : clientDataList) {
-                    if (clientData.socket == data) {
+            if (json.size() > 0) {
+                list<WebsocketClientData>& clientDataList = it->second;
+                auto singleClientEvent = event->as<ISingleClientEvent>();
+                if (singleClientEvent) {
+                    void* data = singleClientEvent->getData();
+                    for (auto& clientData : clientDataList) {
+                        if (clientData.socket == data) {
+                            auto socket = clientData.socket;
+                            server.execute([socket, json] {
+                                    socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
+                                });
+                        }
+                    }
+                } else {
+                    for (auto& clientData : clientDataList) {
                         auto socket = clientData.socket;
                         server.execute([socket, json] {
-                            socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
-                        });
+                                socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
+                            });
                     }
-                }
-            } else {
-                for (auto& clientData : clientDataList) {
-                    auto socket = clientData.socket;
-                    server.execute([socket, json] {
-                        socket->send(reinterpret_cast<const uint8_t*>(json.c_str()), json.size());
-                    });
                 }
             }
         }
@@ -147,7 +149,8 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     auto id = loggable == nullptr ? 0 : loggable->getLogEntryId();
 
     UUID eventType = event->getEventUuid();
-    if (eventType == EventIrcMessage::uuid) {
+    switch(eventType) {
+    case EventIrcMessage::uuid: {
         auto message = event->as<EventIrcMessage>();
         root["cmd"] = "chat";
         root["protocol"] = "irc";
@@ -158,11 +161,15 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["nick"] = message->getFrom();
         root["msg"] = message->getMessage();
         root["type"] = static_cast<int>(message->getType());
-    } else if (eventType == EventLoginResult::uuid) {
+        break;
+    }
+    case EventLoginResult::uuid: {
         auto result = event->as<EventLoginResult>();
         root["cmd"] = "login";
         root["success"] = result->getSuccess();
-    } else if (eventType == EventIrcUserlistReceived::uuid) {
+        break;
+    }
+    case EventIrcUserlistReceived::uuid: {
         auto userlist = event->as<EventIrcUserlistReceived>();
         root["cmd"] = "userlist";
         root["protocol"] = "irc";
@@ -171,18 +178,24 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         auto& users = root["users"] = Json::objectValue;
         for (auto& user : userlist->getUsers())
             users[user.nick] = user.mode;
-    } else if (eventType == EventIrcServerAdded::uuid) {
+        break;
+    }
+    case EventIrcServerAdded::uuid: {
         auto added = event->as<EventIrcServerAdded>();
         root["cmd"] = "serveradded";
         root["protocol"] = "irc";
         root["name"] = added->getServerName();
         root["server"] = to_string(added->getServerId());
-    } else if (eventType == EventIrcServerDeleted::uuid) {
+        break;
+    }
+    case EventIrcServerDeleted::uuid: {
         auto added = event->as<EventIrcServerDeleted>();
         root["cmd"] = "serverremoved";
         root["protocol"] = "irc";
         root["server"] = to_string(added->getServerId());
-    } else if (eventType == EventIrcHostAdded::uuid) {
+        break;
+    }
+    case EventIrcHostAdded::uuid: {
         auto added = event->as<EventIrcHostAdded>();
         root["cmd"] = "hostadded";
         root["protocol"] = "irc";
@@ -192,21 +205,27 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["port"] = added->getPort();
         root["ipv6"] = added->getIpV6();
         root["ssl"] = added->getSsl();
-    } else if (eventType == EventIrcHostDeleted::uuid) {
+        break;
+    }
+    case EventIrcHostDeleted::uuid: {
         auto deleted = event->as<EventIrcHostDeleted>();
         root["cmd"] = "hostdeleted";
         root["protocol"] = "irc";
         root["server"] = to_string(deleted->getServerId());
         root["host"] = deleted->getHost();
         root["port"] = deleted->getPort();
-    } else if (eventType == EventIrcNickModified::uuid) {
+        break;
+    }
+    case EventIrcNickModified::uuid: {
         auto modified = event->as<EventIrcNickModified>();
         root["cmd"] = "nickmodified";
         root["protocol"] = "irc";
         root["server"] = to_string(modified->getServerId());
         root["oldnick"] = modified->getOldNick();
         root["newnick"] = modified->getNewNick();
-    } else if (eventType == EventIrcSettingsListing::uuid) {
+        break;
+    }
+    case EventIrcSettingsListing::uuid: {
         auto settings = event->as<EventIrcSettingsListing>();
         root["cmd"] = "settings";
         root["protocol"] = "irc";
@@ -234,7 +253,9 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
                 channel["hasPassword"] = !channelConfiguration.getChannelPassword().empty();
             }
         }
-    } else if (eventType == EventIrcChatListing::uuid) {
+        break;
+    }
+    case EventIrcChatListing::uuid: {
         auto listing = event->as<EventIrcChatListing>();
         root["cmd"] = "chatlist";
         root["protocol"] = "irc";
@@ -256,7 +277,9 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
                 }
             }
         }
-    } else if (eventType == EventIrcJoined::uuid) {
+        break;
+    }
+    case EventIrcJoined::uuid: {
         auto join = event->as<EventIrcJoined>();
         root["cmd"] = "join";
         root["protocol"] = "irc";
@@ -264,7 +287,9 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["server"] = to_string(join->getServerId());
         root["nick"] = join->getUsername();
         root["channel"] = join->getChannel();
-    } else if (eventType == EventIrcParted::uuid) {
+        break;
+    }
+    case EventIrcParted::uuid: {
         auto part = event->as<EventIrcParted>();
         root["cmd"] = "part";
         root["protocol"] = "irc";
@@ -272,7 +297,9 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["server"] = to_string(part->getServerId());
         root["nick"] = part->getUsername();
         root["channel"] = part->getChannel();
-    } else if (eventType == EventIrcQuit::uuid) {
+        break;
+    }
+    case EventIrcQuit::uuid: {
         auto quit = event->as<EventIrcQuit>();
         root["cmd"] = "quit";
         root["protocol"] = "irc";
@@ -280,7 +307,9 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["server"] = to_string(quit->getServerId());
         root["nick"] = quit->getWho();
         root["reason"] = quit->getReason();
-    } else if (eventType == EventIrcTopic::uuid) {
+        break;
+    }
+    case EventIrcTopic::uuid: {
         auto topic = event->as<EventIrcTopic>();
         root["cmd"] = "topic";
         root["protocol"] = "irc";
@@ -289,7 +318,9 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["nick"] = topic->getUsername();
         root["topic"] = topic->getTopic();
         root["channel"] = topic->getChannel();
-    } else if (eventType == EventIrcNickChanged::uuid) {
+        break;
+    }
+    case EventIrcNickChanged::uuid: {
         auto nick = event->as<EventIrcNickChanged>();
         root["cmd"] = "nickchange";
         root["protocol"] = "irc";
@@ -297,7 +328,9 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["server"] = to_string(nick->getServerId());
         root["nick"] = nick->getUsername();
         root["newNick"] = nick->getNewNick();
-    } else if (eventType == EventIrcAction::uuid) {
+        break;
+    }
+    case EventIrcAction::uuid: {
         auto action = event->as<EventIrcAction>();
         root["cmd"] = "action";
         root["protocol"] = "irc";
@@ -306,7 +339,9 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["nick"] = action->getUsername();
         root["msg"] = action->getMessage();
         root["channel"] = action->getChannel();
-    } else if (eventType == EventIrcModeChanged::uuid) {
+        break;
+    }
+    case EventIrcModeChanged::uuid: {
         auto mode = event->as<EventIrcModeChanged>();
         root["cmd"] = "mode";
         root["protocol"] = "irc";
@@ -318,7 +353,9 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         auto& args = root["args"] = Json::arrayValue;
         for (auto& s : mode->getArgs())
             args.append(s);
-    } else if (eventType == EventIrcKicked::uuid) {
+        break;
+    }
+    case EventIrcKicked::uuid: {
         auto kick = event->as<EventIrcKicked>();
         root["cmd"] = "kick";
         root["protocol"] = "irc";
@@ -328,11 +365,15 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         root["target"] = kick->getTarget();
         root["msg"] = kick->getReason();
         root["channel"] = kick->getChannel();
-    } else if (eventType == EventIrcBacklogResponse::uuid) {
-        auto response = event->as<EventIrcBacklogResponse>();
-    } else {
-        return "";
+        break;
     }
+    case EventIrcBacklogResponse::uuid: {
+        auto response = event->as<EventIrcBacklogResponse>();
+        break;
+    }
+    default:
+        return "";
+    } // switch(eventType)
     root["time"] = (Json::UInt64)chrono::duration_cast<chrono::milliseconds>(event->getTimestamp().time_since_epoch()).count();
     return Json::FastWriter{}.write(root);
 }

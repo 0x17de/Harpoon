@@ -43,7 +43,7 @@ IrcDatabase_Ini::IrcDatabase_Ini(EventQueue* appQueue) :
         EventIrcJoinChannel::uuid,
         EventIrcPartChannel::uuid,
         EventIrcDeleteChannel::uuid
-    }),
+            }),
     appQueue{appQueue}
 {
 }
@@ -53,10 +53,13 @@ IrcDatabase_Ini::~IrcDatabase_Ini() {
 
 bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
     UUID eventType = event->getEventUuid();
-    if (eventType == EventQuit::uuid) {
+    switch(eventType) {
+    case EventQuit::uuid: {
         std::cout << "IrcDB received QUIT event" << std::endl;
         return false;
-    } else if (eventType == EventIrcAddServer::uuid) {
+        break;
+    }
+    case EventIrcAddServer::uuid: {
         auto add = event->as<EventIrcAddServer>();
 
         stringstream serversConfigFilename;
@@ -77,7 +80,9 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             cout << "IMPL ERROR: SERVER ALREADY EXISTS" << endl;
 #pragma message "EventIrcAddServer: handle server already exists case"
         }
-    } else if (eventType == EventIrcDeleteServer::uuid) {
+        break;
+    }
+    case EventIrcDeleteServer::uuid: {
         auto del = event->as<EventIrcDeleteServer>();
         if (del->getServerId() > 0) {
             stringstream serversConfigFilename;
@@ -99,7 +104,8 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             }
         }
 #pragma message "EventIrcDeleteServer: Cleanup directories"
-    } else if (eventType == EventIrcModifyNick::uuid) {
+    }
+    case EventIrcModifyNick::uuid: {
         auto modify = event->as<EventIrcModifyNick>();
         if (modify->getServerId() > 0) {
             stringstream serversConfigFilename;
@@ -146,7 +152,8 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
                 }
             }
         }
-    } else if (eventType == EventIrcAddHost::uuid) {
+    }
+    case EventIrcAddHost::uuid: {
         auto add = event->as<EventIrcAddHost>();
 
         stringstream serverPath;
@@ -180,7 +187,8 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             cout << "IMPL ERROR: HOST ALREADY EXISTS" << endl;
 #pragma message "EventIrcAddHost: handle host already exists case"
         }
-    } else if (eventType == EventIrcDeleteHost::uuid) {
+    }
+    case EventIrcDeleteHost::uuid: {
         auto del = event->as<EventIrcDeleteHost>();
         if (del->getServerId() > 0) {
             stringstream hostsConfigFilename;
@@ -196,7 +204,8 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             appQueue->sendEvent(make_shared<EventIrcHostDeleted>(del->getUserId(), del->getServerId(), del->getHost(), del->getPort()));
         }
 #pragma message "EventIrcDeleteServer: Cleanup directories"
-    } else if (eventType == EventIrcJoinChannel::uuid) {
+    }
+    case EventIrcJoinChannel::uuid: {
         auto join = event->as<EventIrcJoinChannel>();
 
         // construct channels.ini path
@@ -221,13 +230,14 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             if (loginData.passwordSpecified)
                 channelsConfig.setEntry(channelEntry, "password", loginData.password);
         }
-    } else if (eventType == EventIrcPartChannel::uuid) {
+    }
+    case EventIrcPartChannel::uuid: {
         auto part = event->as<EventIrcPartChannel>();
 
         // construct channel.ini path
         stringstream serverChannelsConfigFilename;
         serverChannelsConfigFilename
-           << "config/user" << part->getUserId()
+            << "config/user" << part->getUserId()
             << "/server" << part->getServerId()
             << "/channels.ini";
 
@@ -239,13 +249,14 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             if (categoryEntry)
                 channelsConfig.setEntry(*categoryEntry, "disabled", "yes");
         }
-    } else if (eventType == EventIrcDeleteChannel::uuid) {
+    }
+    case EventIrcDeleteChannel::uuid: {
         auto deleteCommand = event->as<EventIrcDeleteChannel>();
 
         // construct channel.ini path
         stringstream serverChannelsConfigFilename;
         serverChannelsConfigFilename
-           << "config/user" << deleteCommand->getUserId()
+            << "config/user" << deleteCommand->getUserId()
             << "/server" << deleteCommand->getServerId()
             << "/channels.ini";
 
@@ -256,7 +267,8 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
         auto* categoryEntry = channelsConfig.getEntry(channelName);
         if (categoryEntry)
             channelsConfig.deleteCategory(channelName);
-    } else if (eventType == EventIrcServiceInit::uuid) {
+    }
+    case EventIrcServiceInit::uuid: {
         std::cout << "IrcDB received INIT event" << std::endl;
 
         // activate service per user
@@ -366,6 +378,8 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             // dispatch event
             appQueue->sendEvent(login);
         }
+        break;
     }
+    } // switch(eventType)
     return true;
 }
