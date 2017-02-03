@@ -214,11 +214,10 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                 {
                     auto request = event->as<EventIrcRequestBacklog>();
 
-                    Select stmt = select("message_id", "time", "message", "type", "flags", "sender")
-                        .from("harpoon_irc_backlog")
-                        .join("harpoon_irc_sender", "sender")
-                        .order_by("message_id", "DESC")
-                        .limit(5);
+                    Select stmt = select("channel_id")
+                        .from("harpoon_irc_channel")
+                        .where(make_var("channel") == make_constant(request->getChannelName()))
+                        .limit(1);
                     auto eventFetch = std::make_shared<EventDatabaseQuery>(getEventQueue(), event, std::move(stmt));
 
                     appQueue->sendEvent(eventFetch);
@@ -228,39 +227,62 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                 {
                     auto result = event->as<EventDatabaseResult>();
                     if (result->getSuccess()) {
-                        auto origin = result->getEventOrigin();
-                        if (origin->getEventUuid() == EventIrcRequestBacklog::uuid) {
-                            auto request = origin->as<EventIrcRequestBacklog>();
+                        auto resultOrigin = result->getEventOrigin();
+                        switch (resultOrigin->getEventUuid()) {
+                        case EventIrcRequestBacklog::uuid: {
+                            // we got the channel_ref id
+                            std::string channelRefId = result->getResults().front();
 
-                            std::list<MessageData> data;
+                            Select stmt = select("message_id", "time", "message", "type", "flags", "sender")
+                                .from("harpoon_irc_backlog")
+                                .join("harpoon_irc_sender", "sender")
+                                .where(make_var("channel_ref") == make_constant(channelRefId))
+                                .order_by("message_id", "DESC")
+                                .limit(100); // amount of log lines fetched
+                            auto eventFetch = std::make_shared<EventDatabaseQuery>(getEventQueue(), event, std::move(stmt));
 
-                            auto it = result->getResults().begin();
-                            auto end = result->getResults().end();
-                            while (it != end) {
-                                size_t messageId;
-                                size_t type;
-                                size_t flags;
+                            appQueue->sendEvent(eventFetch);
+                            break;
+                        } // case EventIrcBacklogResponse::uuid
+                        case EventDatabaseResult::uuid: {
+                            auto realOrigin = result->getEventOrigin();
+                            if (realOrigin->getEventUuid() == EventIrcRequestBacklog::uuid) {
+                                auto request = realOrigin->as<EventIrcRequestBacklog>();
 
-                                std::istringstream(*it++) >> messageId;
-                                std::string time = *it++;
-                                std::string message = *it++;
-                                std::istringstream(*it++) >> type;
-                                std::istringstream(*it++) >> flags;
-                                std::string sender = *it++;
+                                std::list<MessageData> data;
 
-                                data.emplace_back(messageId,
-                                                  time,
-                                                  message,
-                                                  static_cast<MessageType>(type),
-                                                  flags,
-                                                  sender);
+                                auto it = result->getResults().begin();
+                                auto end = result->getResults().end();
+                                while (it != end) {
+                                    size_t messageId;
+                                    size_t type;
+                                    size_t flags;
+
+                                    std::istringstream(*it++) >> messageId;
+                                    std::string time = *it++;
+                                    std::string message = *it++;
+                                    std::istringstream(*it++) >> type;
+                                    std::istringstream(*it++) >> flags;
+                                    std::string sender = *it++;
+
+                                    data.emplace_back(messageId,
+                                                      time,
+                                                      message,
+                                                      static_cast<MessageType>(type),
+                                                      flags,
+                                                      sender);
+                                }
+
+                                auto response = std::make_shared<EventIrcBacklogResponse>(request->getUserId(),
+                                                                                          request->getServerId(),
+                                                                                          request->getChannelName(),
+                                                                                          std::move(data));
+
+                                appQueue->sendEvent(response);
                             }
-
-                            auto response = std::make_shared<EventIrcBacklogResponse>(request->getUserId(),
-                                                                                      request->getServerId(),
-                                                                                      request->getChannelName(),
-                                                                                      std::move(data));
-                        }
+                            break;
+                        } // case EventDatabaseResult::uuid
+                        } // switch (resultOrigin->getEventUuid())
                     }
                     break;
                 }
