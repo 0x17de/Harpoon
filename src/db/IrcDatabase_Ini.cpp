@@ -103,6 +103,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
                 }
             }
         }
+        break;
 #pragma message "EventIrcDeleteServer: Cleanup directories"
     }
     case EventIrcModifyNick::uuid: {
@@ -152,6 +153,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
                 }
             }
         }
+        break;
     }
     case EventIrcAddHost::uuid: {
         auto add = event->as<EventIrcAddHost>();
@@ -187,6 +189,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             cout << "IMPL ERROR: HOST ALREADY EXISTS" << endl;
 #pragma message "EventIrcAddHost: handle host already exists case"
         }
+        break;
     }
     case EventIrcDeleteHost::uuid: {
         auto del = event->as<EventIrcDeleteHost>();
@@ -203,6 +206,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             hostsConfig.deleteCategory(hostKey.str());
             appQueue->sendEvent(make_shared<EventIrcHostDeleted>(del->getUserId(), del->getServerId(), del->getHost(), del->getPort()));
         }
+        break;
 #pragma message "EventIrcDeleteServer: Cleanup directories"
     }
     case EventIrcJoinChannel::uuid: {
@@ -230,6 +234,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             if (loginData.passwordSpecified)
                 channelsConfig.setEntry(channelEntry, "password", loginData.password);
         }
+        break;
     }
     case EventIrcPartChannel::uuid: {
         auto part = event->as<EventIrcPartChannel>();
@@ -249,6 +254,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             if (categoryEntry)
                 channelsConfig.setEntry(*categoryEntry, "disabled", "yes");
         }
+        break;
     }
     case EventIrcDeleteChannel::uuid: {
         auto deleteCommand = event->as<EventIrcDeleteChannel>();
@@ -267,6 +273,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
         auto* categoryEntry = channelsConfig.getEntry(channelName);
         if (categoryEntry)
             channelsConfig.deleteCategory(channelName);
+        break;
     }
     case EventIrcServiceInit::uuid: {
         std::cout << "IrcDB received INIT event" << std::endl;
