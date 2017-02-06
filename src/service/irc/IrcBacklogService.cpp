@@ -19,6 +19,7 @@
 #include "utils/ModuleProvider.hpp"
 
 #include <iostream>
+#include <iomanip>
 #include <ctime>
 #include <string>
 #include <sstream>
@@ -247,7 +248,15 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                                     size_t flags;
 
                                     std::istringstream(*it++) >> messageId;
-                                    std::string time = *it++;
+
+                                    std::tm t = {};
+                                    std::istringstream ss(*it++); // read in time
+                                    ss >> std::get_time(&t, "%Y-%m-%d %H:%M:%S");
+                                    if (ss.fail()) {
+                                        std::cout << "Could not parse date from backlog response" << std::endl;
+                                    }
+                                    std::time_t time = std::mktime(&t);
+
                                     std::string message = *it++;
                                     std::istringstream(*it++) >> type;
                                     std::istringstream(*it++) >> flags;

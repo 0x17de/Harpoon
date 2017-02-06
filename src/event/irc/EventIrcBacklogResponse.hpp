@@ -3,20 +3,21 @@
 
 #include "../IClientEvent.hpp"
 #include <string>
+#include <iomanip>
 #include <list>
 #include <memory>
 
 enum class IrcDatabaseMessageType;
 struct MessageData {
     size_t messageId;
-    std::string time;
+    std::time_t time;
     std::string message;
     IrcDatabaseMessageType type;
     size_t flags;
     std::string sender;
 
     inline MessageData(size_t messageId,
-                       const std::string& time,
+                       const std::time_t& time,
                        const std::string& message,
                        IrcDatabaseMessageType type,
                        size_t flags,

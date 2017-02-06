@@ -389,6 +389,7 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
         for (auto& entry : data) {
             auto& line = lines[i] = Json::objectValue;
             line["id"] = to_string(entry.messageId);
+            line["time"] = static_cast<double>(entry.time);
             line["msg"] = entry.message;
             line["sender"] = entry.sender;
 
