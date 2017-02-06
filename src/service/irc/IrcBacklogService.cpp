@@ -31,6 +31,8 @@ using namespace Query;
 IrcBacklogService::IrcBacklogService(EventQueue* appQueue)
     : EventLoop({
                     EventDatabaseQuery::uuid
+                  , EventDatabaseResult::uuid
+                  , EventIrcRequestBacklog::uuid
                   , EventQuit::uuid
                 },
                 {
@@ -194,22 +196,8 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
         }
     } else {
         auto loggable = event->as<IrcLoggable>();
-        if (loggable != nullptr) {
+        if (loggable == nullptr) {
             switch(eventType) {
-            case EventIrcMessage::uuid:
-                {
-                    auto message = event->as<EventIrcMessage>();
-                    writeBacklog(event,
-                                 loggable,
-                                 message->getMessage(),
-                                 message->getType() == MessageType::Message
-                                 ? IrcDatabaseMessageType::Message
-                                 : IrcDatabaseMessageType::Notice,
-                                 "0",
-                                 message->getFrom(),
-                                 message->getChannel());
-                    break;
-                }
             case EventIrcRequestBacklog::uuid:
                 {
                     auto request = event->as<EventIrcRequestBacklog>();
@@ -245,7 +233,7 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                             break;
                         } // case EventIrcBacklogResponse::uuid
                         case EventDatabaseResult::uuid: {
-                            auto realOrigin = result->getEventOrigin();
+                            auto realOrigin = resultOrigin->as<EventDatabaseResult>()->getEventOrigin();
                             if (realOrigin->getEventUuid() == EventIrcRequestBacklog::uuid) {
                                 auto request = realOrigin->as<EventIrcRequestBacklog>();
 
@@ -284,6 +272,23 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                         } // case EventDatabaseResult::uuid
                         } // switch (resultOrigin->getEventUuid())
                     }
+                    break;
+                }
+            }
+        } else {
+            switch(eventType) {
+            case EventIrcMessage::uuid:
+                {
+                    auto message = event->as<EventIrcMessage>();
+                    writeBacklog(event,
+                                 loggable,
+                                 message->getMessage(),
+                                 message->getType() == MessageType::Message
+                                 ? IrcDatabaseMessageType::Message
+                                 : IrcDatabaseMessageType::Notice,
+                                 "0",
+                                 message->getFrom(),
+                                 message->getChannel());
                     break;
                 }
             case EventIrcAction::uuid:
