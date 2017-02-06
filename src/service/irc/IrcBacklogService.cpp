@@ -256,7 +256,7 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                                     data.emplace_back(messageId,
                                                       time,
                                                       message,
-                                                      static_cast<MessageType>(type),
+                                                      static_cast<IrcDatabaseMessageType>(type),
                                                       flags,
                                                       sender);
                                 }

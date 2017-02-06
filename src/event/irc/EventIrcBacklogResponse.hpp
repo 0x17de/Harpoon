@@ -6,19 +6,19 @@
 #include <list>
 #include <memory>
 
-enum class MessageType;
+enum class IrcDatabaseMessageType;
 struct MessageData {
     size_t messageId;
     std::string time;
     std::string message;
-    MessageType type;
+    IrcDatabaseMessageType type;
     size_t flags;
     std::string sender;
 
     inline MessageData(size_t messageId,
                        const std::string& time,
                        const std::string& message,
-                       MessageType type,
+                       IrcDatabaseMessageType type,
                        size_t flags,
                        const std::string& sender)
         : messageId{messageId}

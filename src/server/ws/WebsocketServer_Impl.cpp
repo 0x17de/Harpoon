@@ -24,7 +24,9 @@
 #include "event/EventLogout.hpp"
 #include "event/EventQuery.hpp"
 #include "event/EventQueryType.hpp"
+#include "service/irc/IrcDatabaseMessageType.hpp"
 #include <sstream>
+#include <map>
 #include <json/json.h>
 
 #ifdef USE_WEBSOCKET_SERVER_VERBOSE
@@ -36,6 +38,11 @@
 #endif
 
 using namespace std;
+
+
+const std::map<IrcDatabaseMessageType, std::string> databaseMessageTypeToName {
+    { IrcDatabaseMessageType::Message, "msg" }
+};
 
 
 WebsocketServer_Impl::WebsocketServer_Impl(EventQueue* queue, EventQueue* appQueue)
@@ -369,6 +376,32 @@ std::string WebsocketServer_Impl::eventToJson(std::shared_ptr<IEvent> event) {
     }
     case EventIrcBacklogResponse::uuid: {
         auto response = event->as<EventIrcBacklogResponse>();
+
+        root["cmd"] = "backlogresponse";
+        root["protocol"] = "irc";
+        root["server"] = to_string(response->getServerId());
+        root["channel"] = response->getChannel();
+
+        auto& data = response->getData();
+        auto& lines = root["lines"] = Json::arrayValue;
+        lines.resize(data.size());
+        int i = 0;
+        for (auto& entry : data) {
+            auto& line = lines[i] = Json::objectValue;
+            line["id"] = to_string(entry.messageId);
+            line["msg"] = entry.message;
+            line["sender"] = entry.sender;
+
+            auto it = databaseMessageTypeToName.find(entry.type);
+            if (it == databaseMessageTypeToName.end()) {
+                line["type"] = "unknown";
+            } else {
+                line["type"] = it->second;
+            }
+
+            ++i;
+        }
+
         break;
     }
     default:
