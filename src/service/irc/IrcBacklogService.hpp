@@ -7,6 +7,7 @@
 #include <chrono>
 
 
+class IUserEvent;
 class IrcLoggable;
 enum class IrcDatabaseMessageType : int;
 class IrcBacklogService : public EventLoop {
@@ -20,7 +21,7 @@ class IrcBacklogService : public EventLoop {
     void setupTable(std::shared_ptr<IEvent> event);
     bool setupTable_processResult(std::shared_ptr<IEvent> event);
     bool setupTable_processId(std::shared_ptr<IEvent> event);
-    void writeBacklog(std::shared_ptr<IEvent> event,
+    void writeBacklog(std::shared_ptr<IUserEvent> event,
                       IrcLoggable* loggable,
                       const std::string& message,
                       IrcDatabaseMessageType type,

@@ -66,6 +66,7 @@ void IrcBacklogService::setupTable(std::shared_ptr<IEvent> event) {
         .field("sender", FieldType::Text);
     Create stmt = create("harpoon_irc_backlog")
         .field("message_id", FieldType::Id)
+        .field("user_id", FieldType::Integer)
         .field("time", FieldType::Time)
         .field("message", FieldType::Text)
         .field("type", FieldType::Integer)
@@ -139,7 +140,7 @@ bool IrcBacklogService::setupTable_processId(std::shared_ptr<IEvent> event) {
     return true;
 }
 
-void IrcBacklogService::writeBacklog(std::shared_ptr<IEvent> event,
+void IrcBacklogService::writeBacklog(std::shared_ptr<IUserEvent> event,
                                      IrcLoggable* loggable,
                                      const std::string& message,
                                      IrcDatabaseMessageType type,
@@ -148,6 +149,7 @@ void IrcBacklogService::writeBacklog(std::shared_ptr<IEvent> event,
                                      const std::string& channel) {
     std::vector<std::string> data {
         std::to_string(loggable->getLogEntryId()),
+        std::to_string(event->getUserId()),
         convertTimestamp(event->getTimestamp()),
         message,
         std::to_string(static_cast<int>(type)),
@@ -158,6 +160,7 @@ void IrcBacklogService::writeBacklog(std::shared_ptr<IEvent> event,
         insert()
         .into("harpoon_irc_backlog")
         .format("message_id",
+                "user_id",
                 "time",
                 "message",
                 "type",
@@ -219,13 +222,16 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                         auto resultOrigin = result->getEventOrigin();
                         switch (resultOrigin->getEventUuid()) {
                         case EventIrcRequestBacklog::uuid: {
+                            auto request = resultOrigin->as<EventIrcRequestBacklog>();
+
                             // we got the channel_ref id
                             std::string channelRefId = result->getResults().front();
 
                             Select stmt = select("message_id", "time", "message", "type", "flags", "sender")
                                 .from("harpoon_irc_backlog")
                                 .join("harpoon_irc_sender", "sender")
-                                .where(make_var("channel_ref") == make_constant(channelRefId))
+                                .where(make_var("channel_ref") == make_constant(channelRefId)
+                                       && make_var("user_id") == make_constant(std::to_string(request->getUserId())))
                                 .order_by("message_id", "DESC")
                                 .limit(100); // amount of log lines fetched
                             auto eventFetch = std::make_shared<EventDatabaseQuery>(getEventQueue(), event, std::move(stmt));
@@ -289,7 +295,7 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
             case EventIrcMessage::uuid:
                 {
                     auto message = event->as<EventIrcMessage>();
-                    writeBacklog(event,
+                    writeBacklog(std::static_pointer_cast<IUserEvent>(event),
                                  loggable,
                                  message->getMessage(),
                                  message->getType() == MessageType::Message
@@ -303,7 +309,7 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
             case EventIrcAction::uuid:
                 {
                     auto action = event->as<EventIrcAction>();
-                    writeBacklog(event,
+                    writeBacklog(std::static_pointer_cast<IUserEvent>(event),
                                  loggable,
                                  action->getMessage(),
                                  IrcDatabaseMessageType::Action,
@@ -315,7 +321,7 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
             case EventIrcJoined::uuid:
                 {
                     auto joined = event->as<EventIrcJoined>();
-                    writeBacklog(event,
+                    writeBacklog(std::static_pointer_cast<IUserEvent>(event),
                                  loggable,
                                  "",
                                  IrcDatabaseMessageType::Join,
@@ -327,7 +333,7 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
             case EventIrcParted::uuid:
                 {
                     auto parted = event->as<EventIrcParted>();
-                    writeBacklog(event,
+                    writeBacklog(std::static_pointer_cast<IUserEvent>(event),
                                  loggable,
                                  "",
                                  IrcDatabaseMessageType::Part,
@@ -339,7 +345,7 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
             case EventIrcQuit::uuid:
                 {
                     auto quit = event->as<EventIrcQuit>();
-                    writeBacklog(event,
+                    writeBacklog(std::static_pointer_cast<IUserEvent>(event),
                                  loggable,
                                  "",
                                  IrcDatabaseMessageType::Quit,
@@ -351,7 +357,7 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
             case EventIrcKicked::uuid:
                 {
                     auto kicked = event->as<EventIrcKicked>();
-                    writeBacklog(event,
+                    writeBacklog(std::static_pointer_cast<IUserEvent>(event),
                                  loggable,
                                  kicked->getReason(),
                                  IrcDatabaseMessageType::Kick,

@@ -129,7 +129,7 @@ namespace Query {
         return cpp11::make_unique<Expression>(std::move(left), std::move(right), Op::GT);
     }
     inline StatementPtr operator&&(StatementPtr&& left, StatementPtr&& right) {
-        return cpp11::make_unique<Expression>(std::move(left), std::move(right), Op::OR);
+        return cpp11::make_unique<Expression>(std::move(left), std::move(right), Op::AND);
     }
     inline StatementPtr operator||(StatementPtr&& left, StatementPtr&& right) {
         return cpp11::make_unique<Expression>(std::move(left), std::move(right), Op::OR);

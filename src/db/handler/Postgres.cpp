@@ -60,8 +60,8 @@ namespace Database {
                 case Query::Op::NEQ: ss << " != "; break;
                 case Query::Op::GT: ss << " > "; break;
                 case Query::Op::LT: ss << " < "; break;
-                case Query::Op::AND: ss << " && "; break;
-                case Query::Op::OR: ss << " || "; break;
+                case Query::Op::AND: ss << " AND "; break;
+                case Query::Op::OR: ss << " OR "; break;
                 }
             }
         };
