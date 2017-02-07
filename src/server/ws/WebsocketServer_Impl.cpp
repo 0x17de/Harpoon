@@ -41,7 +41,13 @@ using namespace std;
 
 
 const std::map<IrcDatabaseMessageType, std::string> databaseMessageTypeToName {
-    { IrcDatabaseMessageType::Message, "msg" }
+    { IrcDatabaseMessageType::Message, "msg" },
+    { IrcDatabaseMessageType::Join, "join" },
+    { IrcDatabaseMessageType::Part, "part" },
+    { IrcDatabaseMessageType::Quit, "quit" },
+    { IrcDatabaseMessageType::Kick, "kick" },
+    { IrcDatabaseMessageType::Notice, "notice" },
+    { IrcDatabaseMessageType::Action, "action" }
 };
 
 
