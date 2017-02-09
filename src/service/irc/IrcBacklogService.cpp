@@ -224,19 +224,28 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                         case EventIrcRequestBacklog::uuid: {
                             auto request = resultOrigin->as<EventIrcRequestBacklog>();
 
-                            // we got the channel_ref id
-                            std::string channelRefId = result->getResults().front();
+                            auto& results = result->getResults();
+                            if (results.size() == 0) {
+                                // no results -> send empty response
+                                appQueue->sendEvent(std::make_shared<EventIrcBacklogResponse>(request->getUserId(),
+                                                                                              request->getServerId(),
+                                                                                              request->getChannelName(),
+                                                                                              std::list<MessageData>()));
+                            } else {
+                                // we got the channel_ref id
+                                std::string channelRefId = results.front();
 
-                            Select stmt = select("message_id", "time", "message", "type", "flags", "sender")
-                                .from("harpoon_irc_backlog")
-                                .join("harpoon_irc_sender", "sender")
-                                .where(make_var("channel_ref") == make_constant(channelRefId)
-                                       && make_var("user_id") == make_constant(std::to_string(request->getUserId())))
-                                .order_by("message_id", "DESC")
-                                .limit(100); // amount of log lines fetched
-                            auto eventFetch = std::make_shared<EventDatabaseQuery>(getEventQueue(), event, std::move(stmt));
+                                Select stmt = select("message_id", "time", "message", "type", "flags", "sender")
+                                    .from("harpoon_irc_backlog")
+                                    .join("harpoon_irc_sender", "sender")
+                                    .where(make_var("channel_ref") == make_constant(channelRefId)
+                                           && make_var("user_id") == make_constant(std::to_string(request->getUserId())))
+                                    .order_by("message_id", "DESC")
+                                    .limit(100); // amount of log lines fetched
+                                auto eventFetch = std::make_shared<EventDatabaseQuery>(getEventQueue(), event, std::move(stmt));
 
-                            appQueue->sendEvent(eventFetch);
+                                appQueue->sendEvent(eventFetch);
+                            }
                             break;
                         } // case EventIrcBacklogResponse::uuid
                         case EventDatabaseResult::uuid: {
