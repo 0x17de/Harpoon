@@ -18,6 +18,7 @@
 #include "utils/IdProvider.hpp"
 #include "utils/ModuleProvider.hpp"
 
+#include <limits>
 #include <iostream>
 #include <iomanip>
 #include <ctime>
@@ -235,11 +236,17 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                                 // we got the channel_ref id
                                 std::string channelRefId = results.front();
 
+                                auto req = make_var("channel_ref") == make_constant(channelRefId)
+                                    && make_var("user_id") == make_constant(std::to_string(request->getUserId()));
+                                auto fromId = request->getFromId();
+                                bool noFromId = fromId == std::numeric_limits<size_t>::max();
+
                                 Select stmt = select("message_id", "time", "message", "type", "flags", "sender")
                                     .from("harpoon_irc_backlog")
                                     .join("harpoon_irc_sender", "sender")
-                                    .where(make_var("channel_ref") == make_constant(channelRefId)
-                                           && make_var("user_id") == make_constant(std::to_string(request->getUserId())))
+                                    .where(noFromId
+                                           ? std::move(req)
+                                           : std::move(std::move(req) && make_var("message_id") < make_constant(std::to_string(fromId))))
                                     .order_by("message_id", "DESC")
                                     .limit(100); // amount of log lines fetched
                                 auto eventFetch = std::make_shared<EventDatabaseQuery>(getEventQueue(), event, std::move(stmt));

@@ -18,6 +18,7 @@
 #include "event/irc/EventIrcPartChannel.hpp"
 #include "event/irc/EventIrcChangeNick.hpp"
 #include "event/irc/EventIrcRequestBacklog.hpp"
+#include <limits>
 #include <sstream>
 #include <json/json.h>
 
@@ -86,7 +87,7 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                     size_t serverId, fromId;
                     istringstream(root.get("server", "0").asString()) >> serverId;
                     string channel = root.get("channel", "").asString();
-                    istringstream(root.get("from", "0").asString()) >> fromId;
+                    istringstream(root.get("from", std::to_string(std::numeric_limits<size_t>::max())).asString()) >> fromId;
                     int count = root.get("count", 100).asInt();
                     appQueue->sendEvent(make_shared<EventIrcRequestBacklog>(clientData.userId, serverId, channel, fromId, count));
                 } else if (cmd == "action") {
