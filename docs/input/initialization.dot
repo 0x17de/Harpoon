@@ -1,0 +1,25 @@
+digraph Initialization {
+rankdir=LR;app[label="Application
+src/app/Application.cpp"];
+servprov[label="ModuleProvider
+src/utils/ModuleProvider.cpp"];
+app -> servprov [label="login_database
+irc_database
+irc_backlog
+database
+server"];
+servprov -> "LoginDatabase_Ini
+src/db/LoginDatabase_Ini.cpp" [label="login_database:ini"];
+servprov -> "IrcDatabase_Ini
+src/db/IrcDatabase_Ini.cpp" [label="irc_database:ini"];
+servprov -> "LoginDatabase_Dummy
+src/db/LoginDatabase_Dummy.cpp" [label="login_database:dummy"];
+servprov -> "IrcDatabase_Dummy
+src/db/IrcDatabase_Dummy.cpp" [label="irc_database:dummy"];
+servprov -> "Postgres
+src/db/handler/Postgres.cpp" [label="database:postgres"];
+servprov -> "IrcBacklogService
+src/service/irc/IrcBacklogService.cpp" [label="irc_backlog:default"];
+servprov -> "WebsocketServer
+src/server/ws/WebsocketServer.cpp" [label="server:websocket"];
+}
