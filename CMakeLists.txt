@@ -45,6 +45,7 @@ process_flag(0 USE_WEBSOCKET_SERVER 1 "Using websocket server")
   process_flag(1 Seasocks_GIT 0 "Get seasocks from git")
 
 process_flag(0 USE_POSTGRES_DATABASE 1 "Using postgres")
+  process_flag(1 USE_STATIC_SOCI 1 "Use static version of database library")
   process_flag(1 DATABASE_VERBOSE_QUERY 0 "Verbose SQL printing")
 
 process_flag(0 BUILD_TEST 0 "Build tests")
