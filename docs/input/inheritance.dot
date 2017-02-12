@@ -1,0 +1,68 @@
+digraph Initialization {
+rankdir=LR;"SimpleLoop" -> { "EventLoop" }
+"TestError" -> { "std::runtime_error" }
+"IrcDatabase_Ini" -> { "EventLoop" }
+"IrcDatabase_Dummy" -> { "EventLoop" }
+"LoginDatabase_Dummy" -> { "EventLoop" }
+"LoginDatabase_Ini" -> { "EventLoop" }
+"Postgres" -> { "EventLoop" }
+"Application" -> { "EventLoop" }
+"EventQuery" -> { "IUserEvent" }
+"IDatabaseEvent" -> { "IEvent" }
+"EventTemplate" -> { "IEvent" }
+"EventQuit" -> { "IEvent" }
+"IClientEvent" -> { "IUserEvent" }
+"IActivateServiceEvent" -> { "IUserEvent" }
+"EventDatabaseResult" -> { "IDatabaseEvent" }
+"EventLoginResult" -> { "ISingleClientEvent" }
+"EventInit" -> { "IEvent" }
+"EventLogout" -> { "IEvent" }
+"EventLogin" -> { "IEvent" }
+"EventDatabaseQuery" -> { "IDatabaseEvent" }
+"ISingleClientEvent" -> { "IClientEvent" }
+"IUserEvent" -> { "IEvent" }
+"EventIrcNumeric" -> { "IClientEvent" }
+"EventIrcQuit" -> { "IClientEvent", "IrcLoggable" }
+"EventIrcKicked" -> { "IClientEvent", "IrcLoggable" }
+"EventIrcReconnectServer" -> { "IIrcCommand" }
+"EventIrcRequestBacklog" -> { "IIrcCommand" }
+"EventIrcJoined" -> { "IClientEvent", "IrcLoggable" }
+"EventIrcServerAdded" -> { "IClientEvent" }
+"EventIrcDeleteHost" -> { "IUserEvent" }
+"EventIrcDeleteServer" -> { "IUserEvent" }
+"EventIrcAddServer" -> { "IUserEvent" }
+"EventIrcDeleteChannel" -> { "IIrcCommand" }
+"EventIrcNickModified" -> { "IClientEvent" }
+"EventIrcMessage" -> { "IClientEvent", "IrcLoggable" }
+"EventIrcJoinChannel" -> { "IIrcCommand" }
+"EventIrcChangeNick" -> { "IIrcCommand" }
+"EventIrcInvited" -> { "IClientEvent" }
+"EventIrcNickChanged" -> { "IClientEvent", "IrcLoggable" }
+"EventIrcActivateService" -> { "IActivateServiceEvent" }
+"EventIrcModeChanged" -> { "IClientEvent", "IrcLoggable" }
+"EventIrcServiceInit" -> { "IEvent" }
+"EventIrcSettingsListing" -> { "ISingleClientEvent" }
+"EventIrcAction" -> { "IClientEvent", "IrcLoggable" }
+"EventIrcPartChannel" -> { "IIrcCommand" }
+"EventIrcAddHost" -> { "IUserEvent" }
+"EventIrcServerDeleted" -> { "IClientEvent" }
+"EventIrcConnected" -> { "IClientEvent" }
+"IIrcCommand" -> { "IUserEvent" }
+"EventIrcChatListing" -> { "ISingleClientEvent" }
+"EventIrcHostAdded" -> { "IClientEvent" }
+"EventIrcSendMessage" -> { "IIrcCommand" }
+"EventIrcBacklogResponse" -> { "IClientEvent" }
+"EventIrcTopic" -> { "IClientEvent", "IrcLoggable" }
+"EventIrcUserlistReceived" -> { "IClientEvent" }
+"EventIrcHostDeleted" -> { "IClientEvent" }
+"EventIrcModifyNick" -> { "IIrcCommand" }
+"EventIrcSendAction" -> { "IIrcCommand" }
+"EventIrcParted" -> { "IClientEvent", "IrcLoggable" }
+"EventIrcUserModeChanged" -> { "IClientEvent" }
+"IrcConnection" -> { "EventLoop" }
+"IrcBacklogService" -> { "EventLoop" }
+"IrcService" -> { "EventLoop" }
+"WebsocketServer" -> { "EventLoop" }
+"WebsocketHandler" -> { "seasocks::WebSocket::Handler" }
+"UserManager" -> { "EventLoop" }
+}
