@@ -85,7 +85,6 @@ if __name__ == '__main__':
     providers=findModuleProviders()
     inheritance=findInheritance()
     websocket_protocol_receive=findWebsocketProtocolReceive()
-    commandIndex = 0
 
     with open('docs/input/initialization.dot', 'w') as f:
         f.write('digraph Initialization {\n')
@@ -118,17 +117,28 @@ if __name__ == '__main__':
         f.write('fontname="Bitstream Vera Sans";\n');
         #f.write('fontsize=8;\n');
         f.write(']\n');
+
+        protocolIndex = 0
+        commandIndex = 0
+
+        f.write('root [label="client to server request"];\n')
         for protocol in websocket_protocol_receive:
-            if protocol['name'] == '':
-                protocol['name'] = '--WITHOUT--'
+            protocol_name = protocol["name"]
+            if protocol_name == '':
+                protocol_name = 'without protocol'
+            else:
+                protocol_name = 'protocol:\\l\\"'+protocol_name+'\\"'
+            f.write('protocol_'+str(protocolIndex)+' [label="'+protocol_name+'\l"];\n')
+            f.write('root -> protocol_'+str(protocolIndex)+';\n')
             for command in protocol['commands']:
-                f.write('command_'+str(commandIndex)+' [ label="{'+command['name']+'|')
+                f.write('command_'+str(commandIndex)+' [ label="{cmd:\\l\\"'+command['name']+'\\"\l|')
                 if not command['name'] == 'LOGIN':
                     for element in command['elements']:
                         f.write('+ '+element['name']+' : '+element['type']+'\l')
                 f.write('}" ];\n')
-                f.write('"'+protocol['name']+'" -> command_'+str(commandIndex)+';\n')
+                f.write('protocol_'+str(protocolIndex)+' -> command_'+str(commandIndex)+';\n')
                 commandIndex = commandIndex + 1
+            protocolIndex = protocolIndex + 1
                     
         
         f.write('\n}\n')
