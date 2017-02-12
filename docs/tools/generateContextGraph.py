@@ -119,10 +119,13 @@ if __name__ == '__main__':
         #f.write('fontsize=8;\n');
         f.write(']\n');
         for protocol in websocket_protocol_receive:
+            if protocol['name'] == '':
+                protocol['name'] = '--WITHOUT--'
             for command in protocol['commands']:
                 f.write('command_'+str(commandIndex)+' [ label="{'+command['name']+'|')
-                for element in command['elements']:
-                    f.write('+ '+element['name']+' : '+element['type']+'\l')
+                if not command['name'] == 'LOGIN':
+                    for element in command['elements']:
+                        f.write('+ '+element['name']+' : '+element['type']+'\l')
                 f.write('}" ];\n')
                 f.write('"'+protocol['name']+'" -> command_'+str(commandIndex)+';\n')
                 commandIndex = commandIndex + 1

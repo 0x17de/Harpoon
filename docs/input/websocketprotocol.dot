@@ -8,10 +8,10 @@ shape="record";
 edge [
 fontname="Bitstream Vera Sans";
 ]
-command_0 [ label="{LOGIN|+ cmd : String\l+ protocol : String\l}" ];
-"" -> command_0;
+command_0 [ label="{LOGIN|}" ];
+"--WITHOUT--" -> command_0;
 command_1 [ label="{querysettings|}" ];
-"" -> command_1;
+"--WITHOUT--" -> command_1;
 command_2 [ label="{chat|+ server : String\l+ channel : String\l+ msg : String\l}" ];
 "irc" -> command_2;
 command_3 [ label="{requestbacklog|+ server : String\l+ channel : String\l+ count : Int\l}" ];
