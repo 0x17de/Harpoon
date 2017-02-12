@@ -1,5 +1,6 @@
 digraph Initialization {
-rankdir=LR;app[label="Application
+rankdir=LR;
+app[label="Application
 src/app/Application.cpp"];
 servprov[label="ModuleProvider
 src/utils/ModuleProvider.cpp"];

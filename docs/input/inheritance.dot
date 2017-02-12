@@ -1,5 +1,6 @@
 digraph Initialization {
-rankdir=LR;"SimpleLoop" -> { "EventLoop" }
+rankdir=LR;
+"SimpleLoop" -> { "EventLoop" }
 "TestError" -> { "std::runtime_error" }
 "IrcDatabase_Ini" -> { "EventLoop" }
 "IrcDatabase_Dummy" -> { "EventLoop" }

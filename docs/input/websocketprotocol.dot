@@ -1,0 +1,44 @@
+digraph Initialization {
+rankdir=LR;
+fontname="Bitstream Vera Sans";
+node [
+fontname="Bitstream Vera Sans";
+shape="record";
+]
+edge [
+fontname="Bitstream Vera Sans";
+]
+command_0 [ label="{LOGIN|+ cmd : String\l+ protocol : String\l}" ];
+"" -> command_0;
+command_1 [ label="{querysettings|}" ];
+"" -> command_1;
+command_2 [ label="{chat|+ server : String\l+ channel : String\l+ msg : String\l}" ];
+"irc" -> command_2;
+command_3 [ label="{requestbacklog|+ server : String\l+ channel : String\l+ count : Int\l}" ];
+"irc" -> command_3;
+command_4 [ label="{action|+ server : String\l+ channel : String\l+ msg : String\l}" ];
+"irc" -> command_4;
+command_5 [ label="{join|+ server : String\l+ channel : String\l+ password : String\l}" ];
+"irc" -> command_5;
+command_6 [ label="{part|+ server : String\l+ channel : String\l}" ];
+"irc" -> command_6;
+command_7 [ label="{nick|+ server : String\l+ nick : String\l}" ];
+"irc" -> command_7;
+command_8 [ label="{addserver|+ name : String\l}" ];
+"irc" -> command_8;
+command_9 [ label="{deleteserver|+ server : String\l}" ];
+"irc" -> command_9;
+command_10 [ label="{deletechannel|+ server : String\l+ channel : String\l}" ];
+"irc" -> command_10;
+command_11 [ label="{addhost|+ server : String\l+ host : String\l+ password : String\l+ port : Int\l+ ipv6 : Bool\l+ ssl : Bool\l}" ];
+"irc" -> command_11;
+command_12 [ label="{modifyhost|+ server : String\l+ oldhost : String\l+ oldport : Int\l+ host : String\l+ password : String\l+ port : Int\l+ ipv6 : Bool\l+ ssl : Bool\l}" ];
+"irc" -> command_12;
+command_13 [ label="{modifynick|+ server : String\l+ oldnick : String\l+ newnick : String\l}" ];
+"irc" -> command_13;
+command_14 [ label="{reconnect|+ server : String\l}" ];
+"irc" -> command_14;
+command_15 [ label="{deletehost|+ server : String\l+ host : String\l+ port : Int\l}" ];
+"irc" -> command_15;
+
+}
