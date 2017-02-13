@@ -57,7 +57,6 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
     case EventQuit::uuid: {
         std::cout << "IrcDB received QUIT event" << std::endl;
         return false;
-        break;
     }
     case EventIrcAddServer::uuid: {
         auto add = event->as<EventIrcAddServer>();

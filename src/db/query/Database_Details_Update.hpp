@@ -114,7 +114,7 @@ namespace details {
         std::unique_ptr<QueryUpdate_Store> store;
 
         template<class T>
-        TmpQueryUpdate_UPDATE(T&& table)
+        explicit TmpQueryUpdate_UPDATE(T&& table)
             : store{cpp11::make_unique<QueryUpdate_Store>()}
         {
             store->table = std::forward<T>(table);

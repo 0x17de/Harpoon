@@ -388,19 +388,7 @@ bool IrcConnection_Impl::onEvent(std::shared_ptr<IEvent> event) {
                 appQueue->sendEvent(userlist);
             }
         } else if (code == LIBIRC_RFC_RPL_ENDOFNAMES) {
-            //lock_guard<mutex> lock(channelLoginDataMutex);
-            //auto num = event->as<EventIrcNumeric>();
-            //auto& parameters = num->getParameters();
-            //string channelName = parameters.at(0);
-            //auto it = channelStores.find(channelName);
-            //if (it != channelStores.end()) {
-                //auto& channelStore = it->second;
-                //auto& users = channelStore.getUsers();
-                //for (auto userStorePair : users) {
-                    //auto& userStore = userStorePair.second;
-#pragma message "submit userlist stub"
-                //}
-            //}
+            // userlist is sent in parts
         }
     } else if (type == EventIrcModeChanged::uuid) {
         auto mode = event->as<EventIrcModeChanged>();

@@ -38,7 +38,7 @@ WebsocketHandler::~WebsocketHandler() {
 }
 
 void WebsocketHandler::onConnect(seasocks::WebSocket* connection) {
-#pragma message "onConnect stub"
+    // no action required
 }
 
 void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata) {
