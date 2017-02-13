@@ -1,0 +1,28 @@
+Files and Directories {#filesanddirectories}
+=====================
+
+\dot
+digraph Directories {
+rankdir=LR;
+"src" -> { src_event, src_db, src_app, src_service, src_server, src_queue, src_user, src_utils, src_tests };
+src_app [shape="record", label="{Application|- Basic application class\l- Initializes all modules\l- Delivers events across modules\l}"];
+src_event [shape="record", label="{event|- Contains all events\l- Includes base classes\l}"];
+src_event -> { src_event_irc };
+src_event_irc [shape="record", label="{irc|- Contains all irc events}"];
+src_db [shape="record", label="{db|- Contains simple database types\l}"];
+src_db -> { src_db_handler, src_db_query };
+src_db_handler [shape="record", label="{handler|- Various database handlers\l}"];
+src_db_handler -> "Postgres";
+src_db_query [shape="record", label="{query|- Abstraction layer for database calls\l}"];
+src_service [shape="record", label="{service|- All supported chat protocols\l- Connections are instantiated for each user\l- Includes backlog handling for a protocol\l}"];
+src_service -> { src_service_irc };
+src_service_irc [shape="record", label="{irc|- Per user some IrcService keeps all connections alive\l- Irc backlogging is managed here\l}"];
+src_server [shape="record", label="{server|- Contains all external protocols to communicate with harpoon\l}"];
+src_server -> { src_server_ws };
+src_server_ws [shape="record", label="{ws|- Websocket server for communications from harpoon clients\l}"];
+src_queue [shape="record", label="{queue|- Core classes for event handling\l}"];
+src_user [shape="record", label="{user|- Contains all configured users\l- Keeps track of connected clients\l- Delivers requests to specific users and their services\l}"];
+src_utils [shape="record", label="{utils|- Base64 handling\l- Password hashing+verification\l- Filesystem access\l- Id management\l- The base for modules in harpoon\l- UUID base class for events\l}"];
+src_tests [shape="record", label="{tests|- Basic tests for the database and the modularity\l}"];
+}
+\enddot
