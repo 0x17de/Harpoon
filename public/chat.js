@@ -31,6 +31,7 @@ class ChannelBase {
         this.name = name;
         this.server = server;
         this.server.channels[name] = this;
+        this.backlogRequested = false;
         this.channelEntry = this.createEntry();
         this.server.serverEntry.add(this.channelEntry);
         this.backlog = q('<div>').addClass('backlog');
@@ -41,16 +42,34 @@ class ChannelBase {
         if (!this.server.service.chat.activeChannel)
             this.activate();
     }
+    onBacklogScrollTop() {
+        // handle backlog requests
+        if (!this.backlogRequested) {
+            this.backlogRequested = true;
+            this.requestBacklog();
+        }
+    }
+    requestBacklog() {
+        console.log("Class needs to override 'requestBacklog()'");
+        /* ... */
+    }
     clear() {
         for (var i in this.users)
             this.users[i].clear();
         this.remove();
     }
     setDisabled(disabled) {
-        if (disabled)
+        if (disabled) {
             this.channelEntry.addClass('disabled');
-        else
+        } else {
             this.channelEntry.removeClass('disabled');
+            if (this.backlog.parent().scroll()[0].top == 0) {
+                if (!this.backlogRequested) {
+                    this.backlogRequested = true;
+                    this.requestBacklog();
+                }
+            }
+        }
         this.disabled = disabled;
     }
     getDisabled() {
@@ -145,7 +164,9 @@ class Chat {
         this.activeChannel = null;
         this.backlog.on('scroll', (e)=>{
             if (!this.activeChannel) return;
-            if (this.checkScroll()) {
+            if (this.backlog.scroll()[0].top == 0)
+                this.activeChannel.onBacklogScrollTop(); // checks for backlog request
+            if (this.checkScroll()) { // auto scroll down check
                 this.activeChannel.scrollPosition = 'bottom';
             } else {
                 this.activeChannel.scrollPosition = this.backlog.scroll()[0].top;
@@ -203,16 +224,17 @@ class Chat {
         this.ws.onmessage = (msg)=>this.onMessage(msg);
     }
     onWsOpen(cxn, username, password) {
-        var username = "user"; // TODO: till login form exists
-        var password = "password";
-
         this.clear();
         this.send("LOGIN "+username+" "+password+"\n");
     }
     onWsClose(username, password) {
         if (this.pingInterval !== null)
             clearInterval(this.pingInterval);
-        setTimeout(()=>this.login(username, password), 1000);
+        if (this.loginSuccess) {
+            setTimeout(()=>this.login(username, password), 1000);
+        } else {
+            q('#login,#login-error').css({'display':'block'});
+        }
     }
     onMessage(msg) {
         if (msg.data instanceof Blob || msg.data instanceof ArrayBuffer) {
@@ -259,7 +281,10 @@ class Chat {
             return;
         }
 
-        if (json.protocol) {
+        if (!json.protocol) {
+            if (json.cmd == "login" && json.success)
+                this.loginSuccess = true;
+        } else {
             // service specific message
             var service = this.get(json.protocol);
             if (service)

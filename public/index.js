@@ -15,6 +15,6 @@ function login() {
     var password = q('#login-password').val();
     q('#login-user').val("");
     q('#login-password').val("");
-    q('#login').css({'display':'none'});
+    q('#login,#login-error').css({'display':'none'});
     chat.login(user, password);
 }

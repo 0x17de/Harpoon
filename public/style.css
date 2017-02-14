@@ -5,6 +5,12 @@ body, html {
     background:#f0f0f0;
     font-family:"Lucida Console",Monaco,monospace;
 }
+#login-error {
+    color:red;
+    margin-bottom:4px;
+    font-weight:bold;
+    display:none;
+}
 .layout-root {
     position:absolute;
     top:0; left:0;
