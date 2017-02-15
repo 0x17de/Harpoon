@@ -3,10 +3,11 @@
 
 #include "queue/EventQueue.hpp"
 #include "queue/EventLoop.hpp"
+#include "GenericIniDatabase.hpp"
 
 
-class IrcDatabase_Ini : public EventLoop {
-    EventQueue* appQueue;
+class IrcDatabase_Ini : public EventLoop, public GenericIniDatabase {
+    EventQueue* appQueue_;
 public:
     explicit IrcDatabase_Ini(EventQueue* appQueue);
     virtual ~IrcDatabase_Ini();

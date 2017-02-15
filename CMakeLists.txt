@@ -56,6 +56,8 @@ process_flag(0 BUILD_TEST 0 "Build tests")
 set(SOURCE_FILES
     src/app/Application.cpp
     src/app/ApplicationGuard.cpp
+    src/db/GenericIniDatabase.cpp
+    #src/db/HackDatabase_Ini.cpp
     src/db/IrcDatabase_Dummy.cpp
     src/db/IrcDatabase_Ini.cpp
     src/db/LoginDatabase_Dummy.cpp

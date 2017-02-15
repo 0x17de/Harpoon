@@ -43,8 +43,9 @@ IrcDatabase_Ini::IrcDatabase_Ini(EventQueue* appQueue) :
         EventIrcJoinChannel::uuid,
         EventIrcPartChannel::uuid,
         EventIrcDeleteChannel::uuid
-            }),
-    appQueue{appQueue}
+    }),
+    GenericIniDatabase("irc"),
+    appQueue_{appQueue}
 {
 }
 
@@ -60,218 +61,126 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
     }
     case EventIrcAddServer::uuid: {
         auto add = event->as<EventIrcAddServer>();
+        size_t userId = add->getUserId();
+        std::string serverName = add->getName();
+        size_t serverId; // returned via add function on success
 
-        stringstream serversConfigFilename;
-        serversConfigFilename
-            << "config/user" << add->getUserId()
-            << "/irc.servers.ini";
-        Ini serversConfig(serversConfigFilename.str());
-
-        auto& serverEntry = serversConfig.expectCategory(add->getName());
-        string serverIdStr;
-        if (!serversConfig.getEntry(serverEntry, "id", serverIdStr)) {
-            size_t serverId = IdProvider::getInstance().generateNewId("server");
-            serverIdStr = to_string(serverId);
-            serversConfig.setEntry(serverEntry, "id", serverIdStr);
-
-            appQueue->sendEvent(make_shared<EventIrcServerAdded>(add->getUserId(), serverId, add->getName()));
-        } else {
-            cout << "IMPL ERROR: SERVER ALREADY EXISTS" << endl;
-#pragma message "EventIrcAddServer: handle server already exists case"
+        if (addServer(userId,
+                      serverName,
+                      serverId)) {
+            appQueue_->sendEvent(std::make_shared<EventIrcServerAdded>(userId, serverId, serverName));
         }
         break;
     }
     case EventIrcDeleteServer::uuid: {
         auto del = event->as<EventIrcDeleteServer>();
-        if (del->getServerId() > 0) {
-            stringstream serversConfigFilename;
-            serversConfigFilename
-                << "config/user" << del->getUserId()
-                << "/irc.servers.ini";
-            Ini serversConfig(serversConfigFilename.str());
+        size_t userId = del->getUserId();
+        size_t serverId = del->getServerId();
 
-            for (auto& categoryPair : serversConfig) {
-                size_t serverId;
-                string serverIdStr;
-                serversConfig.getEntry(categoryPair.second, "id", serverIdStr);
-                istringstream(serverIdStr) >> serverId;
-                if (serverId == del->getServerId()) {
-                    serversConfig.deleteCategory(categoryPair.first);
-                    appQueue->sendEvent(make_shared<EventIrcServerDeleted>(del->getUserId(), del->getServerId()));
-                    break;
-                }
-            }
+        if (deleteServer(userId,
+                         serverId)) {
+            appQueue_->sendEvent(std::make_shared<EventIrcServerDeleted>(userId, serverId));
         }
         break;
-#pragma message "EventIrcDeleteServer: Cleanup directories"
     }
     case EventIrcModifyNick::uuid: {
         auto modify = event->as<EventIrcModifyNick>();
-        if (modify->getServerId() > 0) {
-            stringstream serversConfigFilename;
-            serversConfigFilename
-                << "config/user" << modify->getUserId()
-                << "/irc.servers.ini";
-            Ini serversConfig(serversConfigFilename.str());
+        size_t userId = modify->getUserId();
+        size_t serverId = modify->getServerId();
+        std::string oldNick = modify->getOldNick();
+        std::string newNick = modify->getNewNick();
 
-            // find server by id
-            for (auto& categoryPair : serversConfig) {
-                auto& server = categoryPair.second;
-                size_t serverId;
-                string serverIdStr;
-                serversConfig.getEntry(server, "id", serverIdStr);
-                istringstream(serverIdStr) >> serverId;
-                if (serverId == modify->getServerId()) {
-                    string nicksStr;
-                    serversConfig.getEntry(server, "nicks", nicksStr);
-                    if (modify->getOldNick().size() == 0) {
-                        stringstream newNicksStr;
-                        if (nicksStr.size() > 0)
-                            newNicksStr << nicksStr << ",";
-                        newNicksStr << modify->getNewNick(); // append nick
-                        serversConfig.setEntry(server, "nicks", newNicksStr.str());
-                    } else {
-                        bool first = true;
-                        istringstream oldNicksStream(nicksStr);
-                        stringstream newNicksStream;
-                        string nick;
-                        while (getline(oldNicksStream, nick, ',')) {
-                            if (nick == modify->getOldNick())
-                                nick = modify->getNewNick(); // change nick to new one
-                            if (nick.size() == 0) continue; // delete nick if empty
-                            if (first) {
-                                first = false;
-                            } else {
-                                newNicksStream << ",";
-                            }
-                            newNicksStream << nick;
-                        }
-                        serversConfig.setEntry(server, "nicks", newNicksStream.str());
-                    }
-                    break; // nicks were changed
-                }
-            }
+        if (modifyNicks(userId, serverId,
+                        oldNick, newNick)) {
+            // no handling for success
         }
         break;
     }
     case EventIrcAddHost::uuid: {
         auto add = event->as<EventIrcAddHost>();
+        size_t userId = add->getUserId();
+        size_t serverId = add->getServerId();
+        std::string hostName = add->getHost();
+        int port = add->getPort();
+        std::string password = add->getPassword();
+        bool ipV6 = add->getIpV6();
+        bool ssl = add->getSsl();
 
-        stringstream serverPath;
-        serverPath
-            << "config/user" << add->getUserId()
-            << "/server" << add->getServerId();
-
-        Filesystem::getInstance().createPathRecursive(serverPath.str());
-
-        stringstream hostsConfigFilename;
-        hostsConfigFilename << serverPath.str() << "/hosts.ini";
-        Ini hostsConfig(hostsConfigFilename.str());
-
-        stringstream hostKey;
-        hostKey << add->getHost() << ":" << add->getPort();
-
-        bool existed = hostsConfig.hasCategory(hostKey.str());
-        if (!existed) {
-            auto& hostEntry = hostsConfig.expectCategory(hostKey.str());
-            hostsConfig.setEntry(hostEntry, "password", add->getPassword());
-            hostsConfig.setEntry(hostEntry, "ipv6", add->getIpV6() ? "y" : "n");
-            hostsConfig.setEntry(hostEntry, "ssl", add->getSsl() ? "y" : "n");
-            appQueue->sendEvent(make_shared<EventIrcHostAdded>(add->getUserId(),
-                                                               add->getServerId(),
-                                                               add->getHost(),
-                                                               add->getPort(),
-                                                               add->getPassword(),
-                                                               add->getIpV6(),
-                                                               add->getSsl()));
-        } else {
-            cout << "IMPL ERROR: HOST ALREADY EXISTS" << endl;
-#pragma message "EventIrcAddHost: handle host already exists case"
+        if (addHost(userId, serverId,
+                    hostName, port,
+                    password,
+                    ipV6, ssl)) {
+            appQueue_->sendEvent(make_shared<EventIrcHostAdded>(userId,
+                                                                serverId,
+                                                                hostName,
+                                                                port,
+                                                                password,
+                                                                ipV6,
+                                                                ssl));
         }
         break;
     }
     case EventIrcDeleteHost::uuid: {
         auto del = event->as<EventIrcDeleteHost>();
-        if (del->getServerId() > 0) {
-            stringstream hostsConfigFilename;
-            hostsConfigFilename
-                << "config/user" << del->getUserId()
-                << "/server" << del->getServerId()
-                << "/hosts.ini";
-            Ini hostsConfig(hostsConfigFilename.str());
+        size_t userId = del->getUserId();
+        size_t serverId = del->getServerId();
+        std::string hostName = del->getHost();
+        int port = del->getPort();
 
-            stringstream hostKey;
-            hostKey << del->getHost() << ":" << del->getPort();
-            hostsConfig.deleteCategory(hostKey.str());
-            appQueue->sendEvent(make_shared<EventIrcHostDeleted>(del->getUserId(), del->getServerId(), del->getHost(), del->getPort()));
+        if (deleteHost(userId, serverId, hostName, port)) {
+            appQueue_->sendEvent(std::make_shared<EventIrcHostDeleted>(userId, serverId, hostName, port));
         }
         break;
 #pragma message "EventIrcDeleteServer: Cleanup directories"
     }
     case EventIrcJoinChannel::uuid: {
         auto join = event->as<EventIrcJoinChannel>();
+        size_t userId = join->getUserId();
+        size_t serverId = join->getServerId();
 
-        // construct channels.ini path
-        stringstream serverChannelsConfigFilename;
-        serverChannelsConfigFilename
-            << "config/user" << join->getUserId()
-            << "/server" << join->getServerId()
-            << "/channels.ini";
-
-        Ini channelsConfig(serverChannelsConfigFilename.str());
-
-        // save data from join event to ini
-        for (auto& loginData : join->getLoginData()) {
-            auto& channelEntry = channelsConfig.expectCategory(loginData.name);
-            string channelId;
-            if (!channelsConfig.getEntry(channelEntry, "id", channelId)) {
-                channelId = to_string(IdProvider::getInstance().generateNewId("channel"));
-                channelsConfig.setEntry(channelEntry, "id", channelId);
-                channelsConfig.setEntry(channelEntry, "password", loginData.password);
-            }
-            channelsConfig.setEntry(channelEntry, "disabled", "no");
-            if (loginData.passwordSpecified)
-                channelsConfig.setEntry(channelEntry, "password", loginData.password);
+        if (joinChannel(userId, serverId,
+                        [&join](Ini& ini){
+                            // save whatever you need here
+                            // save data from join event to ini
+                            for (auto& loginData : join->getLoginData()) {
+                                auto& channelEntry = ini.expectCategory(loginData.name);
+                                string channelId;
+                                if (!ini.getEntry(channelEntry, "id", channelId)) {
+                                    channelId = to_string(IdProvider::getInstance().generateNewId("channel"));
+                                    ini.setEntry(channelEntry, "id", channelId);
+                                    ini.setEntry(channelEntry, "password", loginData.password);
+                                }
+                                ini.setEntry(channelEntry, "disabled", "no");
+                                if (loginData.passwordSpecified) {
+                                    ini.setEntry(channelEntry, "password", loginData.password);
+                                }
+                            }
+                        })) {
+            // no action
         }
+
         break;
     }
     case EventIrcPartChannel::uuid: {
         auto part = event->as<EventIrcPartChannel>();
+        size_t userId = part->getUserId();
+        size_t serverId = part->getServerId();
 
-        // construct channel.ini path
-        stringstream serverChannelsConfigFilename;
-        serverChannelsConfigFilename
-            << "config/user" << part->getUserId()
-            << "/server" << part->getServerId()
-            << "/channels.ini";
-
-        Ini channelsConfig(serverChannelsConfigFilename.str());
-
-        // save data from join event to ini
-        for (const auto& channelName : part->getChannels()) {
-            auto* categoryEntry = channelsConfig.getEntry(channelName);
-            if (categoryEntry)
-                channelsConfig.setEntry(*categoryEntry, "disabled", "yes");
+        if (partChannel(userId, serverId,
+                        [&part](Ini& ini){
+                            // save data from part event to ini
+                            for (const auto& channelName : part->getChannels()) {
+                                auto* categoryEntry = ini.getEntry(channelName);
+                                if (categoryEntry)
+                                    ini.setEntry(*categoryEntry, "disabled", "yes");
+                            }
+                        })) {
+            // no action
         }
         break;
     }
     case EventIrcDeleteChannel::uuid: {
         auto deleteCommand = event->as<EventIrcDeleteChannel>();
-
-        // construct channel.ini path
-        stringstream serverChannelsConfigFilename;
-        serverChannelsConfigFilename
-            << "config/user" << deleteCommand->getUserId()
-            << "/server" << deleteCommand->getServerId()
-            << "/channels.ini";
-
-        Ini channelsConfig(serverChannelsConfigFilename.str());
-
-        // save data from join event to ini
-        string channelName = deleteCommand->getChannelName();
-        auto* categoryEntry = channelsConfig.getEntry(channelName);
-        if (categoryEntry)
-            channelsConfig.deleteCategory(channelName);
         break;
     }
     case EventIrcServiceInit::uuid: {
@@ -341,7 +250,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
                     // read host settings
                     string password, ipV6, ssl;
                     hostsConfig.getEntry(host, "password", password);
-                    hostsConfig.getEntry(host, "ipv6", ipV6);
+                    hostsConfig.getEntry(host, "ipV6", ipV6);
                     hostsConfig.getEntry(host, "ssl", ssl);
 
                     loginConfiguration.addHostConfiguration(hostName,
@@ -382,7 +291,7 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
             }
 
             // dispatch event
-            appQueue->sendEvent(login);
+            appQueue_->sendEvent(login);
         }
         break;
     }
