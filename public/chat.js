@@ -50,7 +50,7 @@ class ChannelBase {
         }
     }
     requestBacklog() {
-        console.log("Class needs to override 'requestBacklog()'");
+        console.log("Channel class needs to override 'requestBacklog()'");
         /* ... */
     }
     clear() {
@@ -198,6 +198,8 @@ class Chat {
         channel.channelEntry.addClass('active');
         channel.channelEntry.removeClass('message', 'highlight');
         this.backlog.scroll(scrollPosition);
+        if (this.backlog.scroll()[0].top == 0)
+            this.activeChannel.onBacklogScrollTop(); // checks for backlog request
     }
     checkScroll() {
         var scroll = this.backlog.scroll()[0];

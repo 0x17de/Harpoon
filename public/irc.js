@@ -25,12 +25,14 @@ class IrcChannel extends ChannelBase {
         super(name, server);
         this.backlogSplitHandle = q('<div>');
         q('#backlog-handles').add(this.backlogSplitHandle);
+        this.smallestId = -1;
     }
     get(userName) {
         return this.users[IrcUtils.stripName(userName)];
     }
-    addMessage(time, nick, msg) {
-        var line = q('<div>');
+    addMessage(id, time, nick, msg) {
+        var nid = Number(id);
+        var line = q('<div id="message-'+id+'">');
         var time = q('<div>').text(time).addClass('backlog-time');
         var msg = q('<div>').text(msg).addClass('backlog-message');
         var nick = q('<div>').text(nick).addClass('backlog-nick');
@@ -39,6 +41,17 @@ class IrcChannel extends ChannelBase {
         if (this.scrollPosition === 'bottom') {
             this.server.service.chat.doScroll();
         }
+        if (nid < this.smallestId)
+            this.smallestId = nid;
+    }
+    requestBacklog() {
+        var request = {
+            protocol:'irc',
+            cmd:'requestbacklog',
+            server:this.server.id,
+            channel:this.name,
+        }
+        this.server.service.chat.send(request);
     }
 }
 
@@ -167,7 +180,7 @@ class IrcService extends ServiceBase {
     handleTopic(json) {
         var channel = this.getById(json.server).get(json.channel);
         if (!channel) return console.log('Channel not created: '+json.server+' '+json.channel);
-        channel.addMessage(IrcUtils.formatTime(json.time), '*', IrcUtils.stripName(json.nick) + ' changed the topic: ' + json.topic);
+        channel.addMessage(json.id, IrcUtils.formatTime(json.time), '*', IrcUtils.stripName(json.nick) + ' changed the topic: ' + json.topic);
     }
     handleNickChange(json) {
         var server = this.getById(json.server);
@@ -179,7 +192,7 @@ class IrcService extends ServiceBase {
             var user = channel.get(json.nick);
             if (!user) continue;
             user.rename(json.newNick);
-            channel.addMessage(IrcUtils.formatTime(json.time), '<->', IrcUtils.stripName(json.nick) + ' is now known as ' + json.newNick);
+            channel.addMessage(json.id, IrcUtils.formatTime(json.time), '<->', IrcUtils.stripName(json.nick) + ' is now known as ' + json.newNick);
         }
     }
     handleJoin(json) {
@@ -190,7 +203,7 @@ class IrcService extends ServiceBase {
             if (!channel) return console.log('Channel not created: '+json.server+' '+json.channel);
             channel.setDisabled(false);
             new IrcUser({name:json.nick}, channel);
-            channel.addMessage(IrcUtils.formatTime(json.time), '-->', IrcUtils.stripName(json.nick) + ' has joined ' + channel.name);
+            channel.addMessage(json.id, IrcUtils.formatTime(json.time), '-->', IrcUtils.stripName(json.nick) + ' has joined ' + channel.name);
         }
     }
     handlePart(json) {
@@ -202,7 +215,7 @@ class IrcService extends ServiceBase {
             var user = channel.get(json.nick);
             if (!user) return;
             user.remove();
-            channel.addMessage(IrcUtils.formatTime(json.time), '<--', IrcUtils.stripName(json.nick) + ' has left ' + channel.name);
+            channel.addMessage(json.id, IrcUtils.formatTime(json.time), '<--', IrcUtils.stripName(json.nick) + ' has left ' + channel.name);
         }
     }
     handleQuit(json) {
@@ -215,20 +228,20 @@ class IrcService extends ServiceBase {
                 var user = channel.get(json.nick);
                 if (!user) continue;
                 user.remove();
-                channel.addMessage(IrcUtils.formatTime(json.time), '<--', IrcUtils.stripName(json.nick) + ' has quit ' + channel.name);
+                channel.addMessage(json.id, IrcUtils.formatTime(json.time), '<--', IrcUtils.stripName(json.nick) + ' has quit ' + channel.name);
             }
         }
     }
     handleAction(json) {
         var channel = this.getById(json.server).get(json.channel);
         if (!channel) return console.log('Channel not created: '+json.server+' '+json.channel);
-        channel.addMessage(IrcUtils.formatTime(json.time), '*', IrcUtils.stripName(json.nick) + ' ' + json.msg);
+        channel.addMessage(json.id, IrcUtils.formatTime(json.time), '*', IrcUtils.stripName(json.nick) + ' ' + json.msg);
         this.highlight(channel, json.msg);
     }
     handleChat(json) {
         var channel = this.getById(json.server).get(json.channel);
         if (!channel) return console.log('Channel not created: '+json.server+' '+json.channel);
-        channel.addMessage(IrcUtils.formatTime(json.time), '<'+IrcUtils.stripName(json.nick)+'>', json.msg);
+        channel.addMessage(json.id, IrcUtils.formatTime(json.time), '<'+IrcUtils.stripName(json.nick)+'>', json.msg);
         this.highlight(channel, json.msg);
     }
     handleSettings(json) {
