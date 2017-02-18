@@ -32,7 +32,7 @@ class IrcChannel extends ChannelBase {
     }
     addMessage(id, time, nick, msg) {
         var nid = Number(id);
-        var line = q('<div id="message-'+id+'">');
+        var line = q('<div>').attr('id', 'message-'+id);
         var time = q('<div>').text(time).addClass('backlog-time');
         var msg = q('<div>').text(msg).addClass('backlog-message');
         var nick = q('<div>').text(nick).addClass('backlog-nick');
@@ -174,9 +174,35 @@ class IrcService extends ServiceBase {
             this.handleChatList(json); break;
         case 'nickchange':
             this.handleNickChange(json); break;
+        case 'backlogresponse':
+            this.handleBacklogResponse(json); break;
         }
     }
 
+    handleBacklogResponse(json) {
+        var channel = this.getById(json.server).get(json.channel);
+        if (!channel) return console.log('Channel not created: '+json.server+' '+json.channel);
+
+        for (var i = 0; i < json.lines.length; ++i) {
+            var line = json.lines[i];
+            var nick;
+
+            switch(line.type) {
+            case "msg":
+            case "notice":
+            case "action":
+                nick = '<'+IrcUtils.stripName(line.sender)+'>'; break;
+            case "join":
+                nick = '-->'; break;
+            case "part":
+                nick = '<--'; break;
+            case "kick":
+            default:
+                nick = '*'; break;
+            }
+            channel.addMessage(line.id, IrcUtils.formatTime(line.time), nick, line.msg);
+        }
+    }
     handleTopic(json) {
         var channel = this.getById(json.server).get(json.channel);
         if (!channel) return console.log('Channel not created: '+json.server+' '+json.channel);
