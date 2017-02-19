@@ -25,7 +25,8 @@ class IrcChannel extends ChannelBase {
         super(name, server);
         this.backlogSplitHandle = q('<div>');
         q('#backlog-handles').add(this.backlogSplitHandle);
-        this.smallestId = -1;
+        this.largestId = -1;
+        this.smallestId = Number.MAX_VALUE;
     }
     get(userName) {
         return this.users[IrcUtils.stripName(userName)];
@@ -37,7 +38,14 @@ class IrcChannel extends ChannelBase {
         var msg = q('<div>').text(msg).addClass('backlog-message');
         var nick = q('<div>').text(nick).addClass('backlog-nick');
         line.add(time).add(nick).add(msg);
-        this.backlog.add(line);
+
+        if (nid > this.largestId) {
+            this.backlog.add(line);
+            this.largestId = nid;
+        } else if (nid < this.smallestId) {
+            this.backlog.insertBefore(line, this.backlog.firstChild());
+            this.smallestId = nid;
+        }
         if (this.scrollPosition === 'bottom') {
             this.server.service.chat.doScroll();
         }

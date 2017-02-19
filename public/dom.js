@@ -34,6 +34,13 @@ class _q {
     eq(index) {
         return q(get(index));
     }
+    firstChild() {
+        return new q(this.get(0).firstChild);
+    }
+    insertBefore(e, before) {
+        this.get(0).insertBefore(e instanceof _q ? e.get(0) : e, before instanceof _q ? before.get(0) : before);
+        return this;
+    }
     add(e) {
         this.get(0).appendChild(e instanceof _q ? e.get(0) : e);
         return this;
