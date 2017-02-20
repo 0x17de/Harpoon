@@ -193,22 +193,37 @@ class IrcService extends ServiceBase {
 
         for (var i = 0; i < json.lines.length; ++i) {
             var line = json.lines[i];
-            var nick;
+            var nick, msg;
 
             switch(line.type) {
             case "msg":
             case "notice":
             case "action":
-                nick = '<'+IrcUtils.stripName(line.sender)+'>'; break;
+                nick = '<'+IrcUtils.stripName(line.sender)+'>';
+                msg = line.msg;
+                break;
+            case "topic":
+                nick = '*';
+                msg = IrcUtils.stripName(line.sender) + ' changed the topic: ' + json.topic;
+                break;
             case "join":
-                nick = '-->'; break;
+                nick = '-->';
+                msg = IrcUtils.stripName(line.sender) + ' has joined ' + channel.name;
+                break;
             case "part":
-                nick = '<--'; break;
+                nick = '<--';
+                msg = IrcUtils.stripName(line.sender) + ' has left ' + channel.name;
+                break;
             case "kick":
+                nick = '*';
+                msg = IrcUtils.stripName(line.sender) + ' was kicked ' + line.msg;
+                break;
             default:
-                nick = '*'; break;
+                nick = '*';
+                msg = line.msg;
+                break;
             }
-            channel.addMessage(line.id, IrcUtils.formatTime(line.time), nick, line.msg);
+            channel.addMessage(line.id, IrcUtils.formatTime(line.time), nick, msg);
         }
     }
     handleTopic(json) {
