@@ -74,6 +74,8 @@ set(SOURCE_FILES
     src/event/EventQuery.cpp
     src/event/EventQuit.cpp
     src/event/IEvent.cpp
+    src/event/hack/EventHackServiceInit.cpp
+    src/event/hack/HackLoggable.cpp
     src/event/irc/EventIrcAction.cpp
     src/event/irc/EventIrcActivateService.cpp
     src/event/irc/EventIrcAddHost.cpp
@@ -117,6 +119,7 @@ set(SOURCE_FILES
     src/event/irc/IrcServerListing.cpp
     src/queue/EventLoop.cpp
     src/queue/EventQueue.cpp
+    src/service/hack/HackBacklogService.cpp
     src/service/irc/IrcBacklogService.cpp
     src/service/irc/IrcChannelLoginData.cpp
     src/service/irc/IrcChannelStore.cpp
@@ -284,9 +287,6 @@ INSTALL(TARGETS Harpoon HarpoonCore
     ARCHIVE DESTINATION lib/static)
 include(InstallRequiredSystemLibraries)
 
-SET(CPACK_PACKAGE_VERSION_MAJOR "0")
-SET(CPACK_PACKAGE_VERSION_MINOR "2")
-SET(CPACK_PACKAGE_VERSION_PATCH "0")
 SET(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
 SET(CPACK_MONOLITHIC_INSTALL 1)
 SET(CPACK_GENERATOR "DEB;TGZ")

@@ -6,7 +6,7 @@
 
 class EventHackServiceInit : public IEvent {
 public:
-    static UUID uuid;
+    static constexpr UUID uuid = 48;
     virtual UUID getEventUuid() const override;
 };
 
