@@ -82,7 +82,7 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                     istringstream(root.get("server", "0").asString()) >> serverId;
                     string channel = root.get("channel", "").asString();
                     string message = root.get("msg", "").asString();
-                    appQueue->sendEvent(make_shared<EventIrcSendMessage>(clientData.userId, serverId, channel, message, MessageType::Message));
+                    appQueue->sendEvent(make_shared<EventIrcSendMessage>(clientData.userId, serverId, channel, message, IrcMessageType::Message));
                 } else if (cmd == "requestbacklog") {
                     size_t serverId, fromId;
                     istringstream(root.get("server", "0").asString()) >> serverId;

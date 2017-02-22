@@ -10,7 +10,7 @@ EventIrcMessage::EventIrcMessage(size_t userId,
                                  const std::string& from,
                                  const std::string& channel,
                                  const std::string& message,
-                                 MessageType type)
+                                 IrcMessageType type)
     : userId{userId}
     , serverId{serverId}
     , from{from}
@@ -40,6 +40,6 @@ std::string EventIrcMessage::getMessage() const {
     return message;
 }
 
-MessageType EventIrcMessage::getType() const {
+IrcMessageType EventIrcMessage::getType() const {
     return type;
 }

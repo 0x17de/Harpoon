@@ -13,7 +13,7 @@ class EventIrcMessage : public IClientEvent, public IrcLoggable {
     std::string from;
     std::string channel;
     std::string message;
-    MessageType type;
+    IrcMessageType type;
 public:
     static constexpr UUID uuid = 27;
     virtual UUID getEventUuid() const override;
@@ -23,14 +23,14 @@ public:
                     const std::string& from,
                     const std::string& channel,
                     const std::string& message,
-                    MessageType type);
+                    IrcMessageType type);
 
     virtual size_t getUserId() const override;
     size_t getServerId() const;
     std::string getFrom() const;
     std::string getChannel() const;
     std::string getMessage() const;
-    MessageType getType() const;
+    IrcMessageType getType() const;
 };
 
 #endif

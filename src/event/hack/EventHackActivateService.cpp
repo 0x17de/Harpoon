@@ -28,7 +28,7 @@ size_t EventHackActivateService::getUserId() const {
 }
 
 HackServerConfiguration& EventHackActivateService::addLoginConfiguration(size_t serverId,
-                                                                       const std::string& serverName) {
+                                                                         const std::string& serverName) {
     auto it = loginData.emplace(piecewise_construct,
                                 forward_as_tuple(serverId),
                                 forward_as_tuple(serverId,

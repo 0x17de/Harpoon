@@ -162,7 +162,7 @@ void IrcConnection_Impl::onChannel(irc_session_t* session,
     string channel(params.at(0));
     string message(params.at(1));
     cout << "<" << channel << ":" << who << ">: " << message << endl;
-    resultEvent = make_shared<EventIrcMessage>(userId, configuration.getServerId(), who, channel, message, MessageType::Message);
+    resultEvent = make_shared<EventIrcMessage>(userId, configuration.getServerId(), who, channel, message, IrcMessageType::Message);
 }
 
 void IrcConnection_Impl::onPrivmsg(irc_session_t* session,
@@ -176,7 +176,7 @@ void IrcConnection_Impl::onPrivmsg(irc_session_t* session,
     string self(params.at(0));
     string message(params.at(1));
     cout << "<" << who << "|" << self << ">: " << message << endl;
-    resultEvent = make_shared<EventIrcMessage>(userId, configuration.getServerId(), who, who, message, MessageType::Message);
+    resultEvent = make_shared<EventIrcMessage>(userId, configuration.getServerId(), who, who, message, IrcMessageType::Message);
 }
 
 void IrcConnection_Impl::onNotice(irc_session_t* session,
@@ -189,7 +189,7 @@ void IrcConnection_Impl::onNotice(irc_session_t* session,
     string who(origin);
     string target(params.at(0));
     string message = params.size() < 2 ? "" : params.at(1);
-    resultEvent = make_shared<EventIrcMessage>(userId, configuration.getServerId(), who, target, message, MessageType::Notice);
+    resultEvent = make_shared<EventIrcMessage>(userId, configuration.getServerId(), who, target, message, IrcMessageType::Notice);
     cout << "N<" << who << "|" << target << ">: " << message << endl;
 }
 
@@ -203,7 +203,7 @@ void IrcConnection_Impl::onChannelNotice(irc_session_t* session,
     string who(origin);
     string channel(params.at(0));
     string message = params.size() < 2 ? "" : params.at(1);
-    resultEvent = make_shared<EventIrcMessage>(userId, configuration.getServerId(), who, channel, message, MessageType::Notice);
+    resultEvent = make_shared<EventIrcMessage>(userId, configuration.getServerId(), who, channel, message, IrcMessageType::Notice);
     cout << "CN<" << who << "|" << channel << ">: " << message << endl;
 }
 

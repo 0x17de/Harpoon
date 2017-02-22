@@ -314,7 +314,7 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                     writeBacklog(std::static_pointer_cast<IUserEvent>(event),
                                  loggable,
                                  message->getMessage(),
-                                 message->getType() == MessageType::Message
+                                 message->getType() == IrcMessageType::Message
                                  ? IrcDatabaseMessageType::Message
                                  : IrcDatabaseMessageType::Notice,
                                  "0",

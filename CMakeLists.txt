@@ -74,6 +74,11 @@ set(SOURCE_FILES
     src/event/EventQuery.cpp
     src/event/EventQuit.cpp
     src/event/IEvent.cpp
+    #src/event/hack/EventHackChatListing.cpp
+    src/event/hack/EventHackConnected.cpp
+    src/event/hack/EventHackJoined.cpp
+    src/event/hack/EventHackMessage.cpp
+    src/event/hack/EventHackServiceInit.cpp
     src/event/hack/EventHackServiceInit.cpp
     src/event/hack/HackLoggable.cpp
     src/event/irc/EventIrcAction.cpp

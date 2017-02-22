@@ -21,7 +21,7 @@ public:
 
     size_t getUserId() const;
     HackServerConfiguration& addLoginConfiguration(size_t serverId,
-                                                  const std::string& serverName);
+                                                   const std::string& serverName);
     const std::map<size_t, HackServerConfiguration>& getLoginConfiguration() const;
 };
 
