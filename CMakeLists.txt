@@ -78,8 +78,10 @@ set(SOURCE_FILES
     src/event/hack/EventHackConnected.cpp
     src/event/hack/EventHackJoined.cpp
     src/event/hack/EventHackMessage.cpp
+    src/event/hack/EventHackParted.cpp
+    src/event/hack/EventHackSendMessage.cpp
     src/event/hack/EventHackServiceInit.cpp
-    src/event/hack/EventHackServiceInit.cpp
+    src/event/hack/EventHackUserlistReceived.cpp
     src/event/hack/HackLoggable.cpp
     src/event/irc/EventIrcAction.cpp
     src/event/irc/EventIrcActivateService.cpp
