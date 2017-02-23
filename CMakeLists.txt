@@ -76,8 +76,10 @@ set(SOURCE_FILES
     src/event/IEvent.cpp
     #src/event/hack/EventHackChatListing.cpp
     src/event/hack/EventHackConnected.cpp
+    src/event/hack/EventHackJoinChannel.cpp
     src/event/hack/EventHackJoined.cpp
     src/event/hack/EventHackMessage.cpp
+    src/event/hack/EventHackPartChannel.cpp
     src/event/hack/EventHackParted.cpp
     src/event/hack/EventHackSendMessage.cpp
     src/event/hack/EventHackServiceInit.cpp
