@@ -9,7 +9,7 @@ UUID EventIrcBacklogResponse::getEventUuid() const {
 EventIrcBacklogResponse::EventIrcBacklogResponse(size_t userId,
                                                  size_t serverId,
                                                  const std::string& channel,
-                                                 std::list<MessageData>&& events)
+                                                 std::list<IrcMessageData>&& events)
     : userId{userId}
     , serverId{serverId}
     , channel{channel}
@@ -29,6 +29,6 @@ std::string EventIrcBacklogResponse::getChannel() const {
     return channel;
 }
 
-const std::list<MessageData>& EventIrcBacklogResponse::getData() const {
+const std::list<IrcMessageData>& EventIrcBacklogResponse::getData() const {
     return events;
 }

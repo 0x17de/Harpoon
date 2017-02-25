@@ -8,7 +8,7 @@
 #include <memory>
 
 enum class IrcDatabaseMessageType;
-struct MessageData {
+struct IrcMessageData {
     size_t messageId;
     std::time_t time;
     std::string message;
@@ -16,12 +16,12 @@ struct MessageData {
     size_t flags;
     std::string sender;
 
-    inline MessageData(size_t messageId,
-                       const std::time_t& time,
-                       const std::string& message,
-                       IrcDatabaseMessageType type,
-                       size_t flags,
-                       const std::string& sender)
+    inline IrcMessageData(size_t messageId,
+                          const std::time_t& time,
+                          const std::string& message,
+                          IrcDatabaseMessageType type,
+                          size_t flags,
+                          const std::string& sender)
         : messageId{messageId}
         , time{time}
         , message{message}
@@ -35,7 +35,7 @@ class EventIrcBacklogResponse : public IClientEvent {
     size_t userId;
     size_t serverId;
     std::string channel;
-    std::list<MessageData> events;
+    std::list<IrcMessageData> events;
 
 public:
     static constexpr UUID uuid = 14;
@@ -44,12 +44,12 @@ public:
     EventIrcBacklogResponse(size_t userId,
                             size_t serverId,
                             const std::string& channel,
-                            std::list<MessageData>&& data);
+                            std::list<IrcMessageData>&& data);
 
     virtual size_t getUserId() const override;
     size_t getServerId() const;
     std::string getChannel() const;
-    const std::list<MessageData>& getData() const;
+    const std::list<IrcMessageData>& getData() const;
 };
 
 #endif

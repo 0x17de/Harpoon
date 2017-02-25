@@ -81,6 +81,7 @@ set(SOURCE_FILES
     src/event/hack/EventHackMessage.cpp
     src/event/hack/EventHackPartChannel.cpp
     src/event/hack/EventHackParted.cpp
+    src/event/hack/EventHackRequestBacklog.cpp
     src/event/hack/EventHackSendMessage.cpp
     src/event/hack/EventHackServiceInit.cpp
     src/event/hack/EventHackUserlistReceived.cpp

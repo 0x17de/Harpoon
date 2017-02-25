@@ -231,7 +231,7 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                                 appQueue->sendEvent(std::make_shared<EventIrcBacklogResponse>(request->getUserId(),
                                                                                               request->getServerId(),
                                                                                               request->getChannelName(),
-                                                                                              std::list<MessageData>()));
+                                                                                              std::list<IrcMessageData>()));
                             } else {
                                 // we got the channel_ref id
                                 std::string channelRefId = results.front();
@@ -260,7 +260,7 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                             if (realOrigin->getEventUuid() == EventIrcRequestBacklog::uuid) {
                                 auto request = realOrigin->as<EventIrcRequestBacklog>();
 
-                                std::list<MessageData> data;
+                                std::list<IrcMessageData> data;
 
                                 auto it = result->getResults().begin();
                                 auto end = result->getResults().end();
