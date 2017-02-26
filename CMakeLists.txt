@@ -75,6 +75,10 @@ set(SOURCE_FILES
     src/event/EventQuit.cpp
     src/event/IEvent.cpp
     #src/event/hack/EventHackChatListing.cpp
+    src/event/hack/EventHackAddHost.cpp
+    src/event/hack/EventHackAddServer.cpp
+    src/event/hack/EventHackDeleteHost.cpp
+    src/event/hack/EventHackDeleteServer.cpp
     src/event/hack/EventHackConnected.cpp
     src/event/hack/EventHackJoinChannel.cpp
     src/event/hack/EventHackJoined.cpp
