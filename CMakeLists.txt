@@ -77,9 +77,11 @@ set(SOURCE_FILES
     #src/event/hack/EventHackChatListing.cpp
     src/event/hack/EventHackAddHost.cpp
     src/event/hack/EventHackAddServer.cpp
+    src/event/hack/EventHackConnected.cpp
     src/event/hack/EventHackDeleteHost.cpp
     src/event/hack/EventHackDeleteServer.cpp
-    src/event/hack/EventHackConnected.cpp
+    src/event/hack/EventHackReconnectServer.cpp
+    src/event/hack/EventHackDeleteChannel.cpp
     src/event/hack/EventHackJoinChannel.cpp
     src/event/hack/EventHackJoined.cpp
     src/event/hack/EventHackMessage.cpp
@@ -87,8 +89,13 @@ set(SOURCE_FILES
     src/event/hack/EventHackParted.cpp
     src/event/hack/EventHackRequestBacklog.cpp
     src/event/hack/EventHackSendMessage.cpp
+    src/event/hack/EventHackServerAdded.cpp
+    src/event/hack/EventHackServerDeleted.cpp
     src/event/hack/EventHackServiceInit.cpp
     src/event/hack/EventHackUserlistReceived.cpp
+    src/event/hack/HackServerListing.cpp
+    src/event/hack/HackChannelListing.cpp
+    src/event/hack/HackChannelUser.cpp
     src/event/hack/HackLoggable.cpp
     src/event/irc/EventIrcAction.cpp
     src/event/irc/EventIrcActivateService.cpp
