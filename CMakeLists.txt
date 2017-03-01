@@ -82,6 +82,8 @@ set(SOURCE_FILES
     src/event/hack/EventHackDeleteChannel.cpp
     src/event/hack/EventHackDeleteHost.cpp
     src/event/hack/EventHackDeleteServer.cpp
+    src/event/hack/EventHackHostAdded.cpp
+    src/event/hack/EventHackHostDeleted.cpp
     src/event/hack/EventHackJoinChannel.cpp
     src/event/hack/EventHackJoined.cpp
     src/event/hack/EventHackMessage.cpp
@@ -145,6 +147,7 @@ set(SOURCE_FILES
     src/service/hack/HackChannelLoginData.cpp
     src/service/hack/HackServerConfiguration.cpp
     src/service/hack/HackServerHostConfiguration.cpp
+    #src/service/hack/HackService.cpp
     src/service/irc/IrcBacklogService.cpp
     src/service/irc/IrcChannelLoginData.cpp
     src/service/irc/IrcChannelStore.cpp

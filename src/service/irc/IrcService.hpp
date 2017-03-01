@@ -1,5 +1,5 @@
-#ifndef USER_H
-#define USER_H
+#ifndef IRCSERVICE_H
+#define IRCSERVICE_H
 
 #include "queue/EventLoop.hpp"
 #include <map>
