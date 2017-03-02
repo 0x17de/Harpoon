@@ -1,7 +1,21 @@
 #include "HackDatabase_Ini.hpp"
-#include "event/hack/EventHackServiceInit.hpp"
 #include "event/EventQuit.hpp"
 #include "event/EventLoginResult.hpp"
+#include "event/hack/EventHackServiceInit.hpp"
+#include "event/hack/EventHackAddServer.hpp"
+#include "event/hack/EventHackServerAdded.hpp"
+#include "event/hack/EventHackDeleteServer.hpp"
+#include "event/hack/EventHackServerDeleted.hpp"
+#include "event/hack/EventHackModifyNick.hpp"
+#include "event/hack/EventHackAddHost.hpp"
+#include "event/hack/EventHackHostAdded.hpp"
+#include "event/hack/EventHackDeleteHost.hpp"
+#include "event/hack/EventHackHostDeleted.hpp"
+#include "event/hack/EventHackJoinChannel.hpp"
+#include "event/hack/EventHackPartChannel.hpp"
+#include "event/hack/EventHackDeleteChannel.hpp"
+#include "event/hack/EventHackActivateService.hpp"
+#include "service/hack/HackServerConfiguration.hpp"
 #include "utils/Filesystem.hpp"
 #include "utils/Ini.hpp"
 #include "utils/IdProvider.hpp"
@@ -148,16 +162,16 @@ bool HackDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
         bool existed = hostsConfig.hasCategory(hostKey.str());
         if (!existed) {
             auto& hostEntry = hostsConfig.expectCategory(hostKey.str());
-            hostsConfig.setEntry(hostEntry, "password", add->getPassword());
+            hostsConfig.setEntry(hostEntry, "websocketUri", add->getWebsocketUri());
             hostsConfig.setEntry(hostEntry, "ipv6", add->getIpV6() ? "y" : "n");
             hostsConfig.setEntry(hostEntry, "ssl", add->getSsl() ? "y" : "n");
             appQueue->sendEvent(make_shared<EventHackHostAdded>(add->getUserId(),
-                                                               add->getServerId(),
-                                                               add->getHost(),
-                                                               add->getPort(),
-                                                               add->getPassword(),
-                                                               add->getIpV6(),
-                                                               add->getSsl()));
+                                                                add->getServerId(),
+                                                                add->getHost(),
+                                                                add->getWebsocketUri(),
+                                                                add->getPort(),
+                                                                add->getIpV6(),
+                                                                add->getSsl()));
         } else {
             cout << "IMPL ERROR: HOST ALREADY EXISTS" << endl;
         }
@@ -193,18 +207,13 @@ bool HackDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
         Ini channelsConfig(serverChannelsConfigFilename.str());
 
         // save data from join event to ini
-        for (auto& loginData : join->getLoginData()) {
-            auto& channelEntry = channelsConfig.expectCategory(loginData.name);
-            string channelId;
-            if (!channelsConfig.getEntry(channelEntry, "id", channelId)) {
-                channelId = to_string(IdProvider::getInstance().generateNewId("channel"));
-                channelsConfig.setEntry(channelEntry, "id", channelId);
-                channelsConfig.setEntry(channelEntry, "password", loginData.password);
-            }
-            channelsConfig.setEntry(channelEntry, "disabled", "no");
-            if (loginData.passwordSpecified)
-                channelsConfig.setEntry(channelEntry, "password", loginData.password);
+        auto& channelEntry = channelsConfig.expectCategory(join->getChannel());
+        string channelId;
+        if (!channelsConfig.getEntry(channelEntry, "id", channelId)) {
+            channelId = to_string(IdProvider::getInstance().generateNewId("channel"));
+            channelsConfig.setEntry(channelEntry, "id", channelId);
         }
+        channelsConfig.setEntry(channelEntry, "disabled", "no");
         break;
     }
     case EventHackPartChannel::uuid: {
@@ -220,11 +229,9 @@ bool HackDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
         Ini channelsConfig(serverChannelsConfigFilename.str());
 
         // save data from join event to ini
-        for (const auto& channelName : part->getChannels()) {
-            auto* categoryEntry = channelsConfig.getEntry(channelName);
-            if (categoryEntry)
-                channelsConfig.setEntry(*categoryEntry, "disabled", "yes");
-        }
+        auto* categoryEntry = channelsConfig.getEntry(part->getChannel());
+        if (categoryEntry)
+            channelsConfig.setEntry(*categoryEntry, "disabled", "yes");
         break;
     }
     case EventHackDeleteChannel::uuid: {
@@ -311,14 +318,14 @@ bool HackDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
                     hostDataIs >> port;
 
                     // read host settings
-                    string password, ipV6, ssl;
-                    hostsConfig.getEntry(host, "password", password);
+                    string websocketUri, ipV6, ssl;
+                    hostsConfig.getEntry(host, "websocketUri", websocketUri);
                     hostsConfig.getEntry(host, "ipv6", ipV6);
                     hostsConfig.getEntry(host, "ssl", ssl);
 
                     loginConfiguration.addHostConfiguration(hostName,
+                                                            websocketUri,
                                                             port,
-                                                            password,
                                                             ipV6 == "y",
                                                             ssl == "y");
                 }
@@ -337,13 +344,12 @@ bool HackDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
                     size_t channelId;
                     string channelIdStr, channelPassword, channelDisabled;
                     channelsConfig.getEntry(channel, "id", channelIdStr);
-                    channelsConfig.getEntry(channel, "password", channelPassword);
                     if (!channelsConfig.getEntry(channel, "disabled", channelDisabled))
                         channelDisabled = "no";
                     istringstream(channelIdStr) >> channelId;
 
                     // add channel to event
-                    loginConfiguration.addChannelLoginData(channelId, channelName, channelPassword, channelDisabled == "yes");
+                    loginConfiguration.addChannelLoginData(channelId, channelName, channelDisabled == "yes");
                 }
 
                 // add nicks

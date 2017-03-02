@@ -1,5 +1,5 @@
 #include "EventHackActivateService.hpp"
-//#include "service/hack/HackService.hpp"
+#include "service/hack/HackService.hpp"
 #include "service/hack/HackConnection.hpp"
 #include "service/hack/HackChannelLoginData.hpp"
 #include "service/hack/HackServerHostConfiguration.hpp"
@@ -20,7 +20,7 @@ EventHackActivateService::EventHackActivateService(size_t userId)
 
 std::shared_ptr<EventLoop> EventHackActivateService::instantiateService(size_t userId, EventQueue* appQueue) const
 {
-    //return make_shared<HackService>(userId, appQueue);
+    return make_shared<HackService>(userId, appQueue);
 }
 
 size_t EventHackActivateService::getUserId() const {

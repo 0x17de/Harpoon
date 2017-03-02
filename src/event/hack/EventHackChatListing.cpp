@@ -15,9 +15,9 @@ EventHackChatListing::EventHackChatListing(size_t firstId,
 {
 }
 
-HackServerListing& EventHackChatListing::addServer(std::string activeNick,
+HackServerListing& EventHackChatListing::addServer(const std::string& activeNick,
                                                    size_t serverId,
-                                                   std::string serverName) {
+                                                   const std::string& serverName) {
     servers.emplace_back(activeNick, serverId, serverName);
     return servers.back();
 }

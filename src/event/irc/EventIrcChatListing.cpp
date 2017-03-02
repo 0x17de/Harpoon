@@ -15,9 +15,9 @@ EventIrcChatListing::EventIrcChatListing(size_t firstId,
 {
 }
 
-IrcServerListing& EventIrcChatListing::addServer(std::string activeNick,
+IrcServerListing& EventIrcChatListing::addServer(const std::string& activeNick,
                                                  size_t serverId,
-                                                 std::string serverName) {
+                                                 const std::string& serverName) {
     servers.emplace_back(activeNick, serverId, serverName);
     return servers.back();
 }

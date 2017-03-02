@@ -19,9 +19,9 @@ public:
     EventHackChatListing(size_t firstId,
                          size_t userId,
                          void* data);
-    HackServerListing& addServer(std::string activeNick,
+    HackServerListing& addServer(const std::string& activeNick,
                                  size_t serverId,
-                                 std::string serverName);
+                                 const std::string& serverName);
 
     size_t getFirstId() const;
     virtual size_t getUserId() const override;

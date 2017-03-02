@@ -57,7 +57,7 @@ set(SOURCE_FILES
     src/app/Application.cpp
     src/app/ApplicationGuard.cpp
     src/db/GenericIniDatabase.cpp
-    #src/db/HackDatabase_Ini.cpp
+    src/db/HackDatabase_Ini.cpp
     src/db/IrcDatabase_Dummy.cpp
     src/db/IrcDatabase_Ini.cpp
     src/db/LoginDatabase_Dummy.cpp
@@ -75,9 +75,11 @@ set(SOURCE_FILES
     src/event/EventQuit.cpp
     src/event/IEvent.cpp
     #src/event/hack/EventHackChatListing.cpp
+    src/event/hack/EventHackActivateService.cpp
     src/event/hack/EventHackAddHost.cpp
     src/event/hack/EventHackAddServer.cpp
     src/event/hack/EventHackBacklogResponse.cpp
+    src/event/hack/EventHackChatListing.cpp
     src/event/hack/EventHackConnected.cpp
     src/event/hack/EventHackDeleteChannel.cpp
     src/event/hack/EventHackDeleteHost.cpp
@@ -87,6 +89,8 @@ set(SOURCE_FILES
     src/event/hack/EventHackJoinChannel.cpp
     src/event/hack/EventHackJoined.cpp
     src/event/hack/EventHackMessage.cpp
+    src/event/hack/EventHackModifyNick.cpp
+    src/event/hack/EventHackNickModified.cpp
     src/event/hack/EventHackPartChannel.cpp
     src/event/hack/EventHackParted.cpp
     src/event/hack/EventHackReconnectServer.cpp
@@ -145,13 +149,17 @@ set(SOURCE_FILES
     src/queue/EventQueue.cpp
     src/service/hack/HackBacklogService.cpp
     src/service/hack/HackChannelLoginData.cpp
+    src/service/hack/HackChannelStore.cpp
+    src/service/hack/HackConnection.cpp
+    src/service/hack/HackConnection_Impl.cpp
     src/service/hack/HackServerConfiguration.cpp
     src/service/hack/HackServerHostConfiguration.cpp
-    #src/service/hack/HackService.cpp
+    src/service/hack/HackService.cpp
     src/service/irc/IrcBacklogService.cpp
     src/service/irc/IrcChannelLoginData.cpp
     src/service/irc/IrcChannelStore.cpp
-    src/service/irc/IrcConnection.cpp src/service/irc/IrcConnection_Impl.cpp
+    src/service/irc/IrcConnection.cpp
+    src/service/irc/IrcConnection_Impl.cpp
     src/service/irc/IrcEvents.cpp
     src/service/irc/IrcServerConfiguration.cpp
     src/service/irc/IrcServerHostConfiguration.cpp
