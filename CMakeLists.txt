@@ -40,6 +40,9 @@ endmacro()
 
 # REPORTING
 
+process_flag(0 USE_IRC_PROTOCOL 1 "Enable the irc protocol support")
+process_flag(0 USE_HACK_PROTOCOL 0 "Enable the hack protocol support")
+
 process_flag(0 USE_WEBSOCKET_SERVER 1 "Using websocket server")
   process_flag(1 USE_WEBSOCKET_SERVER_VERBOSE 0 "Verbose websocket messages")
   process_flag(1 Seasocks_GIT 0 "Get seasocks from git")
@@ -57,9 +60,6 @@ set(SOURCE_FILES
     src/app/Application.cpp
     src/app/ApplicationGuard.cpp
     src/db/GenericIniDatabase.cpp
-    src/db/HackDatabase_Ini.cpp
-    src/db/IrcDatabase_Dummy.cpp
-    src/db/IrcDatabase_Ini.cpp
     src/db/LoginDatabase_Dummy.cpp
     src/db/LoginDatabase_Ini.cpp
     src/db/query/Database_QueryBase.cpp
@@ -74,36 +74,34 @@ set(SOURCE_FILES
     src/event/EventQuery.cpp
     src/event/EventQuit.cpp
     src/event/IEvent.cpp
-    #src/event/hack/EventHackChatListing.cpp
-    src/event/hack/EventHackActivateService.cpp
-    src/event/hack/EventHackAddHost.cpp
-    src/event/hack/EventHackAddServer.cpp
-    src/event/hack/EventHackBacklogResponse.cpp
-    src/event/hack/EventHackChatListing.cpp
-    src/event/hack/EventHackConnected.cpp
-    src/event/hack/EventHackDeleteChannel.cpp
-    src/event/hack/EventHackDeleteHost.cpp
-    src/event/hack/EventHackDeleteServer.cpp
-    src/event/hack/EventHackHostAdded.cpp
-    src/event/hack/EventHackHostDeleted.cpp
-    src/event/hack/EventHackJoinChannel.cpp
-    src/event/hack/EventHackJoined.cpp
-    src/event/hack/EventHackMessage.cpp
-    src/event/hack/EventHackModifyNick.cpp
-    src/event/hack/EventHackNickModified.cpp
-    src/event/hack/EventHackPartChannel.cpp
-    src/event/hack/EventHackParted.cpp
-    src/event/hack/EventHackReconnectServer.cpp
-    src/event/hack/EventHackRequestBacklog.cpp
-    src/event/hack/EventHackSendMessage.cpp
-    src/event/hack/EventHackServerAdded.cpp
-    src/event/hack/EventHackServerDeleted.cpp
-    src/event/hack/EventHackServiceInit.cpp
-    src/event/hack/EventHackUserlistReceived.cpp
-    src/event/hack/HackChannelListing.cpp
-    src/event/hack/HackChannelUser.cpp
-    src/event/hack/HackLoggable.cpp
-    src/event/hack/HackServerListing.cpp
+    src/queue/EventLoop.cpp
+    src/queue/EventQueue.cpp
+    src/user/UserManager.cpp
+    src/utils/Base64.cpp
+    src/utils/Crypto.cpp
+    src/utils/Filesystem.cpp
+    src/utils/IdProvider.cpp
+    src/utils/Ini.cpp
+    src/utils/ModuleProvider.cpp
+    src/utils/Password.cpp)
+
+set(TEST_SOURCE_FILES
+    src/test.cpp src/test.hpp
+    src/tests/TestModules.cpp)
+
+
+# LIBRARIES
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+set(LINK_LIBRARIES "Threads::Threads")
+set(INCLUDE_DIRECTORIES "")
+
+
+if(USE_IRC_PROTOCOL)
+  list(APPEND SOURCE_FILES
+    src/db/IrcDatabase_Dummy.cpp
+    src/db/IrcDatabase_Ini.cpp
     src/event/irc/EventIrcAction.cpp
     src/event/irc/EventIrcActivateService.cpp
     src/event/irc/EventIrcAddHost.cpp
@@ -145,16 +143,6 @@ set(SOURCE_FILES
     src/event/irc/IrcChannelUser.cpp
     src/event/irc/IrcLoggable.cpp
     src/event/irc/IrcServerListing.cpp
-    src/queue/EventLoop.cpp
-    src/queue/EventQueue.cpp
-    src/service/hack/HackBacklogService.cpp
-    src/service/hack/HackChannelLoginData.cpp
-    src/service/hack/HackChannelStore.cpp
-    src/service/hack/HackConnection.cpp
-    src/service/hack/HackConnection_Impl.cpp
-    src/service/hack/HackServerConfiguration.cpp
-    src/service/hack/HackServerHostConfiguration.cpp
-    src/service/hack/HackService.cpp
     src/service/irc/IrcBacklogService.cpp
     src/service/irc/IrcChannelLoginData.cpp
     src/service/irc/IrcChannelStore.cpp
@@ -163,28 +151,52 @@ set(SOURCE_FILES
     src/service/irc/IrcEvents.cpp
     src/service/irc/IrcServerConfiguration.cpp
     src/service/irc/IrcServerHostConfiguration.cpp
-    src/service/irc/IrcService.cpp
-    src/user/UserManager.cpp
-    src/utils/Base64.cpp
-    src/utils/Crypto.cpp
-    src/utils/Filesystem.cpp
-    src/utils/IdProvider.cpp
-    src/utils/Ini.cpp
-    src/utils/ModuleProvider.cpp
-    src/utils/Password.cpp)
+    src/service/irc/IrcService.cpp)
+endif()
 
-set(TEST_SOURCE_FILES
-    src/test.cpp src/test.hpp
-    src/tests/TestModules.cpp)
-
-
-# LIBRARIES
-
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
-set(LINK_LIBRARIES "Threads::Threads")
-set(INCLUDE_DIRECTORIES "")
-
+if(USE_HACK_PROTOCOL)
+  list(APPEND SOURCE_FILES
+    src/db/HackDatabase_Ini.cpp
+    #src/event/hack/EventHackChatListing.cpp
+    src/event/hack/EventHackActivateService.cpp
+    src/event/hack/EventHackAddHost.cpp
+    src/event/hack/EventHackAddServer.cpp
+    src/event/hack/EventHackBacklogResponse.cpp
+    src/event/hack/EventHackChatListing.cpp
+    src/event/hack/EventHackConnected.cpp
+    src/event/hack/EventHackDeleteChannel.cpp
+    src/event/hack/EventHackDeleteHost.cpp
+    src/event/hack/EventHackDeleteServer.cpp
+    src/event/hack/EventHackHostAdded.cpp
+    src/event/hack/EventHackHostDeleted.cpp
+    src/event/hack/EventHackJoinChannel.cpp
+    src/event/hack/EventHackJoined.cpp
+    src/event/hack/EventHackMessage.cpp
+    src/event/hack/EventHackModifyNick.cpp
+    src/event/hack/EventHackNickModified.cpp
+    src/event/hack/EventHackPartChannel.cpp
+    src/event/hack/EventHackParted.cpp
+    src/event/hack/EventHackReconnectServer.cpp
+    src/event/hack/EventHackRequestBacklog.cpp
+    src/event/hack/EventHackSendMessage.cpp
+    src/event/hack/EventHackServerAdded.cpp
+    src/event/hack/EventHackServerDeleted.cpp
+    src/event/hack/EventHackServiceInit.cpp
+    src/event/hack/EventHackUserlistReceived.cpp
+    src/event/hack/HackChannelListing.cpp
+    src/event/hack/HackChannelUser.cpp
+    src/event/hack/HackLoggable.cpp
+    src/event/hack/HackServerListing.cpp
+    src/service/hack/HackBacklogService.cpp
+    src/service/hack/HackChannelLoginData.cpp
+    src/service/hack/HackChannelStore.cpp
+    src/service/hack/HackConnection.cpp
+    src/service/hack/HackConnection_Impl.cpp
+    src/service/hack/HackServerConfiguration.cpp
+    src/service/hack/HackServerHostConfiguration.cpp
+    src/service/hack/HackService.cpp)
+  add_definitions(-DUSE_HACK_PROTOCOL)
+endif()
 
 
 if(USE_POSTGRES_DATABASE)

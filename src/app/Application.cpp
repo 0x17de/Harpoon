@@ -7,7 +7,15 @@
 #include "queue/EventQueue.hpp"
 #include "user/UserManager.hpp"
 #include "event/EventInit.hpp"
+
+#ifdef USE_IRC_PROTOCOL
 #include "event/irc/EventIrcServiceInit.hpp"
+#endif
+
+#ifdef USE_HACK_PROTOCOL
+#include "event/hack/EventHackServiceInit.hpp"
+#endif
+
 #include "event/EventQuit.hpp"
 #include "utils/ModuleProvider.hpp"
 
@@ -42,6 +50,7 @@ Application::Application()
     auto& moduleProvider = ModuleProvider::getInstance();
     eventHandlers.push_back(moduleProvider.initializeModule("login_database", loginDatabaseType, queue));
 
+#ifdef USE_IRC_PROTOCOL
     // load irc settings
     string enableIrcService;
     coreIni.getEntry(services, "irc", enableIrcService);
@@ -60,13 +69,35 @@ Application::Application()
         else
             queue->sendEvent(make_shared<EventIrcServiceInit>());
     }
+#endif
 
     if (databaseType != "" && databaseType != "none")
         eventHandlers.push_back(moduleProvider.initializeModule("database", databaseType, queue));
 
 #ifdef USE_WEBSOCKET_SERVER
-    if (enableWebChat == "y")
+    if (enableWebChat == "y") {
         eventHandlers.push_back(moduleProvider.initializeModule("server", "websocket", queue));
+    }
+#endif
+
+#ifdef USE_HACK_PROTOCOL
+    string enableHackService;
+    coreIni.getEntry(services, "irc", enableHackService);
+    if (enableHackService == "y") {
+        Ini hackIni("config/hack.ini");
+        auto& modules = hackIni.expectCategory("modules");
+
+        string hackDatabaseType,
+            backlogEnabled;
+        hackIni.getEntry(modules, "settings_database", hackDatabaseType);
+        hackIni.getEntry(modules, "backlog", backlogEnabled);
+
+        eventHandlers.push_back(moduleProvider.initializeModule("hack_database", hackDatabaseType, queue));
+        if (backlogEnabled == "y")
+            eventHandlers.push_back(moduleProvider.initializeModule("hack_backlog", "default", queue));
+        else
+            queue->sendEvent(make_shared<EventHackServiceInit>());
+    }
 #endif
 
     for (auto& eventHandler : eventHandlers)

@@ -24,9 +24,9 @@ using namespace std;
 
 
 HackConnection_Impl::HackConnection_Impl(EventQueue* appQueue,
-                                       EventQueue* queue,
-                                       size_t userId,
-                                       const HackServerConfiguration& configuration)
+                                         EventQueue* queue,
+                                         size_t userId,
+                                         const HackServerConfiguration& configuration)
     : appQueue{appQueue}
     , queue{queue}
     , userId{userId}

@@ -22,7 +22,10 @@ class HackChannelLoginData;
 class HackConnection_Impl {
     static std::string getPureNick(const std::string& nick);
 public:
-    HackConnection_Impl(EventQueue* appQueue, EventQueue* queue, size_t userId, const HackServerConfiguration& configuration);
+    HackConnection_Impl(EventQueue* appQueue,
+                        EventQueue* queue,
+                        size_t userId,
+                        const HackServerConfiguration& configuration);
     ~HackConnection_Impl();
 
     static const std::map<char, char> prefixToMode;
