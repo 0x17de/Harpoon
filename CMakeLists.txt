@@ -152,6 +152,7 @@ if(USE_IRC_PROTOCOL)
     src/service/irc/IrcServerConfiguration.cpp
     src/service/irc/IrcServerHostConfiguration.cpp
     src/service/irc/IrcService.cpp)
+  add_definitions(-DUSE_IRC_PROTOCOL)
 endif()
 
 if(USE_HACK_PROTOCOL)

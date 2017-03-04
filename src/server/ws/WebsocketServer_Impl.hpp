@@ -4,33 +4,13 @@
 #include <memory>
 #include <unordered_map>
 #include <thread>
+#include <string>
 #include <seasocks/WebSocket.h>
 #include <seasocks/Server.h>
+#include "WebsocketHandler.hpp"
 
 class EventQueue;
 
-
-struct WebsocketClientData {
-public:
-    WebsocketClientData(size_t userId, seasocks::WebSocket* socket);
-    size_t userId;
-    seasocks::WebSocket* socket;
-};
-
-class WebsocketHandler : public seasocks::WebSocket::Handler {
-    EventQueue* appQueue;
-    EventQueue* queue;
-    const std::unordered_map<seasocks::WebSocket*, std::list<WebsocketClientData>::iterator>& clients;
-public:
-
-    WebsocketHandler(EventQueue* appQueue,
-                     EventQueue* queue,
-                     const std::unordered_map<seasocks::WebSocket*, std::list<WebsocketClientData>::iterator>& clients);
-    virtual ~WebsocketHandler();
-    virtual void onConnect(seasocks::WebSocket* connection);
-    virtual void onData(seasocks::WebSocket* connection, const char* data);
-    virtual void onDisconnect(seasocks::WebSocket* connection);
-};
 
 class WebsocketServer_Impl {
     EventQueue* queue;
