@@ -234,10 +234,7 @@ if(USE_WEBSOCKET_SERVER)
     endif()
     list(APPEND SOURCE_FILES
         src/server/ws/WebsocketServer.cpp
-        src/server/ws/WebsocketServer_Impl.cpp
-        src/server/ws/WebsocketHandler.cpp
-        src/server/ws/WebsocketServer.hpp
-        src/server/ws/WebsocketServer_Impl.hpp)
+        src/server/ws/WebsocketHandler.cpp)
     add_definitions(-DUSE_WEBSOCKET_SERVER)
     if(NOT Seasocks_GIT)
         find_package(Seasocks REQUIRED)

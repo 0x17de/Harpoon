@@ -1,5 +1,4 @@
 #include "WebsocketServer.hpp"
-#include "WebsocketServer_Impl.hpp"
 #include "event/EventLogin.hpp"
 #include "event/EventLogout.hpp"
 #include "event/EventQuery.hpp"
