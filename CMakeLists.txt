@@ -147,7 +147,6 @@ if(USE_IRC_PROTOCOL)
     src/service/irc/IrcChannelLoginData.cpp
     src/service/irc/IrcChannelStore.cpp
     src/service/irc/IrcConnection.cpp
-    src/service/irc/IrcConnection_Impl.cpp
     src/service/irc/IrcEvents.cpp
     src/service/irc/IrcServerConfiguration.cpp
     src/service/irc/IrcServerHostConfiguration.cpp

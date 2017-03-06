@@ -1,4 +1,4 @@
-#include "IrcConnection_Impl.hpp"
+#include "IrcConnection.hpp"
 #include "queue/EventQueue.hpp"
 #include "event/irc/EventIrcConnected.hpp"
 #include "event/irc/EventIrcModeChanged.hpp"
@@ -18,7 +18,7 @@
 using namespace std;
 
 
-void IrcConnection_Impl::onConnect(irc_session_t* session,
+void IrcConnection::onConnect(irc_session_t* session,
                                    const char* event,
                                    const char* origin,
                                    const std::vector<std::string>& params,
@@ -39,7 +39,7 @@ void IrcConnection_Impl::onConnect(irc_session_t* session,
     resultEvent = make_shared<EventIrcConnected>(userId, configuration.getServerId());
 }
 
-void IrcConnection_Impl::onNick(irc_session_t* session,
+void IrcConnection::onNick(irc_session_t* session,
                                 const char* event,
                                 const char* origin,
                                 const std::vector<std::string>& params,
@@ -52,7 +52,7 @@ void IrcConnection_Impl::onNick(irc_session_t* session,
     resultEvent = make_shared<EventIrcNickChanged>(userId, configuration.getServerId(), who, newNick);
 }
 
-void IrcConnection_Impl::onQuit(irc_session_t* session,
+void IrcConnection::onQuit(irc_session_t* session,
                                 const char* event,
                                 const char* origin,
                                 const std::vector<std::string>& params,
@@ -64,7 +64,7 @@ void IrcConnection_Impl::onQuit(irc_session_t* session,
     resultEvent = make_shared<EventIrcQuit>(userId, configuration.getServerId(), who, reason);
 }
 
-void IrcConnection_Impl::onJoin(irc_session_t* session,
+void IrcConnection::onJoin(irc_session_t* session,
                                 const char* event,
                                 const char* origin,
                                 const std::vector<std::string>& params,
@@ -77,7 +77,7 @@ void IrcConnection_Impl::onJoin(irc_session_t* session,
     cout << "JOIN<" << who << ">: " << channel << endl;
 }
 
-void IrcConnection_Impl::onPart(irc_session_t* session,
+void IrcConnection::onPart(irc_session_t* session,
                                 const char* event,
                                 const char* origin,
                                 const std::vector<std::string>& params,
@@ -91,7 +91,7 @@ void IrcConnection_Impl::onPart(irc_session_t* session,
     cout << "PART<" << who << ">: " << channel << ": " << reason << endl;
 }
 
-void IrcConnection_Impl::onMode(irc_session_t* session,
+void IrcConnection::onMode(irc_session_t* session,
                                 const char* event,
                                 const char* origin,
                                 const std::vector<std::string>& params,
@@ -109,7 +109,7 @@ void IrcConnection_Impl::onMode(irc_session_t* session,
     cout << endl;
 }
 
-void IrcConnection_Impl::onUmode(irc_session_t* session,
+void IrcConnection::onUmode(irc_session_t* session,
                                  const char* event,
                                  const char* origin,
                                  const std::vector<std::string>& params,
@@ -123,7 +123,7 @@ void IrcConnection_Impl::onUmode(irc_session_t* session,
     cout << "UMODE<" << who << ">: " << channel << " " << mode << endl;
 }
 
-void IrcConnection_Impl::onTopic(irc_session_t* session,
+void IrcConnection::onTopic(irc_session_t* session,
                                  const char* event,
                                  const char* origin,
                                  const std::vector<std::string>& params,
@@ -137,7 +137,7 @@ void IrcConnection_Impl::onTopic(irc_session_t* session,
     resultEvent = make_shared<EventIrcTopic>(userId, configuration.getServerId(), who, channel, topic);
 }
 
-void IrcConnection_Impl::onKick(irc_session_t* session,
+void IrcConnection::onKick(irc_session_t* session,
                                 const char* event,
                                 const char* origin,
                                 const std::vector<std::string>& params,
@@ -151,7 +151,7 @@ void IrcConnection_Impl::onKick(irc_session_t* session,
     resultEvent = make_shared<EventIrcKicked>(userId, configuration.getServerId(), who, channel, target, reason);
 }
 
-void IrcConnection_Impl::onChannel(irc_session_t* session,
+void IrcConnection::onChannel(irc_session_t* session,
                                    const char* event,
                                    const char* origin,
                                    const std::vector<std::string>& params,
@@ -165,7 +165,7 @@ void IrcConnection_Impl::onChannel(irc_session_t* session,
     resultEvent = make_shared<EventIrcMessage>(userId, configuration.getServerId(), who, channel, message, IrcMessageType::Message);
 }
 
-void IrcConnection_Impl::onPrivmsg(irc_session_t* session,
+void IrcConnection::onPrivmsg(irc_session_t* session,
                                    const char* event,
                                    const char* origin,
                                    const std::vector<std::string>& params,
@@ -179,7 +179,7 @@ void IrcConnection_Impl::onPrivmsg(irc_session_t* session,
     resultEvent = make_shared<EventIrcMessage>(userId, configuration.getServerId(), who, who, message, IrcMessageType::Message);
 }
 
-void IrcConnection_Impl::onNotice(irc_session_t* session,
+void IrcConnection::onNotice(irc_session_t* session,
                                   const char* event,
                                   const char* origin,
                                   const std::vector<std::string>& params,
@@ -193,7 +193,7 @@ void IrcConnection_Impl::onNotice(irc_session_t* session,
     cout << "N<" << who << "|" << target << ">: " << message << endl;
 }
 
-void IrcConnection_Impl::onChannelNotice(irc_session_t* session,
+void IrcConnection::onChannelNotice(irc_session_t* session,
                                          const char* event,
                                          const char* origin,
                                          const std::vector<std::string>& params,
@@ -207,7 +207,7 @@ void IrcConnection_Impl::onChannelNotice(irc_session_t* session,
     cout << "CN<" << who << "|" << channel << ">: " << message << endl;
 }
 
-void IrcConnection_Impl::onInvite(irc_session_t* session,
+void IrcConnection::onInvite(irc_session_t* session,
                                   const char* event,
                                   const char* origin,
                                   const std::vector<std::string>& params,
@@ -221,7 +221,7 @@ void IrcConnection_Impl::onInvite(irc_session_t* session,
     cout << "Invite<" << who << ">: " << channel << ": " << target << endl;
 }
 
-void IrcConnection_Impl::onCtcpReq(irc_session_t* session,
+void IrcConnection::onCtcpReq(irc_session_t* session,
                                    const char* event,
                                    const char* origin,
                                    const std::vector<std::string>& params,
@@ -230,7 +230,7 @@ void IrcConnection_Impl::onCtcpReq(irc_session_t* session,
 #pragma message "stub onCtcpReq"
 }
 
-void IrcConnection_Impl::onCtcpRep(irc_session_t* session,
+void IrcConnection::onCtcpRep(irc_session_t* session,
                                    const char* event,
                                    const char* origin,
                                    const std::vector<std::string>& params,
@@ -239,7 +239,7 @@ void IrcConnection_Impl::onCtcpRep(irc_session_t* session,
 #pragma message "stub onCtcpRep"
 }
 
-void IrcConnection_Impl::onCtcpAction(irc_session_t* session,
+void IrcConnection::onCtcpAction(irc_session_t* session,
                                       const char* event,
                                       const char* origin,
                                       const std::vector<std::string>& params,
@@ -253,7 +253,7 @@ void IrcConnection_Impl::onCtcpAction(irc_session_t* session,
     cout << "Action<" << who << ">: " << target << ": " << message << endl;
 }
 
-void IrcConnection_Impl::onNumeric(irc_session_t* session,
+void IrcConnection::onNumeric(irc_session_t* session,
                                    unsigned int event,
                                    const char* origin,
                                    const std::vector<std::string>& parameters,
@@ -267,7 +267,7 @@ void IrcConnection_Impl::onNumeric(irc_session_t* session,
     cout << endl;
 }
 
-void IrcConnection_Impl::onUnknown(irc_session_t* session,
+void IrcConnection::onUnknown(irc_session_t* session,
                                    const char* event,
                                    const char* origin,
                                    const std::vector<std::string>& params,
