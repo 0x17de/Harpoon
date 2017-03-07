@@ -23,7 +23,9 @@ class EventQueue;
 class EventLoop;
 class ModuleProvider {
     using LoopPtr = std::shared_ptr<EventLoop>;
-    using InitializerMap = std::map<std::string, std::function<LoopPtr(EventQueue*)>>;
+    using LoopInitializer = std::function<LoopPtr(EventQueue*)>;
+    using InitializerMap = std::map<std::string, LoopInitializer>;
+    using InitializerCallback = std::function<LoopPtr(EventQueue*)>;
     std::map<std::string, InitializerMap> initializerByCategory;
 
     ModuleProvider();
@@ -34,7 +36,15 @@ public:
                              EventQueue* appQueue) const;
     void registerModule(const std::string& category,
                         const std::string& name,
-                        std::function<LoopPtr(EventQueue*)> initializer);
+                        InitializerCallback initializer);
+
+    template<class Fn>
+    void forEachModule(const std::string& category, Fn f) {
+        auto it = initializerByCategory.find(category);
+        if (it == initializerByCategory.end()) return;
+        InitializerMap& map = *it;
+        for (auto& p : map) f(p.first, p.second);
+    }
 };
 
 #endif
