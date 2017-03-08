@@ -1,5 +1,5 @@
 #include "queue/EventLoop.hpp"
-#include "ModuleProvider.hpp"
+#include "WebsocketProtocolHandlerProvider.hpp"
 #include <stdexcept>
 #include <sstream>
 #include <iostream>
@@ -7,17 +7,16 @@
 using namespace std;
 
 
-ModuleProvider::ModuleProvider() {
+WebsocketProtocolHandlerProvider::WebsocketProtocolHandlerProvider() {
 }
 
-ModuleProvider& ModuleProvider::getInstance() {
-    static ModuleProvider moduleProvider;
+WebsocketProtocolHandlerProvider& WebsocketProtocolHandlerProvider::getInstance() {
+    static WebsocketProtocolHandlerProvider moduleProvider;
     return moduleProvider;
 }
 
-ModuleProvider::InitializerResult ModuleProvider::initializeModule(const std::string& category,
-                                                         const std::string& name,
-                                                         EventQueue* appQueue) const {
+WebsocketProtocolHandlerProvider::InitializerResult WebsocketProtocolHandlerProvider::initializeModule(const std::string& category,
+                                                                                             const std::string& name) const {
     auto categoryIt = initializerByCategory.find(category);
     if (categoryIt == initializerByCategory.end())
         throw out_of_range(string("No module registered for category ") + category);
@@ -31,18 +30,18 @@ ModuleProvider::InitializerResult ModuleProvider::initializeModule(const std::st
         throw out_of_range(string("No module named ") + name + " found for category " + category + " (Available:" + ss.str() + ")");
     }
 
-    return initializerIt->second(appQueue);
+    return initializerIt->second();
 }
 
-void ModuleProvider::registerModule(const std::string& category,
-                                    const std::string& name,
-                                    InitializerCallback initializer) {
+void WebsocketProtocolHandlerProvider::registerModule(const std::string& category,
+                                                      const std::string& name,
+                                                      InitializerCallback initializer) {
     auto categoryIt = initializerByCategory.find(category);
     InitializerMap* initializerMap;
     if (categoryIt == initializerByCategory.end()) {
         auto resIt = initializerByCategory.emplace(piecewise_construct,
-                           forward_as_tuple(category),
-                           forward_as_tuple());
+                                                   forward_as_tuple(category),
+                                                   forward_as_tuple());
         initializerMap = &resIt.first->second;
     } else {
         initializerMap = &categoryIt->second;

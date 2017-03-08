@@ -5,34 +5,33 @@
 #include <map>
 #include <functional>
 
-#define PROVIDE_MODULE(category, name, className)                       \
+#define PROVIDE_WEBSOCKET_PROTOCOL_MODULE(category, name, className)    \
     static class ProvideModule_##className {                            \
     public:                                                             \
-    ProvideModule_##className() {                                       \
-            auto&& func = [](EventQueue* appQueue)->std::shared_ptr<EventLoop>{ \
+        ProvideModule_##className() {                                       \
+            auto&& func = [](EventQueue* appQueue)->std::shared_ptr<WebsocketProtocolHandler>{ \
                 return std::make_shared<className>(appQueue);           \
             };                                                          \
-            ModuleProvider::getInstance().registerModule(category,      \
-                                                         name,          \
-                                                         func);         \
+            WebsocketProtocolHandlerProvider::getInstance().registerModule(category, \
+                                                                           name, \
+                                                                           func); \
         }                                                               \
     } provideModule_##className
 
 
 class EventQueue;
-class EventLoop;
-class ModuleProvider {
-    using InitializerResult = std::shared_ptr<EventLoop>;
-    using InitializerCallback = std::function<InitializerResult(EventQueue*)>;
+class WebsocketProtocolHandler;
+class WebsocketProtocolHandlerProvider {
+    using InitializerResult = std::shared_ptr<WebsocketProtocolHandler>;
+    using InitializerCallback = std::function<InitializerResult()>;
     using InitializerMap = std::map<std::string, InitializerCallback>;
     std::map<std::string, InitializerMap> initializerByCategory;
 
-    ModuleProvider();
+    WebsocketProtocolHandlerProvider();
 public:
-    static ModuleProvider& getInstance();
+    static WebsocketProtocolHandlerProvider& getInstance();
     InitializerResult initializeModule(const std::string& category,
-                             const std::string& name,
-                             EventQueue* appQueue) const;
+                             const std::string& name) const;
     void registerModule(const std::string& category,
                         const std::string& name,
                         InitializerCallback initializer);

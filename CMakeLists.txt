@@ -83,6 +83,7 @@ set(SOURCE_FILES
     src/utils/IdProvider.cpp
     src/utils/Ini.cpp
     src/utils/ModuleProvider.cpp
+    src/utils/WebsocketProtocolHandlerProvider.cpp
     src/utils/Password.cpp)
 
 set(TEST_SOURCE_FILES
