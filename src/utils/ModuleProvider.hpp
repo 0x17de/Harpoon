@@ -5,18 +5,8 @@
 #include <map>
 #include <functional>
 
-#define PROVIDE_MODULE(category, name, className)                       \
-    static class ProvideModule_##className {                            \
-    public:                                                             \
-    ProvideModule_##className() {                                       \
-            auto&& func = [](EventQueue* appQueue)->std::shared_ptr<EventLoop>{ \
-                return std::make_shared<className>(appQueue);           \
-            };                                                          \
-            ModuleProvider::getInstance().registerModule(category,      \
-                                                         name,          \
-                                                         func);         \
-        }                                                               \
-    } provideModule_##className
+#define PROVIDE_MODULE(category, name, className)                   \
+    namespace { ProvideModule<className> provider(category, name); }
 
 
 class EventQueue;
@@ -43,6 +33,20 @@ public:
         if (it == initializerByCategory.end()) return;
         InitializerMap& map = *it;
         for (auto& p : map) f(p.first, p.second);
+    }
+};
+
+template<class Target>
+class ProvideModule {
+public:
+    ProvideModule(const std::string& category,
+                  const std::string& name) {
+        auto&& func = [](EventQueue* appQueue)->std::shared_ptr<EventLoop>{
+            return std::make_shared<Target>(appQueue);
+        };
+        ModuleProvider::getInstance().registerModule(category,
+                                                     name,
+                                                     func);
     }
 };
 

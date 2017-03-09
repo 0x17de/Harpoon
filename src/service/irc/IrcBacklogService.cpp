@@ -26,7 +26,7 @@
 #include <sstream>
 
 
-PROVIDE_MODULE("irc_backlog", "default", IrcBacklogService);
+PROVIDE_MODULE("irc_backlog", "default", IrcBacklogService)
 using namespace Query;
 
 

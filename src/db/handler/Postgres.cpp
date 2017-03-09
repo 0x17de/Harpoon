@@ -17,7 +17,7 @@ using namespace std;
 
 namespace Database {
 
-    PROVIDE_MODULE("database", "postgres", Postgres);
+    PROVIDE_MODULE("database", "postgres", Postgres)
 
 
     struct Postgres_Impl {
