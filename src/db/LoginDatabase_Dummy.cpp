@@ -9,7 +9,7 @@
 using namespace std;
 
 
-PROVIDE_MODULE("login_database", "dummy", LoginDatabase_Dummy)
+PROVIDE_EVENTLOOP_MODULE("login_database", "dummy", LoginDatabase_Dummy)
 
 LoginDatabase_Dummy::LoginDatabase_Dummy(EventQueue* appQueue)
     : EventLoop({

@@ -10,7 +10,7 @@
 using namespace std;
 
 
-PROVIDE_MODULE("login_database", "ini", LoginDatabase_Ini)
+PROVIDE_EVENTLOOP_MODULE("login_database", "ini", LoginDatabase_Ini)
 
 LoginDatabase_Ini::LoginDatabase_Ini(EventQueue* appQueue)
     : EventLoop({

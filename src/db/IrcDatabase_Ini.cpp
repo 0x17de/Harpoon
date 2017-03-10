@@ -28,7 +28,7 @@
 using namespace std;
 
 
-PROVIDE_MODULE("irc_database", "ini", IrcDatabase_Ini)
+PROVIDE_EVENTLOOP_MODULE("irc_database", "ini", IrcDatabase_Ini)
 
 IrcDatabase_Ini::IrcDatabase_Ini(EventQueue* appQueue) :
     EventLoop({

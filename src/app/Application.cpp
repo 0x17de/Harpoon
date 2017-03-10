@@ -47,7 +47,7 @@ Application::Application()
     coreIni.getEntry(modules, "webchat", enableWebChat);
     coreIni.getEntry(modules, "database", databaseType);
 
-    auto& moduleProvider = ModuleProvider::getInstance();
+    auto& moduleProvider = ModuleProvider<EventLoop>::getInstance();
     eventHandlers.push_back(moduleProvider.initializeModule("login_database", loginDatabaseType, queue));
 
 #ifdef USE_IRC_PROTOCOL

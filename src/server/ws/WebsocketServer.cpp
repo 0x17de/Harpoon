@@ -59,7 +59,7 @@ WebsocketClientData::WebsocketClientData(size_t userId, seasocks::WebSocket* soc
 }
 
 
-PROVIDE_MODULE("server", "websocket", WebsocketServer)
+PROVIDE_EVENTLOOP_MODULE("server", "websocket", WebsocketServer)
 
 
 
