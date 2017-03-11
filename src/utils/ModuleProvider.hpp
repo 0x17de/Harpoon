@@ -11,8 +11,11 @@
     namespace { ProvideModule<target, className> provider(category, name); }
 #define PROVIDE_EVENTLOOP_MODULE(category, name, className)             \
     namespace { ProvideModule<EventLoop, className> provider(category, name); }
+#define PROVIDE_WEBSOCKETPROTOCOL_MODULE(category, name, className)             \
+    namespace { ProvideModule<WebsocketProtocolHandler, className> provider(category, name); }
 
 
+class WebsocketProtocolHandler;
 class EventQueue;
 class EventLoop;
 
@@ -30,6 +33,18 @@ struct ModuleInitializer<EventLoop> {
         return std::make_shared<ModuleClass>(appQueue);
     }
 };
+
+template<>
+struct ModuleInitializer<WebsocketProtocolHandler> {
+    using return_type = std::shared_ptr<WebsocketProtocolHandler>;
+    using callback_type = return_type(*)();
+
+    template<class ModuleClass>
+    static std::shared_ptr<EventLoop> init() {
+        return std::make_shared<ModuleClass>();
+    }
+};
+
 
 
 template<class Target>
