@@ -150,6 +150,11 @@ if(USE_IRC_PROTOCOL)
     src/service/irc/IrcServerConfiguration.cpp
     src/service/irc/IrcServerHostConfiguration.cpp
     src/service/irc/IrcService.cpp)
+  if(USE_WEBSOCKET_SERVER)
+    list(APPEND SOURCE_FILES
+      src/server/ws/WebsocketHandler_Irc.cpp)
+  endif()
+
   add_definitions(-DUSE_IRC_PROTOCOL)
 endif()
 
@@ -232,7 +237,8 @@ if(USE_WEBSOCKET_SERVER)
     endif()
     list(APPEND SOURCE_FILES
         src/server/ws/WebsocketServer.cpp
-        src/server/ws/WebsocketHandler.cpp)
+        src/server/ws/WebsocketHandler.cpp
+        src/server/ws/WebsocketProtocolHandler.cpp)
     add_definitions(-DUSE_WEBSOCKET_SERVER)
     if(NOT Seasocks_GIT)
         find_package(Seasocks REQUIRED)

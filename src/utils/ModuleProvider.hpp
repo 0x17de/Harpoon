@@ -40,7 +40,7 @@ struct ModuleInitializer<WebsocketProtocolHandler> {
     using callback_type = return_type(*)();
 
     template<class ModuleClass>
-    static std::shared_ptr<EventLoop> init() {
+    static std::shared_ptr<WebsocketProtocolHandler> init() {
         return std::make_shared<ModuleClass>();
     }
 };
@@ -60,9 +60,8 @@ public:
         return moduleProvider;
     }
 
-    initializer_result initializeModule(const std::string& category,
-                                       const std::string& name,
-                                       EventQueue* appQueue) const {
+    typename ModuleInitializer<Target>::callback_type getInitializerFunction(const std::string& category,
+                                        const std::string& name) const {
         auto categoryIt = initializerByCategory.find(category);
         if (categoryIt == initializerByCategory.end())
             throw std::out_of_range("No module registered for category " + category);
@@ -76,7 +75,7 @@ public:
             throw std::out_of_range("No module named " + name + " found for category " + category + " (Available:" + ss.str() + ")");
         }
 
-        return initializerIt->second(appQueue);
+        return initializerIt->second;
     }
 
     void registerModule(const std::string& category,

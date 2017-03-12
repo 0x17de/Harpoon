@@ -48,7 +48,7 @@ Application::Application()
     coreIni.getEntry(modules, "database", databaseType);
 
     auto& moduleProvider = ModuleProvider<EventLoop>::getInstance();
-    eventHandlers.push_back(moduleProvider.initializeModule("login_database", loginDatabaseType, queue));
+    eventHandlers.push_back(moduleProvider.getInitializerFunction("login_database", loginDatabaseType)(queue));
 
 #ifdef USE_IRC_PROTOCOL
     // load irc settings
@@ -63,20 +63,20 @@ Application::Application()
         ircIni.getEntry(modules, "settings_database", ircDatabaseType);
         ircIni.getEntry(modules, "backlog", backlogEnabled);
 
-        eventHandlers.push_back(moduleProvider.initializeModule("irc_database", ircDatabaseType, queue));
+        eventHandlers.push_back(moduleProvider.getInitializerFunction("irc_database", ircDatabaseType)(queue));
         if (backlogEnabled == "y")
-            eventHandlers.push_back(moduleProvider.initializeModule("irc_backlog", "default", queue));
+            eventHandlers.push_back(moduleProvider.getInitializerFunction("irc_backlog", "default")(queue));
         else
             queue->sendEvent(make_shared<EventIrcServiceInit>());
     }
 #endif
 
     if (databaseType != "" && databaseType != "none")
-        eventHandlers.push_back(moduleProvider.initializeModule("database", databaseType, queue));
+        eventHandlers.push_back(moduleProvider.getInitializerFunction("database", databaseType)(queue));
 
 #ifdef USE_WEBSOCKET_SERVER
     if (enableWebChat == "y") {
-        eventHandlers.push_back(moduleProvider.initializeModule("server", "websocket", queue));
+        eventHandlers.push_back(moduleProvider.getInitializerFunction("server", "websocket")(queue));
     }
 #endif
 
@@ -92,9 +92,9 @@ Application::Application()
         hackIni.getEntry(modules, "settings_database", hackDatabaseType);
         hackIni.getEntry(modules, "backlog", backlogEnabled);
 
-        eventHandlers.push_back(moduleProvider.initializeModule("hack_database", hackDatabaseType, queue));
+        eventHandlers.push_back(moduleProvider.getInitializerFunction("hack_database", hackDatabaseType)(queue));
         if (backlogEnabled == "y")
-            eventHandlers.push_back(moduleProvider.initializeModule("hack_backlog", "default", queue));
+            eventHandlers.push_back(moduleProvider.getInitializerFunction("hack_backlog", "default")(queue));
         else
             queue->sendEvent(make_shared<EventHackServiceInit>());
     }
