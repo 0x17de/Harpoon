@@ -49,8 +49,8 @@ struct ModuleInitializer<WebsocketProtocolHandler> {
 
 template<class Target>
 class ModuleProvider {
-    using initializer_result = typename ModuleInitializer<Target>::return_type;
-    using initializer_map_type = std::map<std::string, typename ModuleInitializer<Target>::callback_type>;
+    using callback_type = typename ModuleInitializer<Target>::callback_type;
+    using initializer_map_type = std::map<std::string, callback_type>;
     std::map<std::string, initializer_map_type> initializerByCategory;
 
     ModuleProvider() = default;
@@ -80,18 +80,9 @@ public:
 
     void registerModule(const std::string& category,
                         const std::string& name,
-                        typename ModuleInitializer<Target>::callback_type initializer) {
-        auto categoryIt = initializerByCategory.find(category);
-        initializer_map_type* initializerMap;
-        if (categoryIt == initializerByCategory.end()) {
-            auto resIt = initializerByCategory.emplace(std::piecewise_construct,
-                                                       std::forward_as_tuple(category),
-                                                       std::forward_as_tuple());
-            initializerMap = &resIt.first->second;
-        } else {
-            initializerMap = &categoryIt->second;
-        }
-        initializerMap->emplace(name, initializer);
+                        const typename ModuleInitializer<Target>::callback_type& initializer) {
+        initializer_map_type& initializerMap = initializerByCategory[category];
+        initializerMap.emplace(name, initializer);
     }
 
     template<class Fn>
