@@ -195,7 +195,6 @@ if(USE_HACK_PROTOCOL)
     src/service/hack/HackChannelLoginData.cpp
     src/service/hack/HackChannelStore.cpp
     src/service/hack/HackConnection.cpp
-    src/service/hack/HackConnection_Impl.cpp
     src/service/hack/HackServerConfiguration.cpp
     src/service/hack/HackServerHostConfiguration.cpp
     src/service/hack/HackService.cpp)

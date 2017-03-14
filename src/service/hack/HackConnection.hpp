@@ -13,7 +13,20 @@ class HackChannelStore;
 class EventQueue;
 class HackConnection_Impl;
 class HackConnection : public EventLoop {
-    std::shared_ptr<HackConnection_Impl> impl;
+    static const std::map<char, char> prefixToMode;
+
+    size_t userId;
+    HackServerConfiguration configuration;
+    bool running;
+    //hack_session_t* hackSession;
+
+    std::thread hackLoop;
+
+    std::mutex channelLoginDataMutex;
+
+    std::string nick;
+    std::set<std::string> inUseNicks;
+    std::map<std::string, HackChannelStore> channelStores;
 public:
     HackConnection(EventQueue* appQueue, size_t userId, const HackServerConfiguration& configuration);
     virtual ~HackConnection();

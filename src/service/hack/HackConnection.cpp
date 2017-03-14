@@ -1,19 +1,32 @@
 #include "HackConnection.hpp"
-#include "HackConnection_Impl.hpp"
+#include "HackChannelLoginData.hpp"
 #include "event/EventQuit.hpp"
+#include "event/IActivateServiceEvent.hpp"
+#include "event/hack/EventHackJoinChannel.hpp"
+#include "event/hack/EventHackJoined.hpp"
+#include "event/hack/EventHackParted.hpp"
+#include "event/hack/EventHackPartChannel.hpp"
+#include "event/hack/EventHackDeleteChannel.hpp"
+#include "event/hack/EventHackSendMessage.hpp"
+#include "event/hack/EventHackMessage.hpp"
+#include "event/hack/EventHackModifyNick.hpp"
+#include "event/hack/EventHackNickModified.hpp"
+#include "event/hack/EventHackUserlistReceived.hpp"
 
 using namespace std;
 
 
 HackConnection::HackConnection(EventQueue* appQueue,
-                               size_t userId, const
-                               HackServerConfiguration& configuration)
+                               size_t userId,
+                               const HackServerConfiguration& configuration)
     : EventLoop({
           EventQuit::uuid
       }, {
           EventGuard<IUserEvent>
       })
-    , impl{make_shared<HackConnection_Impl>(appQueue, getEventQueue(), userId, configuration)}
+    , userId{userId}
+    , configuration{configuration}
+    , running{true}
 {
 }
 
@@ -21,7 +34,13 @@ HackConnection::~HackConnection() {
 }
 
 bool HackConnection::onEvent(std::shared_ptr<IEvent> event) {
-    return impl->onEvent(event);
+    UUID type = event->getEventUuid();
+    if (type == EventQuit::uuid) {
+        running = false;
+        cout << "[HC] received QUIT" << endl;
+        return false;
+    }
+    return true;
 }
 
 std::string HackConnection::getActiveNick() const {
