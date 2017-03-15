@@ -26,7 +26,7 @@
 using namespace std;
 
 
-PROVIDE_MODULE("hack_database", "ini", HackDatabase_Ini);
+PROVIDE_EVENTLOOP_MODULE("hack_database", "ini", HackDatabase_Ini)
 
 HackDatabase_Ini::HackDatabase_Ini(EventQueue* appQueue) :
     EventLoop({

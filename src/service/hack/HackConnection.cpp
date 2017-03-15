@@ -1,5 +1,7 @@
+#include <iostream>
 #include "HackConnection.hpp"
 #include "HackChannelLoginData.hpp"
+#include "HackChannelStore.hpp"
 #include "event/EventQuit.hpp"
 #include "event/IActivateServiceEvent.hpp"
 #include "event/hack/EventHackJoinChannel.hpp"
@@ -37,18 +39,18 @@ bool HackConnection::onEvent(std::shared_ptr<IEvent> event) {
     UUID type = event->getEventUuid();
     if (type == EventQuit::uuid) {
         running = false;
-        cout << "[HC] received QUIT" << endl;
+        std::cout << "[HC] received QUIT" << std::endl;
         return false;
     }
     return true;
 }
 
 std::string HackConnection::getActiveNick() const {
-    return impl->nick;
+    return nick;
 }
 
 size_t HackConnection::getServerId() const {
-    return impl->configuration.getServerId();
+    return configuration.getServerId();
 }
 
 void HackConnection::addHost(const std::string& hostName,
@@ -56,7 +58,7 @@ void HackConnection::addHost(const std::string& hostName,
                              int port,
                              bool ipV6,
                              bool ssl) {
-    impl->configuration.addHostConfiguration(hostName,
+    configuration.addHostConfiguration(hostName,
                                              websocketUri,
                                              port,
                                              ipV6,
@@ -64,27 +66,27 @@ void HackConnection::addHost(const std::string& hostName,
 }
 
 void HackConnection::removeHost(const std::string& host, int port) {
-    impl->configuration.removeHost(host, port);
+    configuration.removeHost(host, port);
 }
 
 
 const HackServerConfiguration& HackConnection::getServerConfiguration() const {
-    return impl->configuration;
+    return configuration;
 }
 
 std::string HackConnection::getServerName() const {
-    return impl->configuration.getServerName();
+    return configuration.getServerName();
 }
 
 std::mutex& HackConnection::getChannelLoginDataMutex() const {
-    return impl->channelLoginDataMutex;
+    return channelLoginDataMutex;
 }
 
 const std::map<std::string, HackChannelStore>& HackConnection::getChannelStore() const {
-    return impl->channelStores;
+    return channelStores;
 }
 
 const HackChannelStore* HackConnection::getChannelStore(const std::string& channelName) const {
-    auto it = impl->channelStores.find(channelName);
-    return it == impl->channelStores.end() ? 0 : &it->second;
+    auto it = channelStores.find(channelName);
+    return it == channelStores.end() ? 0 : &it->second;
 }

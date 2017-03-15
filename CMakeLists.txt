@@ -40,8 +40,8 @@ endmacro()
 
 # REPORTING
 
-process_flag(0 USE_IRC_PROTOCOL 1 "Enable the irc protocol support")
-process_flag(0 USE_HACK_PROTOCOL 0 "Enable the hack protocol support")
+process_flag(0 USE_IRC_PROTOCOL 1 "Enable irc protocol support")
+process_flag(0 USE_HACK_PROTOCOL 0 "Enable hack protocol support. (Requires websocketpp)")
 
 process_flag(0 USE_WEBSOCKET_SERVER 1 "Using websocket server")
   process_flag(1 USE_WEBSOCKET_SERVER_VERBOSE 0 "Verbose websocket messages")
@@ -159,6 +159,9 @@ if(USE_IRC_PROTOCOL)
 endif()
 
 if(USE_HACK_PROTOCOL)
+  find_package(WebsocketPP REQUIRED)
+  list(APPEND INCLUDE_DIRECTORIES ${WEBSOCKETPP_INCLUDE_DIRS})
+  list(APPEND LINK_LIBRARIES ${WEBSOCKETPP_LIBRARY})
   list(APPEND SOURCE_FILES
     src/db/HackDatabase_Ini.cpp
     #src/event/hack/EventHackChatListing.cpp

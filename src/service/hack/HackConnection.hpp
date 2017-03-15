@@ -6,6 +6,7 @@
 #include <mutex>
 #include <map>
 #include <string>
+#include "service/hack/HackServerConfiguration.hpp"
 
 
 class HackServerConfiguration;
@@ -22,7 +23,7 @@ class HackConnection : public EventLoop {
 
     std::thread hackLoop;
 
-    std::mutex channelLoginDataMutex;
+    mutable std::mutex channelLoginDataMutex;
 
     std::string nick;
     std::set<std::string> inUseNicks;

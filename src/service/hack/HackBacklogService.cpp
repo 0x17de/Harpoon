@@ -20,7 +20,7 @@
 #include <sstream>
 
 
-PROVIDE_MODULE("hack_backlog", "default", HackBacklogService);
+PROVIDE_EVENTLOOP_MODULE("hack_backlog", "default", HackBacklogService)
 using namespace Query;
 
 
