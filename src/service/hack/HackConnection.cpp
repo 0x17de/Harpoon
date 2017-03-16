@@ -14,8 +14,34 @@
 #include "event/hack/EventHackModifyNick.hpp"
 #include "event/hack/EventHackNickModified.hpp"
 #include "event/hack/EventHackUserlistReceived.hpp"
+#include <websocketpp/config/asio_client.hpp>
+#include <websocketpp/client.hpp>
 
 using namespace std;
+namespace ws = websocketpp;
+
+typedef ws::client<ws::config::asio_client> WebsocketClient;
+typedef ws::lib::shared_ptr<ws::lib::thread> WebsocketThread;
+
+
+class HackWebsocketEndpoint {
+public:
+    HackWebsocketEndpoint();
+
+private:
+    WebsocketClient _endpoint;
+    WebsocketThread _thread;
+};
+
+HackWebsocketEndpoint::HackWebsocketEndpoint() {
+    _endpoint.clear_access_channels(ws::log::alevel::all);
+    _endpoint.clear_error_channels(ws::log::elevel::all);
+
+    _endpoint.init_asio();
+    _endpoint.start_perpetual();
+
+    _thread = ws::lib::make_shared<ws::lib::thread>(&WebsocketClient::run, &_endpoint);
+}
 
 
 HackConnection::HackConnection(EventQueue* appQueue,
@@ -32,8 +58,7 @@ HackConnection::HackConnection(EventQueue* appQueue,
 {
 }
 
-HackConnection::~HackConnection() {
-}
+HackConnection::~HackConnection() = default;
 
 bool HackConnection::onEvent(std::shared_ptr<IEvent> event) {
     UUID type = event->getEventUuid();

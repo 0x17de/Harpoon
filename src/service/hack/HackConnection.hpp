@@ -9,6 +9,7 @@
 #include "service/hack/HackServerConfiguration.hpp"
 
 
+class HackWebsocketEndpoint;
 class HackServerConfiguration;
 class HackChannelStore;
 class EventQueue;
@@ -19,7 +20,7 @@ class HackConnection : public EventLoop {
     size_t userId;
     HackServerConfiguration configuration;
     bool running;
-    //hack_session_t* hackSession;
+    std::unique_ptr<HackWebsocketEndpoint> hackEndpoint;
 
     std::thread hackLoop;
 
