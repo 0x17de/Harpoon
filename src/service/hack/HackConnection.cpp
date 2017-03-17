@@ -16,6 +16,7 @@
 #include "event/hack/EventHackUserlistReceived.hpp"
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
+#include "utils/Cpp11Utils.hpp"
 
 using namespace std;
 namespace ws = websocketpp;
@@ -55,10 +56,46 @@ HackConnection::HackConnection(EventQueue* appQueue,
     , userId{userId}
     , configuration{configuration}
     , running{true}
+    , connected{false}
+    , hostIndex{0}
+    , hackEndpoint{cpp11::make_unique<HackWebsocketEndpoint>()}
 {
+    connect();
 }
 
 HackConnection::~HackConnection() = default;
+
+
+void HackConnection::connect() {
+    if (connected) return;
+
+    HackServerHostConfiguration hostConfiguration;
+    {
+        lock_guard<mutex> lock(channelLoginDataMutex);
+        channelStores.clear();
+        for (auto& channel : configuration.getChannelLoginData()) {
+            channelStores.emplace(piecewise_construct,
+                                  forward_as_tuple(channel.getChannelName()),
+                                  forward_as_tuple(channel.getDisabled()));
+        }
+
+        auto& hostConfigurations = configuration.getHostConfigurations();
+        if (hostConfigurations.empty()) return;
+        hostIndex %= hostConfigurations.size();
+
+        hostConfiguration = *next(hostConfigurations.begin(), hostIndex);
+        //if (!findUnusedNick(nick)) break;
+    }
+
+    ostringstream urlOs;
+    urlOs
+        << (hostConfiguration.getSsl() ? "wss://" : "ws://")
+        << hostConfiguration.getHostName()
+        << hostConfiguration.getWebsocketUri();
+
+    // TODO: continue
+}
+
 
 bool HackConnection::onEvent(std::shared_ptr<IEvent> event) {
     UUID type = event->getEventUuid();

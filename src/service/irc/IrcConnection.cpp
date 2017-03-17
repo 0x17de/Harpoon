@@ -145,9 +145,7 @@ IrcConnection::IrcConnection(EventQueue* appQueue,
                 auto& hostConfigurations = this->configuration.getHostConfigurations();
                 if (hostConfigurations.empty()) break; // give up
                 hostIndex %= hostConfigurations.size();
-                auto hostIterator = hostConfigurations.begin();
-                advance(hostIterator, hostIndex);
-                hostConfiguration = *hostIterator;
+                hostConfiguration = *(next(hostConfigurations.begin(), hostIndex));
 
                 if (!findUnusedNick(nick)) break; // give up
             }

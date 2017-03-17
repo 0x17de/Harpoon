@@ -20,6 +20,8 @@ class HackConnection : public EventLoop {
     size_t userId;
     HackServerConfiguration configuration;
     bool running;
+    bool connected;
+    int hostIndex;
     std::unique_ptr<HackWebsocketEndpoint> hackEndpoint;
 
     std::thread hackLoop;
@@ -29,6 +31,9 @@ class HackConnection : public EventLoop {
     std::string nick;
     std::set<std::string> inUseNicks;
     std::map<std::string, HackChannelStore> channelStores;
+
+    void connect();
+
 public:
     HackConnection(EventQueue* appQueue, size_t userId, const HackServerConfiguration& configuration);
     virtual ~HackConnection();
