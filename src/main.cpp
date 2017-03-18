@@ -47,6 +47,22 @@ void doGenUser(bool save) {
     }
 }
 
+template<class T, class R>
+inline static bool isValidChoice(const T& validChoices, const R& choice) {
+    auto end = validChoices.cend();
+    return std::find(validChoices.cbegin(), end, choice) == end;
+}
+
+template<class T>
+inline static void getChoice(const std::string& message, const T& validChoices, std::string& choice, const std::string& defaultValue) {
+    do {
+        cout << message;
+        getline(cin, choice);
+        if (choice.size() == 0) // auto value
+            choice = defaultValue;
+    } while(!isValidChoice(validChoices, choice));
+}
+
 void doSetup(bool save) {
     Filesystem::getInstance().createPathRecursive("config");
 
@@ -57,49 +73,26 @@ void doSetup(bool save) {
     }
 
     string loginDatabaseType,
+        backlogDatabaseType,
         ircSettingsDatabaseType,
         enableWebChat,
         enableIrcService,
         enableIrcBacklog;
+    static const array<string, 2> validBacklogDatabaseTypes{"none", "postgres"};
     static const array<string, 2> validLoginDatabaseTypes{"dummy", "ini"};
     static const array<string, 2> validIrcDatabaseTypes{"dummy", "ini"};
     static const array<string, 2> validYesNoAnswers{"y", "n"};
 
-    do {
-        cout << "Login database type (dummy/ini) [ini]: ";
-        getline(cin, loginDatabaseType);
-        if (loginDatabaseType.size() == 0) // auto value
-            loginDatabaseType = "ini";
-    } while (find(validLoginDatabaseTypes.begin(), validLoginDatabaseTypes.end(), loginDatabaseType) == validLoginDatabaseTypes.end());
+    getChoice("Login database type (dummy/ini) [ini]: ", validLoginDatabaseTypes, loginDatabaseType, "ini");
+    getChoice("Backlog database type (none/postgres) [postgres]: ", validBacklogDatabaseTypes, backlogDatabaseType, "postgres");
 
-    do {
-        cout << "Enable IRC service (y/n) [y]: ";
-        getline(cin, enableIrcService);
-        if (enableIrcService.size() == 0) // auto value
-            enableIrcService = "y";
-    } while (find(validYesNoAnswers.begin(), validYesNoAnswers.end(), enableIrcService) == validYesNoAnswers.end());
-
+    getChoice("Enable IRC service (y/n) [y]: ", validYesNoAnswers, enableIrcService, "y");
     if (enableIrcService == "y") {
-        do {
-            cout << "IRC settings database type (dummy/ini) [ini]: ";
-            getline(cin, ircSettingsDatabaseType);
-            if (ircSettingsDatabaseType.size() == 0) // auto value
-                ircSettingsDatabaseType = "ini";
-        } while (find(validIrcDatabaseTypes.begin(), validIrcDatabaseTypes.end(), ircSettingsDatabaseType) == validIrcDatabaseTypes.end());
-        do {
-            cout << "Collect IRC backlog (y/n) [y]: ";
-            getline(cin, enableIrcBacklog);
-            if (enableIrcBacklog.size() == 0) // auto value
-                enableIrcBacklog = "y";
-        } while (find(validYesNoAnswers.begin(), validYesNoAnswers.end(), enableIrcBacklog) == validYesNoAnswers.end());
+        getChoice("IRC settings database type (dummy/ini) [ini]: ", validIrcDatabaseTypes, ircSettingsDatabaseType, "ini");
+        getChoice("Collect IRC backlog (y/n) [y]: ", validYesNoAnswers, enableIrcBacklog, "y");
     }
 
-    do {
-        cout << "Enable WebChat (y/n) [y]: ";
-        getline(cin, enableWebChat);
-        if (enableWebChat.size() == 0) // auto value
-            enableWebChat = "y";
-    } while (find(validYesNoAnswers.begin(), validYesNoAnswers.end(), enableWebChat) == validYesNoAnswers.end());
+    getChoice("Enable WebChat (y/n) [y]: ", validYesNoAnswers, enableWebChat, "y");
 
     // write core configuration
     {
@@ -108,6 +101,7 @@ void doSetup(bool save) {
         auto& modules = core.expectCategory("modules");
         core.setEntry(modules, "login", loginDatabaseType);
         core.setEntry(modules, "webchat", enableWebChat);
+        core.setEntry(modules, "database", backlogDatabaseType);
 
         auto& services = core.expectCategory("services");
         core.setEntry(services, "irc", enableIrcService);
