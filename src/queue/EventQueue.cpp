@@ -27,7 +27,7 @@ EventQueue::~EventQueue() {
 
 void EventQueue::sendEvent(std::shared_ptr<IEvent> event) {
     if (enabled) {
-        std::unique_lock<std::timed_mutex> lock(impl->queueMutex);
+        std::unique_lock<std::mutex> lock(impl->queueMutex);
         impl->events.push_back(event);
         impl->eventCondition.notify_one();
     }
@@ -37,25 +37,13 @@ void EventQueue::setEnabled(bool lenabled) {
     enabled = lenabled;
 }
 
-int EventQueue::getEvent(int timeout /* milliseconds */, std::shared_ptr<IEvent>& event) {
-    std::chrono::milliseconds timeoutMillis(timeout);
-    std::unique_lock<std::timed_mutex> lock(impl->queueMutex, std::defer_lock);
-    bool lockResult = lock.try_lock_for(timeoutMillis); // lock for checking queue fill status
-    if (!lockResult)
-        return false;
+int EventQueue::getEvent(std::shared_ptr<IEvent>& event) {
+    std::unique_lock<std::mutex> lock(impl->queueMutex);
 
     if (impl->events.size() == 0) {
-        lock.unlock();
-        std::unique_lock<std::mutex> emptyLock(impl->emptyQueueMutex);
         // wait until queue is filled or timeout
-        if (!impl->eventCondition.wait_for(emptyLock, timeoutMillis, [this]{
-                    return !running || impl->events.size() > 0;
-                })) return false;
+        impl->eventCondition.wait(lock);
         if (!running) return false;
-        // try to lock queue
-        lockResult = lock.try_lock_for(timeoutMillis);
-        if (!lockResult)
-            return false;
     }
 
     // get and remove event from queue
@@ -66,6 +54,7 @@ int EventQueue::getEvent(int timeout /* milliseconds */, std::shared_ptr<IEvent>
 
 void EventQueue::stop() {
     running = false;
+    std::unique_lock<std::mutex> lock(impl->queueMutex);
     impl->eventCondition.notify_one();
 }
 

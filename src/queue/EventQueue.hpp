@@ -23,7 +23,7 @@ public:
     void stop();
     void setEnabled(bool enabled);
     void sendEvent(std::shared_ptr<IEvent> event);
-    int getEvent(int timeout /* milliseconds */, std::shared_ptr<IEvent>& event);
+    int getEvent(std::shared_ptr<IEvent>& event);
     bool canProcessEvent(IEvent* event);
 };
 

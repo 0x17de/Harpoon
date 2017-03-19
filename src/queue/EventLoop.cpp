@@ -35,7 +35,7 @@ void EventLoop::run() {
 
     int eventResult;
     // loop and wait for events with a timeout of 1000
-    while ((eventResult = queue.getEvent(1000, event)) >= 0) {
+    while ((eventResult = queue.getEvent(event)) >= 0) {
         if (destruction) break;
         if (eventResult < 0) break; // error
         if (eventResult == 0) continue; // timeout
