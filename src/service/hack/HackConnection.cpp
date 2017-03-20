@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 #include "HackConnection.hpp"
 #include "HackChannelLoginData.hpp"
 #include "HackChannelStore.hpp"
@@ -14,35 +15,10 @@
 #include "event/hack/EventHackModifyNick.hpp"
 #include "event/hack/EventHackNickModified.hpp"
 #include "event/hack/EventHackUserlistReceived.hpp"
-#include <websocketpp/config/asio_client.hpp>
-#include <websocketpp/client.hpp>
 #include "utils/Cpp11Utils.hpp"
 
 using namespace std;
 namespace ws = websocketpp;
-
-typedef ws::client<ws::config::asio_client> WebsocketClient;
-typedef ws::lib::shared_ptr<ws::lib::thread> WebsocketThread;
-
-
-class HackWebsocketEndpoint {
-public:
-    HackWebsocketEndpoint();
-
-private:
-    WebsocketClient _endpoint;
-    WebsocketThread _thread;
-};
-
-HackWebsocketEndpoint::HackWebsocketEndpoint() {
-    _endpoint.clear_access_channels(ws::log::alevel::all);
-    _endpoint.clear_error_channels(ws::log::elevel::all);
-
-    _endpoint.init_asio();
-    _endpoint.start_perpetual();
-
-    _thread = ws::lib::make_shared<ws::lib::thread>(&WebsocketClient::run, &_endpoint);
-}
 
 
 HackConnection::HackConnection(EventQueue* appQueue,
@@ -58,18 +34,48 @@ HackConnection::HackConnection(EventQueue* appQueue,
     , running{true}
     , connected{false}
     , hostIndex{0}
-    , hackEndpoint{cpp11::make_unique<HackWebsocketEndpoint>()}
 {
+    initializeEndpoint();
     connect();
 }
 
-HackConnection::~HackConnection() = default;
+HackConnection::~HackConnection() {
+    if (_thread) {
+        _endpoint->stop_perpetual();
+        _endpoint->stop();
+        _thread->join();
+    }
+}
 
+
+void HackConnection::initializeEndpoint() {
+    _endpoint = cpp11::make_unique<WebsocketClient>();
+
+    _endpoint->clear_access_channels(ws::log::alevel::all);
+    _endpoint->clear_error_channels(ws::log::elevel::all);
+
+    _endpoint->init_asio();
+    _endpoint->start_perpetual();
+
+    _thread = cpp11::make_unique<std::thread>(&WebsocketClient::run, _endpoint.get());
+}
+
+bool HackConnection::findUnusedNick(std::string& nick) {
+    auto& nicks = configuration.getNicks();
+    auto nickIt = find_if(nicks.begin(), nicks.end(), [this](const std::string& foundNick) {
+        return inUseNicks.find(foundNick) == inUseNicks.end(); // not used
+    });
+    bool success = nickIt != nicks.end();
+    if (success) nick = *nickIt; // assign nick
+    return success;
+}
 
 void HackConnection::connect() {
     if (connected) return;
 
     HackServerHostConfiguration hostConfiguration;
+    std::string nick;
+
     {
         lock_guard<mutex> lock(channelLoginDataMutex);
         channelStores.clear();
@@ -84,18 +90,37 @@ void HackConnection::connect() {
         hostIndex %= hostConfigurations.size();
 
         hostConfiguration = *next(hostConfigurations.begin(), hostIndex);
-        //if (!findUnusedNick(nick)) break;
+        if (!findUnusedNick(nick)) return;
     }
 
     ostringstream urlOs;
     urlOs
         << (hostConfiguration.getSsl() ? "wss://" : "ws://")
         << hostConfiguration.getHostName()
+        << ":"
+        << hostConfiguration.getPort()
         << hostConfiguration.getWebsocketUri();
 
-    // TODO: continue
-}
+    /*
+    // websocket startup
+    websocketpp::lib::error_code ec;
+    WebsocketClient::connection_ptr con = _endpoint.get_connection(urlOs.str(), ec);
 
+    if (ec) {
+        std::cerr << "> Connect initialization error: " << ec.message() << std::endl;
+        return;
+    }
+
+    con->set_open_handler([this](ws::connection_hdl hdl){
+        // TODO
+    });
+    con->set_fail_handler([this](ws::connection_hdl hdl){
+        // TODO
+    });
+
+    _endpoint.connect(con);
+    */
+}
 
 bool HackConnection::onEvent(std::shared_ptr<IEvent> event) {
     UUID type = event->getEventUuid();

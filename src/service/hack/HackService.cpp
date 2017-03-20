@@ -73,16 +73,16 @@ bool HackService::onEvent(std::shared_ptr<IEvent> event) {
             hackConnections.erase(it);
             // overwrite old hack connection
             hackConnections.emplace(piecewise_construct,
-                                   forward_as_tuple(reconnect->getServerId()),
-                                   forward_as_tuple(appQueue,
-                                                    reconnect->getUserId(),
-                                                    configuration));
+                                    forward_as_tuple(reconnect->getServerId()),
+                                    forward_as_tuple(appQueue,
+                                                     reconnect->getUserId(),
+                                                     configuration));
         }
     } else if (type == EventHackServerAdded::uuid) {
         auto add = event->as<EventHackServerAdded>();
         hackConnections.emplace(piecewise_construct,
-                               forward_as_tuple(add->getServerId()),
-                               forward_as_tuple(appQueue,
+                                forward_as_tuple(add->getServerId()),
+                                forward_as_tuple(appQueue,
                                                 add->getUserId(),
                                                 HackServerConfiguration{add->getServerId(), add->getServerName()}));
     } else if (type == EventHackServerDeleted::uuid) {

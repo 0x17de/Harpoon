@@ -6,14 +6,17 @@
 #include <mutex>
 #include <map>
 #include <string>
+#include <websocketpp/config/asio_client.hpp>
+#include <websocketpp/client.hpp>
 #include "service/hack/HackServerConfiguration.hpp"
 
 
-class HackWebsocketEndpoint;
+typedef websocketpp::client<websocketpp::config::asio_client> WebsocketClient;
+typedef std::unique_ptr<WebsocketClient> WebsocketClientPtr;
+typedef std::unique_ptr<websocketpp::lib::thread> WebsocketThreadPtr;
+
 class HackServerConfiguration;
 class HackChannelStore;
-class EventQueue;
-class HackConnection_Impl;
 class HackConnection : public EventLoop {
     static const std::map<char, char> prefixToMode;
 
@@ -22,7 +25,6 @@ class HackConnection : public EventLoop {
     bool running;
     bool connected;
     int hostIndex;
-    std::unique_ptr<HackWebsocketEndpoint> hackEndpoint;
 
     std::thread hackLoop;
 
@@ -32,10 +34,15 @@ class HackConnection : public EventLoop {
     std::set<std::string> inUseNicks;
     std::map<std::string, HackChannelStore> channelStores;
 
+    WebsocketClientPtr _endpoint;
+    WebsocketThreadPtr _thread;
+
+    void initializeEndpoint();
     void connect();
+    bool findUnusedNick(std::string& nick);
 
 public:
-    HackConnection(EventQueue* appQueue, size_t userId, const HackServerConfiguration& configuration);
+    explicit HackConnection(EventQueue* appQueue, size_t userId, const HackServerConfiguration& configuration);
     virtual ~HackConnection();
     virtual bool onEvent(std::shared_ptr<IEvent> event) override;
 
