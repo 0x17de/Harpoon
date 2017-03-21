@@ -75,9 +75,12 @@ void doSetup(bool save) {
     string loginDatabaseType,
         backlogDatabaseType,
         ircSettingsDatabaseType,
+        hackSettingsDatabaseType,
         enableWebChat,
         enableIrcService,
-        enableIrcBacklog;
+        enableIrcBacklog,
+        enableHackService,
+        enableHackBacklog;
     static const array<string, 2> validBacklogDatabaseTypes{"none", "postgres"};
     static const array<string, 2> validLoginDatabaseTypes{"dummy", "ini"};
     static const array<string, 2> validIrcDatabaseTypes{"dummy", "ini"};
@@ -105,15 +108,25 @@ void doSetup(bool save) {
 
         auto& services = core.expectCategory("services");
         core.setEntry(services, "irc", enableIrcService);
+        core.setEntry(services, "hack", enableHackService);
     }
 
     // write irc configuration
-    {
+    if (enableIrcService == "y") {
         Ini irc("config/irc.ini");
 
         auto& modules = irc.expectCategory("modules");
         irc.setEntry(modules, "settings_database", ircSettingsDatabaseType);
         irc.setEntry(modules, "backlog", enableIrcBacklog);
+    }
+
+    // write hack configuration
+    if (enableHackService == "y") {
+        Ini hack("config/hack.ini");
+
+        auto& modules = hack.expectCategory("modules");
+        hack.setEntry(modules, "settings_database", hackSettingsDatabaseType);
+        hack.setEntry(modules, "backlog", enableHackBacklog);
     }
 
     // create first user if no users.ini exists
