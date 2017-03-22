@@ -101,10 +101,9 @@ void HackConnection::connect() {
         << hostConfiguration.getPort()
         << hostConfiguration.getWebsocketUri();
 
-    /*
     // websocket startup
     websocketpp::lib::error_code ec;
-    WebsocketClient::connection_ptr con = _endpoint.get_connection(urlOs.str(), ec);
+    WebsocketClient::connection_ptr con = _endpoint->get_connection(urlOs.str(), ec);
 
     if (ec) {
         std::cerr << "> Connect initialization error: " << ec.message() << std::endl;
@@ -117,9 +116,12 @@ void HackConnection::connect() {
     con->set_fail_handler([this](ws::connection_hdl hdl){
         // TODO
     });
+    con->set_message_handler([this](ws::connection_hdl hdl,
+                                    WebsocketClient::message_ptr message){
+        // TODO
+    });
 
-    _endpoint.connect(con);
-    */
+    _endpoint->connect(con);
 }
 
 bool HackConnection::onEvent(std::shared_ptr<IEvent> event) {

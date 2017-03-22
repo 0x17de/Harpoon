@@ -82,7 +82,7 @@ Application::Application()
 
 #ifdef USE_HACK_PROTOCOL
     string enableHackService;
-    coreIni.getEntry(services, "irc", enableHackService);
+    coreIni.getEntry(services, "hack", enableHackService);
     if (enableHackService == "y") {
         Ini hackIni("config/hack.ini");
         auto& modules = hackIni.expectCategory("modules");
