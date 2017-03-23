@@ -1,5 +1,6 @@
 #include <iostream>
 #include <thread>
+#include <json/json.h>
 #include "HackConnection.hpp"
 #include "HackChannelLoginData.hpp"
 #include "HackChannelStore.hpp"
@@ -102,7 +103,7 @@ void HackConnection::connect() {
         << hostConfiguration.getWebsocketUri();
 
     // websocket startup
-    websocketpp::lib::error_code ec;
+    ws::lib::error_code ec;
     WebsocketClient::connection_ptr con = _endpoint->get_connection(urlOs.str(), ec);
 
     if (ec) {
@@ -110,8 +111,22 @@ void HackConnection::connect() {
         return;
     }
 
-    con->set_open_handler([this](ws::connection_hdl hdl){
-        // TODO
+    con->set_open_handler([this,con](ws::connection_hdl hdl){
+        Json::Value root{Json::objectValue};
+        root["cmd"] = "join";
+        root["channel"] = "?harpoonDev"; // debug
+        root["nick"] = "test";
+        root["pass"] = "test";
+
+        ws::lib::error_code ec;
+        _endpoint->send(hdl, Json::FastWriter{}.write(root), ws::frame::opcode::text, ec);
+        if (ec) {
+            std::cerr << "Failed to send ws message: " << ec.message() << std::endl;
+            _endpoint->close(hdl, ws::close::status::normal, "", ec);
+            if (ec) {
+                std::cerr << "Error during close operation: " << ec.message() << std::endl;
+            }
+        }
     });
     con->set_fail_handler([this](ws::connection_hdl hdl){
         // TODO
