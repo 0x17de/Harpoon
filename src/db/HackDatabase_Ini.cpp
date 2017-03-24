@@ -320,12 +320,14 @@ bool HackDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
                     // read host settings
                     string websocketUri, ipV6, ssl;
                     hostsConfig.getEntry(host, "websocketUri", websocketUri);
+                    hostsConfig.getEntry(host, "password", password);
                     hostsConfig.getEntry(host, "ipv6", ipV6);
                     hostsConfig.getEntry(host, "ssl", ssl);
 
                     loginConfiguration.addHostConfiguration(hostName,
                                                             websocketUri,
                                                             port,
+                                                            password,
                                                             ipV6 == "y",
                                                             ssl == "y");
                 }
