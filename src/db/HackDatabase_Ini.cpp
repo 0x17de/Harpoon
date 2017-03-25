@@ -170,6 +170,7 @@ bool HackDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
                                                                 add->getHost(),
                                                                 add->getWebsocketUri(),
                                                                 add->getPort(),
+                                                                add->getPassword(),
                                                                 add->getIpV6(),
                                                                 add->getSsl()));
         } else {
@@ -312,6 +313,7 @@ bool HackDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
 
                     // construct host config from name
                     string hostName;
+                    string password;
                     int port;
                     istringstream hostDataIs(hostData);
                     getline(hostDataIs, hostName, ':');

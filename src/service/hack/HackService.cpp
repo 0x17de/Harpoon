@@ -100,6 +100,7 @@ bool HackService::onEvent(std::shared_ptr<IEvent> event) {
             connection.addHost(add->getHost(),
                                add->getWebsocketUri(),
                                add->getPort(),
+                               add->getPassword(),
                                add->getIpV6(),
                                add->getSsl());
         }

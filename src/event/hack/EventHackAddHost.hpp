@@ -11,6 +11,7 @@ class EventHackAddHost : public IUserEvent {
     std::string host;
     std::string websocketUri;
     int port;
+    std::string password;
     bool ipV6;
     bool ssl;
 public:
@@ -22,6 +23,7 @@ public:
                      const std::string& host,
                      const std::string& websocketUri,
                      int port,
+                     const std::string& password,
                      bool ipV6,
                      bool ssl);
     virtual size_t getUserId() const override;
@@ -29,6 +31,7 @@ public:
     std::string getHost() const;
     std::string getWebsocketUri() const;
     int getPort() const;
+    std::string getPassword() const;
     bool getIpV6() const;
     bool getSsl() const;
 };

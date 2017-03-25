@@ -6,6 +6,7 @@ EventHackAddHost::EventHackAddHost(size_t userId,
                                    const std::string& host,
                                    const std::string& websocketUri,
                                    int port,
+                                   const std::string& password,
                                    bool ipV6,
                                    bool ssl)
     : userId{userId}
@@ -13,6 +14,7 @@ EventHackAddHost::EventHackAddHost(size_t userId,
     , host{host}
     , websocketUri{websocketUri}
     , port{port}
+    , password{password}
     , ipV6{ipV6}
     , ssl{ssl}
 {
@@ -40,6 +42,10 @@ std::string EventHackAddHost::getWebsocketUri() const {
 
 int EventHackAddHost::getPort() const {
     return port;
+}
+
+std::string EventHackAddHost::getPassword() const {
+    return password;
 }
 
 bool EventHackAddHost::getIpV6() const {

@@ -59,9 +59,10 @@ std::string HackServerConfiguration::getServerName() const {
 void HackServerConfiguration::addHostConfiguration(const std::string& hostName,
                                                    const std::string& websocketUri,
                                                    int port,
+                                                   const std::string& password,
                                                    bool ipV6,
                                                    bool ssl) {
-	hostConfigurations.emplace_back(hostName, websocketUri, port, ipV6, ssl);
+	hostConfigurations.emplace_back(hostName, websocketUri, port, password, ipV6, ssl);
 }
 
 void HackServerConfiguration::removeHost(const std::string& hostName, int port) {

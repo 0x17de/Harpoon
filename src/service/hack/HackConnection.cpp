@@ -160,13 +160,15 @@ size_t HackConnection::getServerId() const {
 void HackConnection::addHost(const std::string& hostName,
                              const std::string& websocketUri,
                              int port,
+                             const std::string& password,
                              bool ipV6,
                              bool ssl) {
     configuration.addHostConfiguration(hostName,
-                                             websocketUri,
-                                             port,
-                                             ipV6,
-                                             ssl);
+                                       websocketUri,
+                                       port,
+                                       password,
+                                       ipV6,
+                                       ssl);
 }
 
 void HackConnection::removeHost(const std::string& host, int port) {

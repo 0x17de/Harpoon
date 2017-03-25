@@ -53,6 +53,7 @@ public:
     void addHost(const std::string& hostName,
                  const std::string& websocketUri,
                  int port,
+                 const std::string& password,
                  bool ipV6,
                  bool ssl);
     void removeHost(const std::string& host, int port);
