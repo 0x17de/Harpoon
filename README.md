@@ -29,8 +29,10 @@ This program is still work in progress. It will require a server.
 
 ### Dependencies
  - Services
-   - IRC
+   - IRC (USE_IRC_PROTOCOL
      - LibIrcClient (>=1.6-r2)
+   - HACK (USE_HACK_PROTOCOL
+     - Websocketpp (>=0.7.0)
    - Backlog (optional, via USE_*_DATABASE flags)
      - SOCI (>=3.2.2)
      - PostgreSQL (optional via USE_POSTGRES_DATABASE)
