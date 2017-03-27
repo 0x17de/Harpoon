@@ -129,11 +129,11 @@ void HackConnection::connect() {
         }
     });
     con->set_fail_handler([this](ws::connection_hdl hdl){
-        // TODO
+        std::cout << "Connection failed" << std::endl;
     });
     con->set_message_handler([this](ws::connection_hdl hdl,
                                     WebsocketClient::message_ptr message){
-        // TODO
+        std::cout << "Message: " << message << std::endl;
     });
 
     _endpoint->connect(con);
