@@ -89,6 +89,18 @@ set(TEST_SOURCE_FILES
     src/tests/TestModules.cpp)
 
 
+# EXECUTABLES
+
+add_library(HarpoonCore SHARED ${SOURCE_FILES})
+add_executable(Harpoon src/main.cpp)
+target_link_libraries(Harpoon HarpoonCore)
+if(BUILD_TEST)
+    add_executable(HarpoonTest
+                   ${TEST_SOURCE_FILES})
+    target_link_libraries(HarpoonTest HarpoonCore)
+endif()
+
+
 # LIBRARIES
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -262,6 +274,11 @@ if(USE_WEBSOCKET_SERVER)
       GIT_TAG "master"
       UPDATE_COMMAND ""
       INSTALL_COMMAND "")
+    ExternalProject_Get_Property(Seasocks source_dir)
+    ExternalProject_Get_Property(Seasocks binary_dir)
+    add_dependencies(Harpoon Seasocks)
+    list(APPEND INCLUDE_DIRECTORIES ${source_dir}/src/main/c/)
+    list(APPEND LINK_LIBRARIES ${binary_dir}/src/main/c/libseasocks.a)
   else()
     if(Seasocks_FOUND)
       list(APPEND INCLUDE_DIRECTORIES ${Seasocks_INCLUDE_DIR})
@@ -300,18 +317,6 @@ if(LibIrcClient_FOUND)
 else()
   message(FATAL_ERROR "LibIrcClient NOT FOUND")
   set(MISSING_LIB 1)
-endif()
-
-
-# EXECUTABLES
-
-add_library(HarpoonCore SHARED ${SOURCE_FILES})
-add_executable(Harpoon src/main.cpp)
-target_link_libraries(Harpoon HarpoonCore)
-if(BUILD_TEST)
-    add_executable(HarpoonTest
-                   ${TEST_SOURCE_FILES})
-    target_link_libraries(HarpoonTest HarpoonCore)
 endif()
 
 
