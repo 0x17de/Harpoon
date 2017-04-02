@@ -84,31 +84,6 @@ set(SOURCE_FILES
     src/utils/Ini.cpp
     src/utils/Password.cpp)
 
-set(TEST_SOURCE_FILES
-    src/test.cpp src/test.hpp
-    src/tests/TestModules.cpp)
-
-
-# EXECUTABLES
-
-add_library(HarpoonCore SHARED ${SOURCE_FILES})
-add_executable(Harpoon src/main.cpp)
-target_link_libraries(Harpoon HarpoonCore)
-if(BUILD_TEST)
-    add_executable(HarpoonTest
-                   ${TEST_SOURCE_FILES})
-    target_link_libraries(HarpoonTest HarpoonCore)
-endif()
-
-
-# LIBRARIES
-
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
-set(LINK_LIBRARIES "Threads::Threads")
-set(INCLUDE_DIRECTORIES "")
-
-
 if(USE_IRC_PROTOCOL)
   list(APPEND SOURCE_FILES
     src/db/IrcDatabase_Dummy.cpp
@@ -162,19 +137,9 @@ if(USE_IRC_PROTOCOL)
     src/service/irc/IrcServerConfiguration.cpp
     src/service/irc/IrcServerHostConfiguration.cpp
     src/service/irc/IrcService.cpp)
-  if(USE_WEBSOCKET_SERVER)
-    list(APPEND SOURCE_FILES
-      src/server/ws/WebsocketHandler_Irc.cpp)
-  endif()
-
-  add_definitions(-DUSE_IRC_PROTOCOL)
 endif()
 
 if(USE_HACK_PROTOCOL)
-  find_package(Boost REQUIRED COMPONENTS system)
-  find_package(WebsocketPP REQUIRED)
-  list(APPEND INCLUDE_DIRECTORIES ${WEBSOCKETPP_INCLUDE_DIRS})
-  list(APPEND LINK_LIBRARIES ${WEBSOCKETPP_LIBRARY} ${Boost_LIBRARIES})
   list(APPEND SOURCE_FILES
     src/db/HackDatabase_Ini.cpp
     #src/event/hack/EventHackChatListing.cpp
@@ -214,6 +179,48 @@ if(USE_HACK_PROTOCOL)
     src/service/hack/HackServerConfiguration.cpp
     src/service/hack/HackServerHostConfiguration.cpp
     src/service/hack/HackService.cpp)
+endif()
+
+set(TEST_SOURCE_FILES
+    src/test.cpp src/test.hpp
+    src/tests/TestModules.cpp)
+
+
+# EXECUTABLES
+
+add_library(HarpoonCore SHARED ${SOURCE_FILES})
+add_executable(Harpoon src/main.cpp)
+target_link_libraries(Harpoon HarpoonCore)
+if(BUILD_TEST)
+    add_executable(HarpoonTest
+                   ${TEST_SOURCE_FILES})
+    target_link_libraries(HarpoonTest HarpoonCore)
+endif()
+
+
+# LIBRARIES
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+set(LINK_LIBRARIES "Threads::Threads")
+set(INCLUDE_DIRECTORIES "")
+
+
+
+if(USE_IRC_PROTOCOL)
+  if(USE_WEBSOCKET_SERVER)
+    list(APPEND SOURCE_FILES
+      src/server/ws/WebsocketHandler_Irc.cpp)
+  endif()
+
+  add_definitions(-DUSE_IRC_PROTOCOL)
+endif()
+
+if(USE_HACK_PROTOCOL)
+  find_package(Boost REQUIRED COMPONENTS system)
+  find_package(WebsocketPP REQUIRED)
+  list(APPEND INCLUDE_DIRECTORIES ${WEBSOCKETPP_INCLUDE_DIRS})
+  list(APPEND LINK_LIBRARIES ${WEBSOCKETPP_LIBRARY} ${Boost_LIBRARIES})
   add_definitions(-DUSE_HACK_PROTOCOL)
 endif()
 
