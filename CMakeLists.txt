@@ -43,6 +43,8 @@ endmacro()
 process_flag(0 USE_IRC_PROTOCOL 1 "Enable irc protocol support")
 process_flag(0 USE_HACK_PROTOCOL 0 "Enable hack protocol support. (Requires websocketpp+boost)")
 
+process_flag(0 USE_POSTGRES_DATABASE 1 "Enable postgres db support.")
+
 process_flag(0 USE_WEBSOCKET_SERVER 1 "Using websocket server")
   process_flag(1 USE_WEBSOCKET_SERVER_VERBOSE 0 "Verbose websocket messages")
   process_flag(1 Seasocks_GIT 0 "Get seasocks from git")
@@ -137,7 +139,15 @@ if(USE_IRC_PROTOCOL)
     src/service/irc/IrcServerConfiguration.cpp
     src/service/irc/IrcServerHostConfiguration.cpp
     src/service/irc/IrcService.cpp)
+
+  if(USE_WEBSOCKET_SERVER)
+    list(APPEND SOURCE_FILES
+      src/server/ws/WebsocketHandler_Irc.cpp)
+  endif()
+
+  add_definitions(-DUSE_IRC_PROTOCOL)
 endif()
+
 
 if(USE_HACK_PROTOCOL)
   list(APPEND SOURCE_FILES
@@ -181,6 +191,29 @@ if(USE_HACK_PROTOCOL)
     src/service/hack/HackService.cpp)
 endif()
 
+
+if(USE_POSTGRES_DATABASE)
+    list(APPEND SOURCE_FILES
+        src/db/handler/Postgres.hpp
+        src/db/handler/Postgres.cpp)
+    add_definitions(-DUSE_POSTGRES_DATABASE)
+endif()
+if(DATABASE_VERBOSE_QUERY)
+    add_definitions(-DDATABASE_VERBOSE_QUERY)
+endif()
+
+if(USE_WEBSOCKET_SERVER)
+  if(USE_WEBSOCKET_SERVER_VERBOSE)
+    add_definitions(-DUSE_WEBSOCKET_SERVER_VERBOSE)
+  endif()
+  list(APPEND SOURCE_FILES
+    src/server/ws/WebsocketServer.cpp
+    src/server/ws/WebsocketHandler.cpp
+    src/server/ws/WebsocketProtocolHandler.cpp)
+  add_definitions(-DUSE_WEBSOCKET_SERVER)
+endif()
+
+
 set(TEST_SOURCE_FILES
     src/test.cpp src/test.hpp
     src/tests/TestModules.cpp)
@@ -206,16 +239,6 @@ set(LINK_LIBRARIES "Threads::Threads")
 set(INCLUDE_DIRECTORIES "")
 
 
-
-if(USE_IRC_PROTOCOL)
-  if(USE_WEBSOCKET_SERVER)
-    list(APPEND SOURCE_FILES
-      src/server/ws/WebsocketHandler_Irc.cpp)
-  endif()
-
-  add_definitions(-DUSE_IRC_PROTOCOL)
-endif()
-
 if(USE_HACK_PROTOCOL)
   find_package(Boost REQUIRED COMPONENTS system)
   find_package(WebsocketPP REQUIRED)
@@ -223,18 +246,6 @@ if(USE_HACK_PROTOCOL)
   list(APPEND LINK_LIBRARIES ${WEBSOCKETPP_LIBRARY} ${Boost_LIBRARIES})
   add_definitions(-DUSE_HACK_PROTOCOL)
 endif()
-
-
-if(USE_POSTGRES_DATABASE)
-    list(APPEND SOURCE_FILES
-        src/db/handler/Postgres.hpp
-        src/db/handler/Postgres.cpp)
-    add_definitions(-DUSE_POSTGRES_DATABASE)
-endif()
-if(DATABASE_VERBOSE_QUERY)
-    add_definitions(-DDATABASE_VERBOSE_QUERY)
-endif()
-
 
 
 if(USE_POSTGRES_DATABASE)
@@ -254,14 +265,6 @@ endif()
 
 
 if(USE_WEBSOCKET_SERVER)
-    if(USE_WEBSOCKET_SERVER_VERBOSE)
-        add_definitions(-DUSE_WEBSOCKET_SERVER_VERBOSE)
-    endif()
-    list(APPEND SOURCE_FILES
-        src/server/ws/WebsocketServer.cpp
-        src/server/ws/WebsocketHandler.cpp
-        src/server/ws/WebsocketProtocolHandler.cpp)
-    add_definitions(-DUSE_WEBSOCKET_SERVER)
     if(NOT Seasocks_GIT)
         find_package(Seasocks REQUIRED)
         if(NOT Seasocks_FOUND)
