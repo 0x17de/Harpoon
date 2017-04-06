@@ -50,7 +50,7 @@ void doGenUser(bool save) {
 template<class T, class R>
 inline static bool isValidChoice(const T& validChoices, const R& choice) {
     auto end = validChoices.cend();
-    return std::find(validChoices.cbegin(), end, choice) == end;
+    return std::find(validChoices.cbegin(), end, choice) != end;
 }
 
 template<class T>
