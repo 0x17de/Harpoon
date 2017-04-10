@@ -58,6 +58,10 @@ process_flag(0 BUILD_TEST 0 "Build tests")
 
 # SOURCES
 
+set(TEST_SOURCE_FILES
+    src/test.cpp src/test.hpp
+    src/tests/TestModules.cpp)
+
 set(SOURCE_FILES
     src/app/Application.cpp
     src/app/ApplicationGuard.cpp
@@ -196,6 +200,9 @@ if(USE_POSTGRES_DATABASE)
     list(APPEND SOURCE_FILES
         src/db/handler/Postgres.hpp
         src/db/handler/Postgres.cpp)
+      
+    list(APPEND TEST_SOURCE_FILES
+        src/tests/TestPostgres.cpp)
     add_definitions(-DUSE_POSTGRES_DATABASE)
 endif()
 if(DATABASE_VERBOSE_QUERY)
@@ -214,20 +221,16 @@ if(USE_WEBSOCKET_SERVER)
 endif()
 
 
-set(TEST_SOURCE_FILES
-    src/test.cpp src/test.hpp
-    src/tests/TestModules.cpp)
-
-
 # EXECUTABLES
 
 add_library(HarpoonCore SHARED ${SOURCE_FILES})
 add_executable(Harpoon src/main.cpp)
 target_link_libraries(Harpoon HarpoonCore)
 if(BUILD_TEST)
-    add_executable(HarpoonTest
-                   ${TEST_SOURCE_FILES})
-    target_link_libraries(HarpoonTest HarpoonCore)
+  find_package(GTest REQUIRED)
+  add_executable(HarpoonTest
+                 ${TEST_SOURCE_FILES})
+  target_link_libraries(HarpoonTest HarpoonCore ${GTEST_LIBRARIES} pthread)
 endif()
 
 
@@ -257,9 +260,6 @@ if(USE_POSTGRES_DATABASE)
         message(FATAL_ERROR "SOCI NOT FOUND")
         set(MISSING_LIB 1)
     endif()
-
-    list(APPEND TEST_SOURCE_FILES
-        src/tests/TestPostgres.cpp)
 endif()
 
 

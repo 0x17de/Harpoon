@@ -1,4 +1,4 @@
-#include "test.hpp"
+#include <gtest/gtest.h>
 #include <memory>
 #include <sstream>
 #include <mutex>
@@ -21,7 +21,7 @@ struct DatabaseHelper {
     shared_ptr<soci::session> session;
     void login() {
         Ini settings("config/postgres.ini");
-        ASSERT_EQUAL(false, settings.isNew());
+        ASSERT_EQ(false, settings.isNew());
 
         string host,
             port,
@@ -46,7 +46,7 @@ struct DatabaseHelper {
               << "user=" << username << " "
               << "password=" << password;
 
-        ASSERT_NOTHROW(([&]{
+        ASSERT_NO_THROW(([&]{
             session = make_shared<soci::session>(login.str());
         }));
     }
@@ -57,7 +57,7 @@ struct DatabaseHelper {
     void tryDrop(const std::string& table) {
         if (exists(table))
             session->once << "DROP TABLE " << table;
-        ASSERT_EQUAL(false, exists(table));
+        ASSERT_EQ(false, exists(table));
     }
     void compareColumns(const std::string& table,
                         const std::map<std::string, std::string>& mapping) {
@@ -67,11 +67,11 @@ struct DatabaseHelper {
         size_t column_count = 0;
         while (s.fetch()) {
             auto it = mapping.find(columnName);
-            ASSERT_EQUAL(false, it == mapping.end());
-            ASSERT_EQUAL(it->second, dataType);
+            ASSERT_EQ(false, it == mapping.end());
+            ASSERT_EQ(it->second, dataType);
             ++column_count;
         }
-        ASSERT_EQUAL(mapping.size(), column_count);
+        ASSERT_EQ(mapping.size(), column_count);
     }
 };
 
@@ -85,12 +85,12 @@ struct PostgresChecker : public EventLoop, public DatabaseHelper {
 
     void testConnect() {
         tryDrop("test_postgres");
-        ASSERT_NOTHROW(([this]{
+        ASSERT_NO_THROW(([this]{
             session->once << "SELECT * FROM information_schema.tables";
         }));
-        ASSERT_EQUAL(false, exists("test_postgres"));
+        ASSERT_EQ(false, exists("test_postgres"));
         session->once << "CREATE TABLE test_postgres (id serial, key text)";
-        ASSERT_EQUAL(true, exists("test_postgres"));
+        ASSERT_EQ(true, exists("test_postgres"));
 
         compareColumns("test_postgres", {
             {"id", "integer"}, // serial converts to integer
@@ -99,13 +99,13 @@ struct PostgresChecker : public EventLoop, public DatabaseHelper {
 
         // cleanup
         session->once << "DROP TABLE test_postgres";
-        ASSERT_EQUAL(false, exists("test_postgres"));
+        ASSERT_EQ(false, exists("test_postgres"));
     }
 
     void testWrite() {
         tryDrop("test_postgres_write");
         session->once << "CREATE TABLE test_postgres_write (id serial, key text)";
-        ASSERT_EQUAL(true, exists("test_postgres_write"));
+        ASSERT_EQ(true, exists("test_postgres_write"));
 
         size_t count;
         size_t id;
@@ -117,7 +117,7 @@ struct PostgresChecker : public EventLoop, public DatabaseHelper {
         stCheck1.execute();
         while (stCheck1.fetch())
             ++count;
-        ASSERT_EQUAL(true, count == 0);
+        ASSERT_EQ(true, count == 0);
 
         // classic insert
         vector<string> textToInsert = {"test0", "test1"};
@@ -129,24 +129,24 @@ struct PostgresChecker : public EventLoop, public DatabaseHelper {
         stCheck2.execute();
         while (stCheck2.fetch()) {
             if (id == 1)
-                ASSERT_EQUAL(textToInsert[0], key);
+                ASSERT_EQ(textToInsert[0], key);
             else if (id == 2)
-                ASSERT_EQUAL(textToInsert[1], key);
+                ASSERT_EQ(textToInsert[1], key);
             else
-                ASSERT_INVALID("Unreachable");
+                ADD_FAILURE(); // Unreachable
             ++count;
         }
-        ASSERT_EQUAL(true, count == 2);
+        ASSERT_EQ(true, count == 2);
 
         // cleanup
         session->once << "DROP TABLE test_postgres_write";
-        ASSERT_EQUAL(false, exists("test_postgres_write"));
+        ASSERT_EQ(false, exists("test_postgres_write"));
     }
 
     void testWeirdWrite() {
         tryDrop("test_postgres_weirdwrite");
         session->once << "CREATE TABLE test_postgres_weirdwrite (id serial, key text)";
-        ASSERT_EQUAL(true, exists("test_postgres_weirdwrite"));
+        ASSERT_EQ(true, exists("test_postgres_weirdwrite"));
 
         vector<string> textToInsert = {"test0", "test1"};
 
@@ -174,18 +174,18 @@ struct PostgresChecker : public EventLoop, public DatabaseHelper {
         st.execute();
         while (st.fetch()) {
             if (id == 1)
-                ASSERT_EQUAL(textToInsert[0], key);
+                ASSERT_EQ(textToInsert[0], key);
             else if (id == 2)
-                ASSERT_EQUAL(textToInsert[1], key);
+                ASSERT_EQ(textToInsert[1], key);
             else
-                ASSERT_INVALID("Unreachable");
+                ADD_FAILURE(); // Unreachable
             ++count;
         }
-        ASSERT_EQUAL(true, count == 2);
+        ASSERT_EQ(true, count == 2);
 
         // cleanup
         session->once << "DROP TABLE test_postgres_weirdwrite";
-        ASSERT_EQUAL(false, exists("test_postgres_weirdwrite"));
+        ASSERT_EQ(false, exists("test_postgres_weirdwrite"));
     }
 
     virtual bool onEvent(std::shared_ptr<IEvent> event) override {
@@ -229,15 +229,15 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
         }
 
         // wait till table is created
-        ASSERT_EQUAL(true, waitForEvent());
+        ASSERT_EQ(true, waitForEvent());
 
         // check result
-        ASSERT_EQUAL(true, results.size() == 1);
-        ASSERT_EQUAL(true, results.back()->as<EventDatabaseResult>()->getSuccess());
+        ASSERT_EQ(true, results.size() == 1);
+        ASSERT_EQ(true, results.back()->as<EventDatabaseResult>()->getSuccess());
         results.clear();
 
         // check table columns
-        ASSERT_EQUAL(true, exists("test_postgreshandler"));
+        ASSERT_EQ(true, exists("test_postgreshandler"));
         compareColumns("test_postgreshandler", {
             {"id", "integer"}, // serial converts to integer
             {"key", "text"}
@@ -254,11 +254,11 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             handler.getEventQueue()->sendEvent(eventInsert);
         }
 
-        ASSERT_EQUAL(true, waitForEvent());
+        ASSERT_EQ(true, waitForEvent());
 
         // check result
-        ASSERT_EQUAL(true, results.size() == 1);
-        ASSERT_EQUAL(true, results.back()->as<EventDatabaseResult>()->getSuccess());
+        ASSERT_EQ(true, results.size() == 1);
+        ASSERT_EQ(true, results.back()->as<EventDatabaseResult>()->getSuccess());
         results.clear();
 
         {
@@ -270,14 +270,14 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             st.execute();
             while (st.fetch()) {
                 if (id == 1)
-                    ASSERT_EQUAL("test0", key);
+                    ASSERT_EQ("test0", key);
                 else if (id == 2)
-                    ASSERT_EQUAL("test1", key);
+                    ASSERT_EQ("test1", key);
                 else
-                    ASSERT_INVALID("Unreachable");
+                    ADD_FAILURE(); // Unreachable
                 ++count;
             }
-            ASSERT_EQUAL(true, count == 2);
+            ASSERT_EQ(true, count == 2);
         }
 
         {
@@ -289,20 +289,20 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             handler.getEventQueue()->sendEvent(eventFetch);
         }
 
-        ASSERT_EQUAL(true, waitForEvent());
+        ASSERT_EQ(true, waitForEvent());
 
         // check result
         {
-            ASSERT_EQUAL(true, results.size() == 1);
+            ASSERT_EQ(true, results.size() == 1);
             auto result = results.back()->as<EventDatabaseResult>();
-            ASSERT_EQUAL(true, result != nullptr);
-            ASSERT_EQUAL(true, result->getSuccess());
+            ASSERT_EQ(true, result != nullptr);
+            ASSERT_EQ(true, result->getSuccess());
 
             auto& resultList = result->getResults();
-            ASSERT_EQUAL(true, resultList.size() == 2);
+            ASSERT_EQ(true, resultList.size() == 2);
             auto it = resultList.begin();
-            ASSERT_EQUAL("1", *it++);
-            ASSERT_EQUAL("test0", *it);
+            ASSERT_EQ("1", *it++);
+            ASSERT_EQ("test0", *it);
 
             // cleanup
             results.clear();
@@ -319,14 +319,14 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             handler.getEventQueue()->sendEvent(eventFetch);
         }
 
-        ASSERT_EQUAL(true, waitForEvent());
+        ASSERT_EQ(true, waitForEvent());
 
         // check result
         {
-            ASSERT_EQUAL(true, results.size() == 1);
+            ASSERT_EQ(true, results.size() == 1);
             auto dbResult = results.back()->as<EventDatabaseResult>();
-            ASSERT_EQUAL(true, dbResult->getSuccess());
-            ASSERT_EQUAL(2uL, dbResult->getResults().size());
+            ASSERT_EQ(true, dbResult->getSuccess());
+            ASSERT_EQ(2uL, dbResult->getResults().size());
             results.clear();
         }
 
@@ -342,15 +342,15 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             handler.getEventQueue()->sendEvent(eventFetch);
         }
 
-        ASSERT_EQUAL(true, waitForEvent());
+        ASSERT_EQ(true, waitForEvent());
 
         // check result
         {
-            ASSERT_EQUAL(true, results.size() == 1);
+            ASSERT_EQ(true, results.size() == 1);
             auto dbResult = results.back()->as<EventDatabaseResult>();
-            ASSERT_EQUAL(true, dbResult->getSuccess());
-            ASSERT_EQUAL(1uL, dbResult->getResults().size());
-            ASSERT_EQUAL("2", dbResult->getResults().front());
+            ASSERT_EQ(true, dbResult->getSuccess());
+            ASSERT_EQ(1uL, dbResult->getResults().size());
+            ASSERT_EQ("2", dbResult->getResults().front());
             results.clear();
         }
 
@@ -365,16 +365,16 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             handler.getEventQueue()->sendEvent(eventFetch);
         }
 
-        ASSERT_EQUAL(true, waitForEvent());
+        ASSERT_EQ(true, waitForEvent());
 
         // check result
         {
-            ASSERT_EQUAL(true, results.size() == 1);
+            ASSERT_EQ(true, results.size() == 1);
             auto dbResult = results.back()->as<EventDatabaseResult>();
-            ASSERT_EQUAL(true, dbResult->getSuccess());
-            ASSERT_EQUAL(2uL, dbResult->getResults().size());
-            ASSERT_EQUAL("1", dbResult->getResults().front());
-            ASSERT_EQUAL("test0", dbResult->getResults().back());
+            ASSERT_EQ(true, dbResult->getSuccess());
+            ASSERT_EQ(2uL, dbResult->getResults().size());
+            ASSERT_EQ("1", dbResult->getResults().front());
+            ASSERT_EQ("test0", dbResult->getResults().back());
             results.clear();
         }
 
@@ -389,15 +389,15 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             handler.getEventQueue()->sendEvent(eventFetch);
         }
 
-        ASSERT_EQUAL(true, waitForEvent());
+        ASSERT_EQ(true, waitForEvent());
 
         // check result
         {
-            ASSERT_EQUAL(true, results.size() == 1);
+            ASSERT_EQ(true, results.size() == 1);
             auto dbResult = results.back()->as<EventDatabaseResult>();
-            ASSERT_EQUAL(true, dbResult->getSuccess());
-            ASSERT_EQUAL(1uL, dbResult->getResults().size());
-            ASSERT_EQUAL("2", dbResult->getResults().back());
+            ASSERT_EQ(true, dbResult->getSuccess());
+            ASSERT_EQ(1uL, dbResult->getResults().size());
+            ASSERT_EQ("2", dbResult->getResults().back());
             results.clear();
         }
 
@@ -412,7 +412,7 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
 
             handler.getEventQueue()->sendEvent(eventUpdate);
 
-            ASSERT_EQUAL(true, waitForEvent());
+            ASSERT_EQ(true, waitForEvent());
             results.clear();
 
             Select stmt2 = select("key")
@@ -423,15 +423,15 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             handler.getEventQueue()->sendEvent(eventFetch);
         }
 
-        ASSERT_EQUAL(true, waitForEvent());
+        ASSERT_EQ(true, waitForEvent());
 
         // check result
         {
-            ASSERT_EQUAL(true, results.size() == 1);
+            ASSERT_EQ(true, results.size() == 1);
             auto dbResult = results.back()->as<EventDatabaseResult>();
-            ASSERT_EQUAL(true, dbResult->getSuccess());
-            ASSERT_EQUAL(1uL, dbResult->getResults().size());
-            ASSERT_EQUAL("replaced", dbResult->getResults().back());
+            ASSERT_EQ(true, dbResult->getSuccess());
+            ASSERT_EQ(1uL, dbResult->getResults().size());
+            ASSERT_EQ("replaced", dbResult->getResults().back());
             results.clear();
         }
 
@@ -446,11 +446,11 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             handler.getEventQueue()->sendEvent(eventDelete);
         }
 
-        ASSERT_EQUAL(true, waitForEvent());
+        ASSERT_EQ(true, waitForEvent());
 
         // check result
-        ASSERT_EQUAL(true, results.size() == 1);
-        ASSERT_EQUAL(true, results.back()->as<EventDatabaseResult>()->getSuccess());
+        ASSERT_EQ(true, results.size() == 1);
+        ASSERT_EQ(true, results.back()->as<EventDatabaseResult>()->getSuccess());
         results.clear();
 
         {
@@ -462,17 +462,17 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             st.execute();
             while (st.fetch()) {
                 if (id == 1)
-                    ASSERT_EQUAL("replaced", key);
+                    ASSERT_EQ("replaced", key);
                 else
-                    ASSERT_INVALID("Unreachable");
+                    ADD_FAILURE(); // Unreachable
                 ++count;
             }
-            ASSERT_EQUAL(true, count == 1);
+            ASSERT_EQ(true, count == 1);
         }
 
         // cleanup
         session->once << "DROP TABLE test_postgreshandler";
-        ASSERT_EQUAL(false, exists("test_postgreshandler"));
+        ASSERT_EQ(false, exists("test_postgreshandler"));
     }
 
     void testJoin() {
@@ -500,16 +500,16 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
         }
 
         // wait till table is created
-        ASSERT_EQUAL(true, waitForEvent());
+        ASSERT_EQ(true, waitForEvent());
 
         // check result
-        ASSERT_EQUAL(true, results.size() == 1);
-        ASSERT_EQUAL(true, results.back()->as<EventDatabaseResult>()->getSuccess());
+        ASSERT_EQ(true, results.size() == 1);
+        ASSERT_EQ(true, results.back()->as<EventDatabaseResult>()->getSuccess());
         results.clear();
 
         // check table columns
-        ASSERT_EQUAL(true, exists("test_postgresjoin"));
-        ASSERT_EQUAL(true, exists("test_postgresjoin_name"));
+        ASSERT_EQ(true, exists("test_postgresjoin"));
+        ASSERT_EQ(true, exists("test_postgresjoin_name"));
         compareColumns("test_postgresjoin", {
             {"id", "integer"}, // serial converts to integer
             {"key", "text"},
@@ -532,11 +532,11 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             handler.getEventQueue()->sendEvent(eventInsert);
         }
 
-        ASSERT_EQUAL(true, waitForEvent());
+        ASSERT_EQ(true, waitForEvent());
 
         // check result
-        ASSERT_EQUAL(true, results.size() == 1);
-        ASSERT_EQUAL(true, results.back()->as<EventDatabaseResult>()->getSuccess());
+        ASSERT_EQ(true, results.size() == 1);
+        ASSERT_EQ(true, results.back()->as<EventDatabaseResult>()->getSuccess());
         results.clear();
 
         {
@@ -548,16 +548,16 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             soci::statement st = (session->prepare << "SELECT name_id, name FROM test_postgresjoin_name", soci::into(id, id_ind), soci::into(name, name_ind));
             st.execute();
             while (st.fetch()) {
-                ASSERT_EQUAL(true, id_ind == soci::i_ok);
-                ASSERT_EQUAL(true, name_ind == soci::i_ok);
+                ASSERT_EQ(true, id_ind == soci::i_ok);
+                ASSERT_EQ(true, name_ind == soci::i_ok);
                 if (id == 1) {
-                    ASSERT_EQUAL(true, id == 1);
-                    ASSERT_EQUAL("testname", name);
+                    ASSERT_EQ(true, id == 1);
+                    ASSERT_EQ("testname", name);
                 } else
-                    ASSERT_INVALID("Unreachable");
+                    ADD_FAILURE(); // Unreachable
                 ++count;
             }
-            ASSERT_EQUAL(true, count == 1);
+            ASSERT_EQ(true, count == 1);
         }
 
         {
@@ -570,17 +570,17 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             soci::statement st = (session->prepare << "SELECT id, key, name_ref FROM test_postgresjoin WHERE id = '1'", soci::into(id, id_ind), soci::into(key, key_ind), soci::into(name_ref, name_ref_ind));
             st.execute();
             while (st.fetch()) {
-                ASSERT_EQUAL(true, id_ind == soci::i_ok);
-                ASSERT_EQUAL(true, key_ind == soci::i_ok);
-                ASSERT_EQUAL(true, name_ref_ind == soci::i_ok);
+                ASSERT_EQ(true, id_ind == soci::i_ok);
+                ASSERT_EQ(true, key_ind == soci::i_ok);
+                ASSERT_EQ(true, name_ref_ind == soci::i_ok);
                 if (id == 1) {
-                    ASSERT_EQUAL("test0", key);
-                    ASSERT_EQUAL(true, name_ref != 0);
+                    ASSERT_EQ("test0", key);
+                    ASSERT_EQ(true, name_ref != 0);
                 } else
-                    ASSERT_INVALID("Unreachable");
+                    ADD_FAILURE(); // Unreachable
                 ++count;
             }
-            ASSERT_EQUAL(true, count == 1);
+            ASSERT_EQ(true, count == 1);
         }
 
         {
@@ -593,17 +593,17 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             soci::statement st = (session->prepare << "SELECT id, key, name FROM test_postgresjoin LEFT JOIN test_postgresjoin_name ON name_ref = name_id WHERE id = '1'", soci::into(id, id_ind), soci::into(key, key_ind), soci::into(name, name_ind));
             st.execute();
             while (st.fetch()) {
-                ASSERT_EQUAL(true, id_ind == soci::i_ok);
-                ASSERT_EQUAL(true, key_ind == soci::i_ok);
-                ASSERT_EQUAL(true, name_ind == soci::i_ok);
+                ASSERT_EQ(true, id_ind == soci::i_ok);
+                ASSERT_EQ(true, key_ind == soci::i_ok);
+                ASSERT_EQ(true, name_ind == soci::i_ok);
                 if (id == 1) {
-                    ASSERT_EQUAL("test0", key);
-                    ASSERT_EQUAL("testname", name);
+                    ASSERT_EQ("test0", key);
+                    ASSERT_EQ("testname", name);
                 } else
-                    ASSERT_INVALID("Unreachable");
+                    ADD_FAILURE(); // Unreachable
                 ++count;
             }
-            ASSERT_EQUAL(true, count == 1);
+            ASSERT_EQ(true, count == 1);
         }
 
         {
@@ -616,27 +616,27 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             handler.getEventQueue()->sendEvent(eventFetch);
         }
 
-        ASSERT_EQUAL(true, waitForEvent());
+        ASSERT_EQ(true, waitForEvent());
 
         // check result
         {
-            ASSERT_EQUAL(true, results.size() == 1);
+            ASSERT_EQ(true, results.size() == 1);
             auto dbResult = results.back()->as<EventDatabaseResult>();
-            ASSERT_EQUAL(true, dbResult->getSuccess());
-            ASSERT_EQUAL(3uL, dbResult->getResults().size());
+            ASSERT_EQ(true, dbResult->getSuccess());
+            ASSERT_EQ(3uL, dbResult->getResults().size());
 
             auto it = dbResult->getResults().begin();
-            ASSERT_EQUAL("1", *it++);
-            ASSERT_EQUAL("test0", *it++);
-            ASSERT_EQUAL("testname", *it++);
+            ASSERT_EQ("1", *it++);
+            ASSERT_EQ("test0", *it++);
+            ASSERT_EQ("testname", *it++);
             results.clear();
         }
 
         // cleanup
         session->once << "DROP TABLE test_postgresjoin";
         session->once << "DROP TABLE test_postgresjoin_name";
-        ASSERT_EQUAL(false, exists("test_postgresjoin"));
-        ASSERT_EQUAL(false, exists("test_postgresjoin_name"));
+        ASSERT_EQ(false, exists("test_postgresjoin"));
+        ASSERT_EQ(false, exists("test_postgresjoin_name"));
     }
 
     void testTypes() {
@@ -656,10 +656,10 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
             handler.getEventQueue()->sendEvent(eventSetup);
         }
 
-        ASSERT_EQUAL(true, waitForEvent());
+        ASSERT_EQ(true, waitForEvent());
 
         session->once << "DROP TABLE test_postgrestypes";
-        ASSERT_EQUAL(false, exists("test_postgrestypes"));
+        ASSERT_EQ(false, exists("test_postgrestypes"));
     }
 
     virtual bool onEvent(std::shared_ptr<IEvent> event) override {
@@ -672,38 +672,32 @@ struct PostgresHandlerChecker : public EventLoop, public DatabaseHelper {
     }
 };
 
-TEST(PostgresConnect,
-     ([]{
-         PostgresChecker checker;
-         checker.testConnect();
-     }));
+TEST(Postgres, PostgresConnect) {
+    PostgresChecker checker;
+    checker.testConnect();
+}
 
-TEST(PostgresWrite,
-     ([]{
-         PostgresChecker checker;
-         checker.testWrite();
-     }));
+TEST(Postgres, PostgresWrite) {
+    PostgresChecker checker;
+    checker.testWrite();
+}
 
-TEST(PostgresWeirdWrite,
-     ([]{
-         PostgresChecker checker;
-         checker.testWeirdWrite();
-     }));
+TEST(Postgres, PostgresWeirdWrite) {
+    PostgresChecker checker;
+    checker.testWeirdWrite();
+}
 
-TEST(PostgresHandler,
-     ([]{
-         PostgresHandlerChecker checker;
-         checker.testHandler();
-     }));
+TEST(Postgres, PostgresHandler) {
+    PostgresHandlerChecker checker;
+    checker.testHandler();
+}
 
-TEST(PostgresHandlerJoin,
-     ([]{
-         PostgresHandlerChecker checker;
-         checker.testJoin();
-     }));
+TEST(Postgres, PostgresHandlerJoin) {
+    PostgresHandlerChecker checker;
+    checker.testJoin();
+}
 
-TEST(PostgresHandlerTypes,
-     ([]{
-         PostgresHandlerChecker checker;
-         checker.testTypes();
-     }));
+TEST(Postgres, PostgresHandlerTypes) {
+    PostgresHandlerChecker checker;
+    checker.testTypes();
+}
