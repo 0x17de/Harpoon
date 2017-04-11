@@ -81,10 +81,10 @@ void doSetup(bool save) {
         enableIrcBacklog,
         enableHackService,
         enableHackBacklog;
-    static const array<string, 2> validBacklogDatabaseTypes{"none", "postgres"};
-    static const array<string, 2> validLoginDatabaseTypes{"dummy", "ini"};
-    static const array<string, 2> validIrcDatabaseTypes{"dummy", "ini"};
-    static const array<string, 2> validYesNoAnswers{"y", "n"};
+    static const array<string, 2> validBacklogDatabaseTypes{{"none", "postgres"}};
+    static const array<string, 2> validLoginDatabaseTypes{{"dummy", "ini"}};
+    static const array<string, 2> validIrcDatabaseTypes{{"dummy", "ini"}};
+    static const array<string, 2> validYesNoAnswers{{"y", "n"}};
 
     getChoice("Login database type (dummy/ini) [ini]: ", validLoginDatabaseTypes, loginDatabaseType, "ini");
     getChoice("Backlog database type (none/postgres) [postgres]: ", validBacklogDatabaseTypes, backlogDatabaseType, "postgres");
