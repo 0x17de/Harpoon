@@ -37,7 +37,7 @@ void EventQueue::setEnabled(bool lenabled) {
     enabled = lenabled;
 }
 
-int EventQueue::getEvent(std::shared_ptr<IEvent>& event) {
+bool EventQueue::getEvent(std::shared_ptr<IEvent>& event) {
     std::unique_lock<std::mutex> lock(impl->queueMutex);
 
     if (impl->events.size() == 0) {
