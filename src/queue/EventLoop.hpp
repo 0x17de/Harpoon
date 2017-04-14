@@ -17,6 +17,9 @@ bool EventGuard(IEvent* event) {
 
 class IEvent;
 class EventQueue;
+
+/// Base class for event loop based flows.
+/// The callback onEvent will be called for every arriving event.
 class EventLoop {
     EventQueue queue;
     bool threaded;

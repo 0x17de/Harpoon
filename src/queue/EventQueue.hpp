@@ -9,6 +9,8 @@
 
 class IEvent;
 class EventQueue_Impl;
+/// Base class for receiving events.
+/// For the event loop getEvent can be used to process pending events.
 class EventQueue {
     std::shared_ptr<EventQueue_Impl> impl;
     std::set<UUID> eventsToBeProcessed;

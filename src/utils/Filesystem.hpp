@@ -10,6 +10,7 @@ class Filesystem {
     Filesystem();
 public:
     static Filesystem& getInstance();
+    /// Recursively creates the required direcory in the current working directory
 	bool createPathRecursive(const std::string& path);
 };
 

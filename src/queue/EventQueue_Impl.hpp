@@ -10,8 +10,11 @@
 
 class EventQueue_Impl {
 public:
+    /// lock for the condition variable
     std::mutex queueMutex;
+    /// contains all received and accepted events
     std::list<std::shared_ptr<IEvent>> events;
+    /// for waiting till the next event if the queue is empty
     std::condition_variable eventCondition;
 };
 
