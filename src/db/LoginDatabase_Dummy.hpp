@@ -5,6 +5,8 @@
 #include "queue/EventLoop.hpp"
 
 
+/// Simple database dummy for testing
+/// Default credentials are "user" "password"
 class LoginDatabase_Dummy : public EventLoop {
     EventQueue* appQueue;
 public:

@@ -5,6 +5,11 @@
 #include "queue/EventLoop.hpp"
 
 
+/// Contains a predefined configuration for testing
+/// "TestServer" 127.0.0.1:6667 with password "wealllikedebian"
+/// No ssl and enabled
+/// The default nicks are iirc, iirc2 and iirc3
+/// Autologin channels are #test and #test2
 class IrcDatabase_Dummy : public EventLoop {
 	EventQueue* appQueue;
 public:
