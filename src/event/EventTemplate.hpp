@@ -4,7 +4,7 @@
 #include "IEvent.hpp"
 #include <cstdlib>
 
-
+/// Template event which is used nowhere
 class EventTemplate : public IEvent {
     size_t userId;
     size_t serverId;

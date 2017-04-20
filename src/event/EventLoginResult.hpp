@@ -6,6 +6,7 @@
 
 
 class EventQueue;
+/// Response which is sent from the login database on successful login
 class EventLoginResult : public ISingleClientEvent {
     bool success;
     size_t userId;

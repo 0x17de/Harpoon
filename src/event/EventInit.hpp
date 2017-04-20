@@ -3,7 +3,7 @@
 
 #include "IEvent.hpp"
 
-
+/// Event which is sent to all modules on initialization at once
 class EventInit : public IEvent {
 public:
     static constexpr UUID uuid = 3;

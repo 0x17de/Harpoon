@@ -4,7 +4,7 @@
 #include "IEvent.hpp"
 #include <cstdlib>
 
-
+/// A user's client connection was closed
 class EventLogout : public IEvent {
     void* data;
 public:
