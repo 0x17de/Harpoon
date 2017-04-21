@@ -18,6 +18,9 @@
 #include <thread>
 
 
+/// Each client has one irc connection per host
+/// Irc connections are created by the IrcService class on activate user
+/// or on EventIrcServerAdded messages.
 class IrcConnection : public EventLoop {
     EventQueue* appQueue;
 

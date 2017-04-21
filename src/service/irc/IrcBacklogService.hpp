@@ -10,6 +10,10 @@
 class IUserEvent;
 class IrcLoggable;
 enum class IrcDatabaseMessageType : int;
+/// Initializes the database layout on startup,
+/// buffers all messages until the last id is received from the database
+/// and sets the id for the IdProvider.
+/// Afterwards processes all buffered messages.
 class IrcBacklogService : public EventLoop {
     /// Core application event queue
     EventQueue* appQueue;
