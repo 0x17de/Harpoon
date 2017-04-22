@@ -65,6 +65,7 @@ set(TEST_SOURCE_FILES
 set(SOURCE_FILES
     src/app/Application.cpp
     src/app/ApplicationGuard.cpp
+    src/app/ArgumentParser.cpp
     src/db/GenericIniDatabase.cpp
     src/db/LoginDatabase_Dummy.cpp
     src/db/LoginDatabase_Ini.cpp
