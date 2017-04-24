@@ -100,6 +100,7 @@ Application::Application()
     }
 #endif
 
+    // Initialize all event handlers
     for (auto& eventHandler : eventHandlers)
         eventHandler->getEventQueue()->sendEvent(make_shared<EventInit>());
 
@@ -117,6 +118,7 @@ bool Application::onEvent(std::shared_ptr<IEvent> event) {
     // which event do we process?
     UUID eventType = event->getEventUuid();
 
+    // dispatch events
     for (auto& eventHandler : eventHandlers) {
         auto eventQueue = eventHandler->getEventQueue();
         if (eventQueue->canProcessEvent(event.get()))
@@ -125,9 +127,9 @@ bool Application::onEvent(std::shared_ptr<IEvent> event) {
 
     if (eventType == EventQuit::uuid) {
         cout << "Received Quit Event" << endl;
-        eventHandlers.clear();
+        eventHandlers.clear(); // stop all event handlers. All received the quit event yet
         cout << "Submodules were stopped" << endl;
-        return false;
+        return false; // stop execution
     }
     return true;
 }
