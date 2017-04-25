@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-
+/// User specific settings for a channel
 class IrcUserStore {
     std::string nick;
     std::string mode;
@@ -18,12 +18,14 @@ public:
     void removeMode(char mode);
 };
 
+/// Channel settings used inside the IrcConnection
 class IrcChannelStore {
     std::string channelPassword;
     std::string channelTopic;
     std::map<std::string, IrcUserStore> users;
     bool disabled;
 
+    /// convert a nick to lowercase
     std::string nickToLower(const std::string& nick);
 public:
     IrcChannelStore(const std::string& channelPassword,

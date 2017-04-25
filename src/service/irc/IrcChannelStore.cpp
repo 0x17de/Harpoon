@@ -1,5 +1,6 @@
 #include "IrcChannelStore.hpp"
 #include <algorithm>
+#include <iterator>
 
 using namespace std;
 
@@ -35,8 +36,8 @@ void IrcUserStore::removeMode(char modeChar) {
 }
 
 std::string IrcChannelStore::nickToLower(const std::string& nick) {
-    string nickLower = nick;
-    transform(nickLower.begin(), nickLower.end(), nickLower.begin(), ::tolower);
+    string nickLower;
+    transform(nickLower.begin(), nickLower.end(), std::back_inserter(nickLower), ::tolower);
     return nickLower;
 }
 
