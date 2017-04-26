@@ -46,9 +46,12 @@ struct DatabaseHelper {
               << "user=" << username << " "
               << "password=" << password;
 
-        ASSERT_NO_THROW(([&]{
+        try {
             session = make_shared<soci::session>(login.str());
-        }));
+        } catch(const soci::soci_error& e) {
+            ADD_FAILURE();
+        }
+        ASSERT_NE(nullptr, session.get());
     }
     bool  exists(const std::string& table) {
         session->once << "SELECT * FROM information_schema.tables WHERE table_name = :table_name LIMIT 1", soci::use(table);
