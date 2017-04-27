@@ -104,6 +104,33 @@ void ArgumentParser::doSetup(bool save) {
         hack.setEntry(modules, "backlog", enableHackBacklog);
     }
 
+    if (backlogDatabaseType == "postgres") {
+        Ini postgres("config/postgres.ini");
+        std::string host = "127.0.0.1",
+            port = "5432",
+            username = "harpoon",
+            password = "harpoon",
+            database = "harpoon";
+
+        std::cout << "Postgres host [127.0.0.1]: ";
+        std::getline(std::cin, host);
+        std::cout << "Postgres port [5432]: ";
+        std::getline(std::cin, port);
+        std::cout << "Postgres username [harpoon]: ";
+        std::getline(std::cin, username);
+        std::cout << "Postgres password [harpoon]: ";
+        std::getline(std::cin, password);
+        std::cout << "Postgres database [harpoon]: ";
+        std::getline(std::cin, database);
+
+        auto category = postgres.expectCategory("auth");
+        postgres.setEntry(category, "host", host);
+        postgres.setEntry(category, "port", port);
+        postgres.setEntry(category, "username", username);
+        postgres.setEntry(category, "password", password);
+        postgres.setEntry(category, "database", database);
+    }
+
     // create first user if no users.ini exists
     if (!usersIniExists) {
         cout << endl << "The first can now be created" << endl;
