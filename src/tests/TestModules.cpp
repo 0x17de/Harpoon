@@ -5,6 +5,7 @@
 #include "db/LoginDatabase_Dummy.hpp"
 #include "db/handler/Postgres.hpp"
 #include "db/LoginDatabase_Ini.hpp"
+#include "event/EventInit.hpp"
 #include "service/irc/IrcConnection.hpp"
 #include "service/irc/IrcBacklogService.hpp"
 #include "service/irc/IrcService.hpp"
@@ -23,20 +24,32 @@ public:
 
 TEST(Modules, ModulesInitDeinit) {
     /*
-    {
-        SimpleLoop simpleLoop;
-    }
-    SimpleLoop base;
-    EventQueue* q = base.getEventQueue();
+    bool testRunning;
+    std::shared_ptr<SimpleLoop> base;
+
+    std::thread watcher([&]{
+            while (testRunning) {
+                if (base) {
+                    base->getEventQueue()->sendEvent(std::make_shared<EventInit>());
+                }
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+        });
+    
+    base = std::make_shared<SimpleLoop>();
+    EventQueue* q = base->getEventQueue();
 
     // Check each object for proper initialization/deinitialization
-    {IrcDatabase_Ini ircdatabase_ini(q);}
-    {IrcDatabase_Dummy ircdatabase_dummy(q);}
-    {LoginDatabase_Dummy logindatabase_dummy(q);}
-    {IrcConnection ircconnection(q, 0, IrcServerConfiguration{0, "server"});}
-    {IrcBacklogService ircbacklogservice(q);}
-    {IrcService ircservice(0, q);}
-    {WebsocketServer websocketserver(q);}
-    {UserManager usermanager(q);}
+    //{IrcDatabase_Ini ircdatabase_ini(q);}
+    //{IrcDatabase_Dummy ircdatabase_dummy(q);}
+    //{LoginDatabase_Dummy logindatabase_dummy(q);}
+    //{IrcConnection ircconnection(q, 0, IrcServerConfiguration{0, "server"});}
+    //{IrcBacklogService ircbacklogservice(q);}
+    //{IrcService ircservice(0, q);}
+    //{WebsocketServer websocketserver(q);}
+    //{UserManager usermanager(q);}
+
+    testRunning = false;
+    watcher.join();
     */
 }
