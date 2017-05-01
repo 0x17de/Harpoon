@@ -51,7 +51,9 @@ struct DatabaseHelper {
         } catch(const soci::soci_error& e) {
             ADD_FAILURE();
         }
-        ASSERT_NE(nullptr, session.get());
+        if (session.get() == nullptr) {
+            throw std::runtime_error("Could not connect to DB");
+        }
     }
     bool  exists(const std::string& table) {
         session->once << "SELECT * FROM information_schema.tables WHERE table_name = :table_name LIMIT 1", soci::use(table);
