@@ -25,11 +25,17 @@ namespace Database {
         EventQueue* appQueue;
         shared_ptr<soci::session> sqlSession;
         explicit Postgres_Impl(EventQueue* appQueue) : connectionFailed{false}, appQueue{appQueue} {};
+        /// Connects the the db on init event, accepts and forwards queries
         bool onEvent(std::shared_ptr<IEvent> event);
+        /// Chooses query type and calls corresponding functions
+        /// for each supplied query in the event.
+        /// Sends back the result for all queries together
         void handleQuery(std::shared_ptr<IEvent> event);
 
+        /// Converts a generic field type to a postgres specific string
         static std::string fieldTypeName(Query::FieldType type);
 
+        /// handles creation of tables
         void query_createTable(Query::QueryCreate_Store* store, EventDatabaseResult* result);
         void query_insert(Query::QueryInsert_Store* store, EventDatabaseResult* result);
         void query_update(Query::QueryUpdate_Store* store, EventDatabaseResult* result);
