@@ -3,8 +3,8 @@
 
 enum class EventQueryType
 {
-    Chats,
-    Settings
+    Chats, ///< requests a listing of all active servers and chats
+    Settings ///< returns configuration data like server+channel settings
 };
 
 #endif

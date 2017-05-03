@@ -9,6 +9,7 @@ using namespace std;
 
 
 int main(int argc, char** argv) {
+    // Includes check for setup flags for generation of the config files
     if (!ArgumentParser::checkArgs(argc, argv))
         return 0;
 
