@@ -12,6 +12,8 @@
 #include "WebsocketHandler.hpp"
 
 
+/// A websocket server listening for client connections.
+/// Translates internal events to json messages for clients.
 class WebsocketServer : public EventLoop {
     EventQueue* appQueue;
 
@@ -21,12 +23,19 @@ class WebsocketServer : public EventLoop {
     seasocks::Server server;
     std::thread serverThread;
 
+    /// Converts events to json messages
     std::string eventToJson(std::shared_ptr<IEvent> event);
 public:
+    /// Constructor
+    ///
+    /// \param appQueue The application's event queue
     WebsocketServer(EventQueue* appQueue);
+    /// Destructor
     ~WebsocketServer();
 
+    /// Registers a valid client as active and can then receive messages
     void addClient(size_t userId, seasocks::WebSocket* socket);
+    /// Removes a client on disconnect
     void removeClient(seasocks::WebSocket* socket);
 
     virtual bool onEvent(std::shared_ptr<IEvent> event) override;
