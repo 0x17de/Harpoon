@@ -1,6 +1,7 @@
 #ifndef IRCDATABASEMESSAGETYPE_H
 #define IRCDATABASEMESSAGETYPE_H
 
+/// Type mapping for each possible irc message/action type
 enum class IrcDatabaseMessageType : int {
     Message = 0,
     Join = 1,

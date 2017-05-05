@@ -7,6 +7,7 @@
 
 class IEvent;
 
+/// Meant as an abstraction for handling different protocols in WebsocketHandler
 class WebsocketProtocolHandler {
 public:
     virtual ~WebsocketProtocolHandler();

@@ -3,7 +3,7 @@
 
 #include <string>
 
-
+/// Stored inside the ServerConfiguration which is used by IrcConections
 class IrcChannelLoginData {
     size_t channelId;
     std::string channelName;

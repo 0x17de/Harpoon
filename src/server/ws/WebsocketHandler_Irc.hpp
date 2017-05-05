@@ -5,6 +5,7 @@
 #include "utils/ModuleProvider.hpp"
 
 
+/// Preparations for WebsocketHandler - just for the irc protocol
 class WebsocketHandler_Irc : public WebsocketProtocolHandler {
 public:
     virtual ~WebsocketHandler_Irc();
