@@ -59,8 +59,7 @@ process_flag(0 BUILD_TEST 0 "Build tests")
 # SOURCES
 
 set(TEST_SOURCE_FILES
-    src/test.cpp src/test.hpp
-    src/tests/TestModules.cpp)
+    src/test.cpp src/test.hpp)
 
 set(SOURCE_FILES
     src/app/Application.cpp
