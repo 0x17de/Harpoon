@@ -6,9 +6,8 @@
 #include "event/EventQuit.hpp"
 #include "event/irc/EventIrcMessage.hpp"
 #include "event/irc/EventIrcAction.hpp"
-#include "event/irc/EventIrcJoined.hpp"
+#include "event/irc/EventIrcUserStatusChanged.hpp"
 #include "event/irc/EventIrcKicked.hpp"
-#include "event/irc/EventIrcParted.hpp"
 #include "event/irc/EventIrcChatListing.hpp"
 #include "event/irc/EventIrcSettingsListing.hpp"
 #include "event/irc/EventIrcQuit.hpp"
@@ -303,24 +302,19 @@ std::string WebsocketServer::eventToJson(std::shared_ptr<IEvent> event) {
         }
         break;
     }
-    case EventIrcJoined::uuid: {
-        auto join = event->as<EventIrcJoined>();
-        root["cmd"] = "join";
+    case EventIrcUserStatusChanged::uuid: {
+        auto statusChanged = event->as<EventIrcUserStatusChanged>();
+        switch(statusChanged->getStatus()) {
+        case EventIrcUserStatusChanged::Status::Joined:
+            root["cmd"] = "join"; break;
+        case EventIrcUserStatusChanged::Status::Parted:
+            root["cmd"] = "part"; break;
+        }
         root["protocol"] = "irc";
         root["id"] = to_string(id);
-        root["server"] = to_string(join->getServerId());
-        root["nick"] = join->getUsername();
-        root["channel"] = join->getChannel();
-        break;
-    }
-    case EventIrcParted::uuid: {
-        auto part = event->as<EventIrcParted>();
-        root["cmd"] = "part";
-        root["protocol"] = "irc";
-        root["id"] = to_string(id);
-        root["server"] = to_string(part->getServerId());
-        root["nick"] = part->getUsername();
-        root["channel"] = part->getChannel();
+        root["server"] = to_string(statusChanged->getServerId());
+        root["nick"] = statusChanged->getUsername();
+        root["channel"] = statusChanged->getChannel();
         break;
     }
     case EventIrcQuit::uuid: {

@@ -4,8 +4,7 @@
 #include "event/irc/EventIrcModeChanged.hpp"
 #include "event/irc/EventIrcUserModeChanged.hpp"
 #include "event/irc/EventIrcNickChanged.hpp"
-#include "event/irc/EventIrcJoined.hpp"
-#include "event/irc/EventIrcParted.hpp"
+#include "event/irc/EventIrcUserStatusChanged.hpp"
 #include "event/irc/EventIrcKicked.hpp"
 #include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcTopic.hpp"
@@ -73,7 +72,11 @@ void IrcConnection::onJoin(irc_session_t* session,
     if (params.size() < 1) return;
     string who(origin);
     string channel(params.at(0));
-    resultEvent = make_shared<EventIrcJoined>(userId, configuration.getServerId(), who, channel);
+    resultEvent = make_shared<EventIrcUserStatusChanged>(userId,
+                                                         configuration.getServerId(),
+                                                         who,
+                                                         channel,
+                                                         EventIrcUserStatusChanged::Status::Joined);
     cout << "JOIN<" << who << ">: " << channel << endl;
 }
 
@@ -87,7 +90,11 @@ void IrcConnection::onPart(irc_session_t* session,
     string who(origin);
     string channel(params.at(0));
     string reason = params.size() < 2 ? "" : params.at(1);
-    resultEvent = make_shared<EventIrcParted>(userId, configuration.getServerId(), who, channel);
+    resultEvent = make_shared<EventIrcUserStatusChanged>(userId,
+                                              configuration.getServerId(),
+                                              who,
+                                              channel,
+                                              EventIrcUserStatusChanged::Status::Joined);
     cout << "PART<" << who << ">: " << channel << ": " << reason << endl;
 }
 

@@ -3,8 +3,7 @@
 #include "event/EventQuit.hpp"
 #include "event/IActivateServiceEvent.hpp"
 #include "event/irc/EventIrcJoinChannel.hpp"
-#include "event/irc/EventIrcJoined.hpp"
-#include "event/irc/EventIrcParted.hpp"
+#include "event/irc/EventIrcUserStatusChanged.hpp"
 #include "event/irc/EventIrcKicked.hpp"
 #include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcNickChanged.hpp"
@@ -252,33 +251,29 @@ bool IrcConnection::onEvent(std::shared_ptr<IEvent> event) {
             channelStores.emplace(piecewise_construct,
                                   forward_as_tuple(channelLower),
                                   forward_as_tuple(channelPassword, false));
-            appQueue->sendEvent(make_shared<EventIrcJoined>(joinCommand->getUserId(),
-                                                            joinCommand->getServerId(),
-                                                            "",
-                                                            channelLower));
+            appQueue->sendEvent(make_shared<EventIrcUserStatusChanged>(joinCommand->getUserId(),
+                                                                       joinCommand->getServerId(),
+                                                                       "",
+                                                                       channelLower,
+                                                                       EventIrcUserStatusChanged::Status::Joined));
         }
-    } else if (type == EventIrcJoined::uuid) {
-        auto join = event->as<EventIrcJoined>();
-        string userName = join->getUsername();
+    } else if (type == EventIrcUserStatusChanged::uuid) {
+        auto statusChanged = event->as<EventIrcUserStatusChanged>();
+        string userName = statusChanged->getUsername();
         if (userName.size() > 0)  {
-            string channelName = join->getChannel();
+            string channelName = statusChanged->getChannel();
 
             lock_guard<mutex> lock(channelLoginDataMutex);
             auto it = channelStores.find(channelName);
             if (it != channelStores.end()) {
                 IrcChannelStore& channelStore = it->second;
-                channelStore.addUser(getPureNick(userName), "");
+                switch(statusChanged->getStatus()) {
+                case EventIrcUserStatusChanged::Status::Joined:
+                    channelStore.addUser(getPureNick(userName), ""); break;
+                case EventIrcUserStatusChanged::Status::Parted:
+                    channelStore.removeUser(getPureNick(userName)); break;
+                }
             }
-        }
-    } else if (type == EventIrcParted::uuid) {
-        auto part = event->as<EventIrcParted>();
-        string channelName = part->getChannel();
-
-        lock_guard<mutex> lock(channelLoginDataMutex);
-        auto it = channelStores.find(channelName);
-        if (it != channelStores.end()) {
-            IrcChannelStore& channelStore = it->second;
-            channelStore.removeUser(getPureNick(part->getUsername()));
         }
     } else if (type == EventIrcTopic::uuid) {
         auto topic = event->as<EventIrcTopic>();

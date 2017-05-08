@@ -9,8 +9,7 @@
 #include "event/irc/EventIrcMessageType.hpp"
 #include "event/irc/EventIrcMessage.hpp"
 #include "event/irc/EventIrcAction.hpp"
-#include "event/irc/EventIrcJoined.hpp"
-#include "event/irc/EventIrcParted.hpp"
+#include "event/irc/EventIrcUserStatusChanged.hpp"
 #include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcKicked.hpp"
 #include "event/irc/EventIrcRequestBacklog.hpp"
@@ -334,28 +333,25 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                                  action->getChannel());
                     break;
                 }
-            case EventIrcJoined::uuid:
+            case EventIrcUserStatusChanged::uuid:
                 {
-                    auto joined = event->as<EventIrcJoined>();
+                    auto statusChange = event->as<EventIrcUserStatusChanged>();
+
+                    IrcDatabaseMessageType messageType;
+                    switch(statusChange->getStatus()) {
+                    case EventIrcUserStatusChanged::Status::Joined:
+                        messageType = IrcDatabaseMessageType::Join; break;
+                    case EventIrcUserStatusChanged::Status::Parted:
+                        messageType = IrcDatabaseMessageType::Part; break;
+                    }
+                    
                     writeBacklog(std::static_pointer_cast<IUserEvent>(event),
                                  loggable,
                                  "",
-                                 IrcDatabaseMessageType::Join,
+                                 messageType,
                                  "0",
-                                 joined->getUsername(),
-                                 joined->getChannel());
-                    break;
-                }
-            case EventIrcParted::uuid:
-                {
-                    auto parted = event->as<EventIrcParted>();
-                    writeBacklog(std::static_pointer_cast<IUserEvent>(event),
-                                 loggable,
-                                 "",
-                                 IrcDatabaseMessageType::Part,
-                                 "0",
-                                 parted->getUsername(),
-                                 parted->getChannel());
+                                 statusChange->getUsername(),
+                                 statusChange->getChannel());
                     break;
                 }
             case EventIrcQuit::uuid:
