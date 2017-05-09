@@ -11,7 +11,6 @@
 #include "event/irc/EventIrcAction.hpp"
 #include "event/irc/EventIrcUserStatusChanged.hpp"
 #include "event/irc/EventIrcQuit.hpp"
-#include "event/irc/EventIrcKicked.hpp"
 #include "event/irc/EventIrcRequestBacklog.hpp"
 #include "event/irc/EventIrcBacklogResponse.hpp"
 #include "utils/IdProvider.hpp"
@@ -343,8 +342,9 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                         messageType = IrcDatabaseMessageType::Join; break;
                     case EventIrcUserStatusChanged::Status::Parted:
                         messageType = IrcDatabaseMessageType::Part; break;
+                    case EventIrcUserStatusChanged::Status::Kicked:
+                        messageType = IrcDatabaseMessageType::Kick; break;
                     }
-                    
                     writeBacklog(std::static_pointer_cast<IUserEvent>(event),
                                  loggable,
                                  "",
@@ -364,18 +364,6 @@ bool IrcBacklogService::processEvent(std::shared_ptr<IEvent> event) {
                                  "0",
                                  quit->getWho(),
                                  "");
-                    break;
-                }
-            case EventIrcKicked::uuid:
-                {
-                    auto kicked = event->as<EventIrcKicked>();
-                    writeBacklog(std::static_pointer_cast<IUserEvent>(event),
-                                 loggable,
-                                 kicked->getReason(),
-                                 IrcDatabaseMessageType::Kick,
-                                 "0",
-                                 kicked->getUsername(),
-                                 kicked->getChannel());
                     break;
                 }
             }

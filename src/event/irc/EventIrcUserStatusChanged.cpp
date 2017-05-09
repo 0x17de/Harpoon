@@ -18,6 +18,23 @@ EventIrcUserStatusChanged::EventIrcUserStatusChanged(size_t userId,
 {
 }
 
+EventIrcUserStatusChanged::EventIrcUserStatusChanged(size_t userId,
+                                                     size_t serverId,
+                                                     const std::string& username,
+                                                     const std::string& channel,
+                                                     Status status,
+                                                     const std::string& target,
+                                                     const std::string& reason)
+    : userId{userId}
+    , serverId{serverId}
+    , username{username}
+    , channel{channel}
+    , status{status}
+    , target{target}
+    , reason{reason}
+{
+}
+
 size_t EventIrcUserStatusChanged::getUserId() const {
     return userId;
 }
@@ -36,4 +53,12 @@ std::string EventIrcUserStatusChanged::getChannel() const {
 
 EventIrcUserStatusChanged::Status EventIrcUserStatusChanged::getStatus() const {
     return status;
+}
+
+std::string EventIrcUserStatusChanged::getTarget() const {
+    return target;
+}
+
+std::string EventIrcUserStatusChanged::getReason() const {
+    return reason;
 }

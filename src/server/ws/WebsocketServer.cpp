@@ -7,7 +7,6 @@
 #include "event/irc/EventIrcMessage.hpp"
 #include "event/irc/EventIrcAction.hpp"
 #include "event/irc/EventIrcUserStatusChanged.hpp"
-#include "event/irc/EventIrcKicked.hpp"
 #include "event/irc/EventIrcChatListing.hpp"
 #include "event/irc/EventIrcSettingsListing.hpp"
 #include "event/irc/EventIrcQuit.hpp"
@@ -306,9 +305,16 @@ std::string WebsocketServer::eventToJson(std::shared_ptr<IEvent> event) {
         auto statusChanged = event->as<EventIrcUserStatusChanged>();
         switch(statusChanged->getStatus()) {
         case EventIrcUserStatusChanged::Status::Joined:
-            root["cmd"] = "join"; break;
+            root["cmd"] = "join";
+            break;
         case EventIrcUserStatusChanged::Status::Parted:
-            root["cmd"] = "part"; break;
+            root["cmd"] = "part";
+            break;
+        case EventIrcUserStatusChanged::Status::Kicked:
+            root["cmd"] = "kick";
+            root["target"] = statusChanged->getTarget();
+            root["msg"] = statusChanged->getReason();
+            break;
         }
         root["protocol"] = "irc";
         root["id"] = to_string(id);
@@ -371,18 +377,6 @@ std::string WebsocketServer::eventToJson(std::shared_ptr<IEvent> event) {
         auto& args = root["args"] = Json::arrayValue;
         for (auto& s : mode->getArgs())
             args.append(s);
-        break;
-    }
-    case EventIrcKicked::uuid: {
-        auto kick = event->as<EventIrcKicked>();
-        root["cmd"] = "kick";
-        root["protocol"] = "irc";
-        root["id"] = to_string(id);
-        root["server"] = to_string(kick->getServerId());
-        root["nick"] = kick->getUsername();
-        root["target"] = kick->getTarget();
-        root["msg"] = kick->getReason();
-        root["channel"] = kick->getChannel();
         break;
     }
     case EventIrcBacklogResponse::uuid: {

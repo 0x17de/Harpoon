@@ -5,7 +5,6 @@
 #include "event/irc/EventIrcUserModeChanged.hpp"
 #include "event/irc/EventIrcNickChanged.hpp"
 #include "event/irc/EventIrcUserStatusChanged.hpp"
-#include "event/irc/EventIrcKicked.hpp"
 #include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcTopic.hpp"
 #include "event/irc/EventIrcAction.hpp"
@@ -155,7 +154,13 @@ void IrcConnection::onKick(irc_session_t* session,
     string channel(params.at(0));
     string target = params.size() < 2 ? "" : params.at(1);
     string reason = params.size() < 3 ? "" : params.at(2);
-    resultEvent = make_shared<EventIrcKicked>(userId, configuration.getServerId(), who, channel, target, reason);
+    resultEvent = make_shared<EventIrcUserStatusChanged>(userId,
+                                                         configuration.getServerId(),
+                                                         who,
+                                                         channel,
+                                                         EventIrcUserStatusChanged::Status::Kicked,
+                                                         target,
+                                                         reason);
 }
 
 void IrcConnection::onChannel(irc_session_t* session,

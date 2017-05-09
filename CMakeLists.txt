@@ -109,7 +109,6 @@ if(USE_IRC_PROTOCOL)
     src/event/irc/EventIrcHostDeleted.cpp
     src/event/irc/EventIrcInvited.cpp
     src/event/irc/EventIrcJoinChannel.cpp
-    src/event/irc/EventIrcKicked.cpp
     src/event/irc/EventIrcMessage.cpp
     src/event/irc/EventIrcModeChanged.cpp
     src/event/irc/EventIrcModifyNick.cpp
