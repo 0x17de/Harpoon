@@ -5,7 +5,6 @@
 #include "event/irc/EventIrcUserModeChanged.hpp"
 #include "event/irc/EventIrcNickChanged.hpp"
 #include "event/irc/EventIrcUserStatusChanged.hpp"
-#include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcTopic.hpp"
 #include "event/irc/EventIrcAction.hpp"
 #include "event/irc/EventIrcMessage.hpp"
@@ -59,7 +58,13 @@ void IrcConnection::onQuit(irc_session_t* session,
     string who(origin);
     string reason = params.size() < 1 ? "" : params.at(0);
     cout << "Q<" << origin << ">: " << reason << endl;
-    resultEvent = make_shared<EventIrcQuit>(userId, configuration.getServerId(), who, reason);
+    resultEvent = make_shared<EventIrcUserStatusChanged>(userId,
+                                                         configuration.getServerId(),
+                                                         who,
+                                                         "",
+                                                         EventIrcUserStatusChanged::Status::Quit,
+                                                         "",
+                                                         reason);
 }
 
 void IrcConnection::onJoin(irc_session_t* session,

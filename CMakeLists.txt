@@ -116,7 +116,6 @@ if(USE_IRC_PROTOCOL)
     src/event/irc/EventIrcNickModified.cpp
     src/event/irc/EventIrcNumeric.cpp
     src/event/irc/EventIrcPartChannel.cpp
-    src/event/irc/EventIrcQuit.cpp
     src/event/irc/EventIrcReconnectServer.cpp
     src/event/irc/EventIrcRequestBacklog.cpp
     src/event/irc/EventIrcSendAction.cpp

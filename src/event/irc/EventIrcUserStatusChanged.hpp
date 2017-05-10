@@ -11,7 +11,8 @@ public:
     enum class Status {
         Joined,
         Parted,
-        Kicked
+        Kicked,
+        Quit
     };
 private:
     size_t userId;

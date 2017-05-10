@@ -9,7 +9,6 @@
 #include "event/irc/EventIrcUserStatusChanged.hpp"
 #include "event/irc/EventIrcChatListing.hpp"
 #include "event/irc/EventIrcSettingsListing.hpp"
-#include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcTopic.hpp"
 #include "event/irc/EventIrcNickChanged.hpp"
 #include "event/irc/EventIrcServerAdded.hpp"
@@ -315,22 +314,17 @@ std::string WebsocketServer::eventToJson(std::shared_ptr<IEvent> event) {
             root["target"] = statusChanged->getTarget();
             root["msg"] = statusChanged->getReason();
             break;
+        case EventIrcUserStatusChanged::Status::Quit:
+            root["cmd"] = "kick";
+            root["target"] = statusChanged->getTarget();
+            root["reason"] = statusChanged->getReason(); // TODO: verify it is "reason"
+            break;
         }
         root["protocol"] = "irc";
         root["id"] = to_string(id);
         root["server"] = to_string(statusChanged->getServerId());
         root["nick"] = statusChanged->getUsername();
         root["channel"] = statusChanged->getChannel();
-        break;
-    }
-    case EventIrcQuit::uuid: {
-        auto quit = event->as<EventIrcQuit>();
-        root["cmd"] = "quit";
-        root["protocol"] = "irc";
-        root["id"] = to_string(id);
-        root["server"] = to_string(quit->getServerId());
-        root["nick"] = quit->getWho();
-        root["reason"] = quit->getReason();
         break;
     }
     case EventIrcTopic::uuid: {

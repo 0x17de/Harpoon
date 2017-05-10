@@ -4,7 +4,6 @@
 #include "event/IActivateServiceEvent.hpp"
 #include "event/irc/EventIrcJoinChannel.hpp"
 #include "event/irc/EventIrcUserStatusChanged.hpp"
-#include "event/irc/EventIrcQuit.hpp"
 #include "event/irc/EventIrcNickChanged.hpp"
 #include "event/irc/EventIrcPartChannel.hpp"
 #include "event/irc/EventIrcDeleteChannel.hpp"
@@ -271,6 +270,7 @@ bool IrcConnection::onEvent(std::shared_ptr<IEvent> event) {
                     channelStore.addUser(getPureNick(userName), ""); break;
                 case EventIrcUserStatusChanged::Status::Parted:
                 case EventIrcUserStatusChanged::Status::Kicked:
+                case EventIrcUserStatusChanged::Status::Quit:
                     channelStore.removeUser(getPureNick(userName)); break;
                 }
             }
@@ -285,15 +285,6 @@ bool IrcConnection::onEvent(std::shared_ptr<IEvent> event) {
         if (it != channelStores.end()) {
             IrcChannelStore& channelStore = it->second;
             channelStore.setTopic(topicText);
-        }
-    } else if (type == EventIrcQuit::uuid) {
-        auto part = event->as<EventIrcQuit>();
-        string nick = getPureNick(part->getWho());
-
-        lock_guard<mutex> lock(channelLoginDataMutex);
-        for (auto& channelPair : channelStores) {
-            auto& channelStore = channelPair.second;
-            channelStore.removeUser(nick);
         }
     } else if (type == EventIrcModifyNick::uuid) {
         lock_guard<mutex> lock(channelLoginDataMutex);
