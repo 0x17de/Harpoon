@@ -251,9 +251,9 @@ bool IrcConnection::onEvent(std::shared_ptr<IEvent> event) {
                                   forward_as_tuple(channelPassword, false));
             appQueue->sendEvent(make_shared<EventIrcUserStatusChanged>(joinCommand->getUserId(),
                                                                        joinCommand->getServerId(),
+                                                                       EventIrcUserStatusChanged::Status::Joined,
                                                                        "",
-                                                                       channelLower,
-                                                                       EventIrcUserStatusChanged::Status::Joined));
+                                                                       channelLower));
         }
     } else if (type == EventIrcUserStatusChanged::uuid) {
         auto statusChanged = event->as<EventIrcUserStatusChanged>();

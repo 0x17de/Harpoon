@@ -60,9 +60,9 @@ void IrcConnection::onQuit(irc_session_t* session,
     cout << "Q<" << origin << ">: " << reason << endl;
     resultEvent = make_shared<EventIrcUserStatusChanged>(userId,
                                                          configuration.getServerId(),
+                                                         EventIrcUserStatusChanged::Status::Quit,
                                                          who,
                                                          "",
-                                                         EventIrcUserStatusChanged::Status::Quit,
                                                          "",
                                                          reason);
 }
@@ -78,9 +78,9 @@ void IrcConnection::onJoin(irc_session_t* session,
     string channel(params.at(0));
     resultEvent = make_shared<EventIrcUserStatusChanged>(userId,
                                                          configuration.getServerId(),
+                                                         EventIrcUserStatusChanged::Status::Joined,
                                                          who,
-                                                         channel,
-                                                         EventIrcUserStatusChanged::Status::Joined);
+                                                         channel);
     cout << "JOIN<" << who << ">: " << channel << endl;
 }
 
@@ -95,10 +95,10 @@ void IrcConnection::onPart(irc_session_t* session,
     string channel(params.at(0));
     string reason = params.size() < 2 ? "" : params.at(1);
     resultEvent = make_shared<EventIrcUserStatusChanged>(userId,
-                                              configuration.getServerId(),
-                                              who,
-                                              channel,
-                                              EventIrcUserStatusChanged::Status::Joined);
+                                                         configuration.getServerId(),
+                                                         EventIrcUserStatusChanged::Status::Joined,
+                                                         who,
+                                                         channel);
     cout << "PART<" << who << ">: " << channel << ": " << reason << endl;
 }
 
@@ -161,9 +161,9 @@ void IrcConnection::onKick(irc_session_t* session,
     string reason = params.size() < 3 ? "" : params.at(2);
     resultEvent = make_shared<EventIrcUserStatusChanged>(userId,
                                                          configuration.getServerId(),
+                                                         EventIrcUserStatusChanged::Status::Kicked,
                                                          who,
                                                          channel,
-                                                         EventIrcUserStatusChanged::Status::Kicked,
                                                          target,
                                                          reason);
 }

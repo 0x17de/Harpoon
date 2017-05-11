@@ -6,23 +6,10 @@ UUID EventIrcUserStatusChanged::getEventUuid() const {
 }
 
 EventIrcUserStatusChanged::EventIrcUserStatusChanged(size_t userId,
-                                       size_t serverId,
-                                       const std::string& username,
-                                       const std::string& channel,
-                                       Status status)
-    : userId{userId}
-    , serverId{serverId}
-    , username{username}
-    , channel{channel}
-    , status{status}
-{
-}
-
-EventIrcUserStatusChanged::EventIrcUserStatusChanged(size_t userId,
                                                      size_t serverId,
+                                                     Status status,
                                                      const std::string& username,
                                                      const std::string& channel,
-                                                     Status status,
                                                      const std::string& target,
                                                      const std::string& reason)
     : userId{userId}

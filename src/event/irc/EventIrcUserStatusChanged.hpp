@@ -6,6 +6,7 @@
 #include <string>
 
 
+/// Event for notifying that a irc user's status changed
 class EventIrcUserStatusChanged : public IClientEvent, public IrcLoggable {
 public:
     enum class Status {
@@ -28,16 +29,11 @@ public:
 
     EventIrcUserStatusChanged(size_t userId,
                               size_t serverId,
-                              const std::string& username,
-                              const std::string& channel,
-                              Status status);
-    EventIrcUserStatusChanged(size_t userId,
-                              size_t serverId,
-                              const std::string& username,
-                              const std::string& channel,
                               Status status,
-                              const std::string& target,
-                              const std::string& reason);
+                              const std::string& username,
+                              const std::string& channel = "",
+                              const std::string& target = "",
+                              const std::string& reason = "");
     virtual size_t getUserId() const override;
     size_t getServerId() const;
     std::string getUsername() const;
