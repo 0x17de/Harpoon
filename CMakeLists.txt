@@ -108,14 +108,12 @@ if(USE_IRC_PROTOCOL)
     src/event/irc/EventIrcHostAdded.cpp
     src/event/irc/EventIrcHostDeleted.cpp
     src/event/irc/EventIrcInvited.cpp
-    src/event/irc/EventIrcJoinChannel.cpp
     src/event/irc/EventIrcMessage.cpp
     src/event/irc/EventIrcModeChanged.cpp
     src/event/irc/EventIrcModifyNick.cpp
     src/event/irc/EventIrcNickChanged.cpp
     src/event/irc/EventIrcNickModified.cpp
     src/event/irc/EventIrcNumeric.cpp
-    src/event/irc/EventIrcPartChannel.cpp
     src/event/irc/EventIrcReconnectServer.cpp
     src/event/irc/EventIrcRequestBacklog.cpp
     src/event/irc/EventIrcSendAction.cpp
@@ -127,6 +125,7 @@ if(USE_IRC_PROTOCOL)
     src/event/irc/EventIrcTopic.cpp
     src/event/irc/EventIrcUserModeChanged.cpp
     src/event/irc/EventIrcUserStatusChanged.cpp
+    src/event/irc/EventIrcUserStatusRequest.cpp
     src/event/irc/EventIrcUserlistReceived.cpp
     src/event/irc/IrcChannelListing.cpp
     src/event/irc/IrcChannelUser.cpp

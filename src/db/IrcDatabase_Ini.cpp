@@ -6,8 +6,7 @@
 #include "service/irc/IrcServerHostConfiguration.hpp"
 #include "service/irc/IrcServerConfiguration.hpp"
 #include "event/irc/EventIrcActivateService.hpp"
-#include "event/irc/EventIrcJoinChannel.hpp"
-#include "event/irc/EventIrcPartChannel.hpp"
+#include "event/irc/EventIrcUserStatusRequest.hpp"
 #include "event/irc/EventIrcDeleteChannel.hpp"
 #include "event/irc/EventIrcAddServer.hpp"
 #include "event/irc/EventIrcDeleteServer.hpp"
@@ -40,8 +39,7 @@ IrcDatabase_Ini::IrcDatabase_Ini(EventQueue* appQueue) :
         EventIrcAddHost::uuid,
         EventIrcDeleteHost::uuid,
         EventIrcModifyNick::uuid,
-        EventIrcJoinChannel::uuid,
-        EventIrcPartChannel::uuid,
+        EventIrcUserStatusRequest::uuid,
         EventIrcDeleteChannel::uuid
     }),
     GenericIniDatabase("irc"),
@@ -133,49 +131,40 @@ bool IrcDatabase_Ini::onEvent(std::shared_ptr<IEvent> event) {
         break;
 #pragma message "EventIrcDeleteServer: Cleanup directories"
     }
-    case EventIrcJoinChannel::uuid: {
-        auto join = event->as<EventIrcJoinChannel>();
-        size_t userId = join->getUserId();
-        size_t serverId = join->getServerId();
+    case EventIrcUserStatusRequest::uuid: {
+        auto statusRequest = event->as<EventIrcUserStatusRequest>();
+        size_t userId = statusRequest->getUserId();
+        size_t serverId = statusRequest->getServerId();
 
-        if (joinChannel(userId, serverId,
-                        [&join](Ini& ini){
+        switch (statusRequest->getStatus()) {
+        case EventIrcUserStatusRequest::Status::Join:
+            joinChannel(userId, serverId,
+                        [&statusRequest](Ini& ini){
                             // save whatever you need here
-                            // save data from join event to ini
-                            for (auto& loginData : join->getLoginData()) {
-                                auto& channelEntry = ini.expectCategory(loginData.name);
-                                string channelId;
-                                if (!ini.getEntry(channelEntry, "id", channelId)) {
-                                    channelId = to_string(IdProvider::getInstance().generateNewId("channel"));
-                                    ini.setEntry(channelEntry, "id", channelId);
-                                    ini.setEntry(channelEntry, "password", loginData.password);
-                                }
-                                ini.setEntry(channelEntry, "disabled", "no");
-                                if (loginData.passwordSpecified) {
-                                    ini.setEntry(channelEntry, "password", loginData.password);
-                                }
+                            // save data from statusRequest event to ini
+                            auto& channelEntry = ini.expectCategory(statusRequest->getTarget());
+                            string channelId;
+                            if (!ini.getEntry(channelEntry, "id", channelId)) {
+                                channelId = to_string(IdProvider::getInstance().generateNewId("channel"));
+                                ini.setEntry(channelEntry, "id", channelId);
+                                ini.setEntry(channelEntry, "password", statusRequest->getPassword());
                             }
-                        })) {
-            // no action
-        }
-
-        break;
-    }
-    case EventIrcPartChannel::uuid: {
-        auto part = event->as<EventIrcPartChannel>();
-        size_t userId = part->getUserId();
-        size_t serverId = part->getServerId();
-
-        if (partChannel(userId, serverId,
-                        [&part](Ini& ini){
+                            ini.setEntry(channelEntry, "disabled", "no");
+                            if (statusRequest->getPassword().size() > 0) {
+                                ini.setEntry(channelEntry, "password", statusRequest->getPassword());
+                            }
+                        });
+            break;
+        case EventIrcUserStatusRequest::Status::Part:
+            partChannel(userId, serverId,
+                        [&statusRequest](Ini& ini){
                             // save data from part event to ini
-                            for (const auto& channelName : part->getChannels()) {
-                                auto* categoryEntry = ini.getEntry(channelName);
-                                if (categoryEntry)
-                                    ini.setEntry(*categoryEntry, "disabled", "yes");
+                            auto* categoryEntry = ini.getEntry(statusRequest->getTarget());
+                            if (categoryEntry) {
+                                ini.setEntry(*categoryEntry, "disabled", "yes");
                             }
-                        })) {
-            // no action
+                        });
+            break;
         }
         break;
     }

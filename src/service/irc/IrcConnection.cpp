@@ -2,10 +2,9 @@
 #include "IrcChannelLoginData.hpp"
 #include "event/EventQuit.hpp"
 #include "event/IActivateServiceEvent.hpp"
-#include "event/irc/EventIrcJoinChannel.hpp"
+#include "event/irc/EventIrcUserStatusRequest.hpp"
 #include "event/irc/EventIrcUserStatusChanged.hpp"
 #include "event/irc/EventIrcNickChanged.hpp"
-#include "event/irc/EventIrcPartChannel.hpp"
 #include "event/irc/EventIrcDeleteChannel.hpp"
 #include "event/irc/EventIrcSendMessage.hpp"
 #include "event/irc/EventIrcSendAction.hpp"
@@ -218,42 +217,53 @@ bool IrcConnection::onEvent(std::shared_ptr<IEvent> event) {
         lock_guard<mutex> lock(channelLoginDataMutex);
         auto nick = event->as<EventIrcChangeNick>();
         irc_cmd_nick(ircSession, nick->getNick().c_str());
-    } else if (type == EventIrcJoinChannel::uuid) {
+    } else if (type == EventIrcUserStatusRequest::uuid) {
         lock_guard<mutex> lock(channelLoginDataMutex);
-        auto joinCommand = event->as<EventIrcJoinChannel>();
-        for (auto& entry : joinCommand->getLoginData()) {
-            string channelName = entry.name;
-
+        auto statusRequest = event->as<EventIrcUserStatusRequest>();
+        string channelName = statusRequest->getTarget();
+        switch(statusRequest->getStatus()) {
+        case EventIrcUserStatusRequest::Status::Join: {
             size_t lastPound = channelName.rfind('#');
-            if (channelName.size() == 0 || lastPound == channelName.size())
-                continue; // invalid channel name
+            if (channelName.size() > 0 && lastPound != channelName.size()) {
+                string channelLower = channelName;
+                transform(channelLower.begin(), channelLower.end(), channelLower.begin(), ::tolower);
 
-            string channelLower = channelName;
-            transform(channelLower.begin(), channelLower.end(), channelLower.begin(), ::tolower);
-
-            auto it = channelStores.find(channelLower);
-            if (it != channelStores.end()) {
-                if (it->second.getDisabled()) {
-                    // TODO: check if password specified
+                auto it = channelStores.find(channelLower);
+                if (it != channelStores.end()) {
+                    if (it->second.getDisabled()) {
+                        // TODO: check if password specified
+                        irc_cmd_join(ircSession,
+                                     channelLower.c_str(),
+                                     it->second.getChannelPassword().c_str());
+                        it->second.setDisabled(false);
+                    }
+                } else {
+                    string channelPassword = statusRequest->getPassword();
                     irc_cmd_join(ircSession,
                                  channelLower.c_str(),
-                                 it->second.getChannelPassword().c_str());
-                    it->second.setDisabled(false);
+                                 channelPassword.c_str());
+                    channelStores.emplace(piecewise_construct,
+                                          forward_as_tuple(channelLower),
+                                          forward_as_tuple(channelPassword, false));
+                    appQueue->sendEvent(make_shared<EventIrcUserStatusChanged>(statusRequest->getUserId(),
+                                                                               statusRequest->getServerId(),
+                                                                               EventIrcUserStatusChanged::Status::Joined,
+                                                                               "",
+                                                                               channelLower));
                 }
-                continue;
             }
-            string channelPassword = entry.password;
-            irc_cmd_join(ircSession,
-                         channelLower.c_str(),
-                         channelPassword.c_str());
-            channelStores.emplace(piecewise_construct,
-                                  forward_as_tuple(channelLower),
-                                  forward_as_tuple(channelPassword, false));
-            appQueue->sendEvent(make_shared<EventIrcUserStatusChanged>(joinCommand->getUserId(),
-                                                                       joinCommand->getServerId(),
-                                                                       EventIrcUserStatusChanged::Status::Joined,
-                                                                       "",
-                                                                       channelLower));
+            break;
+        }
+        case EventIrcUserStatusRequest::Status::Part: {
+            std::string channelLower;
+            transform(channelName.begin(), channelName.end(), std::back_inserter(channelLower), ::tolower);
+            auto it = channelStores.find(channelLower);
+            if (it != channelStores.end()) {
+                irc_cmd_part(ircSession, channelLower.c_str());
+                it->second.setDisabled(true);
+            }
+            break;
+        }
         }
     } else if (type == EventIrcUserStatusChanged::uuid) {
         auto statusChanged = event->as<EventIrcUserStatusChanged>();
@@ -388,18 +398,6 @@ bool IrcConnection::onEvent(std::shared_ptr<IEvent> event) {
                     argIndex += 1;
                 }
             }
-        }
-    } else if (type == EventIrcPartChannel::uuid) {
-        lock_guard<mutex> lock(channelLoginDataMutex);
-        auto partCommand = event->as<EventIrcPartChannel>();
-        for (string channelName : partCommand->getChannels()) {
-            string channelLower = channelName;
-            transform(channelLower.begin(), channelLower.end(), channelLower.begin(), ::tolower);
-            auto it = channelStores.find(channelLower);
-            if (it == channelStores.end())
-                continue;
-            irc_cmd_part(ircSession, channelLower.c_str());
-            it->second.setDisabled(true);
         }
     } else if (type == EventIrcDeleteChannel::uuid) {
         lock_guard<mutex> lock(channelLoginDataMutex);

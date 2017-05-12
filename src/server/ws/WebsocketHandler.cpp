@@ -13,8 +13,7 @@
 #include "event/irc/EventIrcDeleteHost.hpp"
 #include "event/irc/EventIrcModifyNick.hpp"
 #include "event/irc/EventIrcReconnectServer.hpp"
-#include "event/irc/EventIrcJoinChannel.hpp"
-#include "event/irc/EventIrcPartChannel.hpp"
+#include "event/irc/EventIrcUserStatusRequest.hpp"
 #include "event/irc/EventIrcChangeNick.hpp"
 #include "event/irc/EventIrcRequestBacklog.hpp"
 #include <limits>
@@ -100,16 +99,21 @@ void WebsocketHandler::onData(seasocks::WebSocket* connection, const char* cdata
                     istringstream(root.get("server", "0").asString()) >> serverId;
                     string channel = root.get("channel", "").asString();
                     string password = root.get("password", "").asString();
-                    auto join = make_shared<EventIrcJoinChannel>(clientData.userId, serverId);
-                    join->addLoginData(channel, password);
-                    appQueue->sendEvent(join);
+                    auto statusRequest = make_shared<EventIrcUserStatusRequest>(EventIrcUserStatusRequest::Status::Join,
+                                                                                clientData.userId,
+                                                                                serverId,
+                                                                                channel,
+                                                                                password);
+                    appQueue->sendEvent(statusRequest);
                 } else if (cmd == "part") {
                     size_t serverId;
                     istringstream(root.get("server", "0").asString()) >> serverId;
                     string channel = root.get("channel", "").asString();
-                    auto part = make_shared<EventIrcPartChannel>(clientData.userId, serverId);
-                    part->addChannel(channel);
-                    appQueue->sendEvent(part);
+                    auto statusRequest = make_shared<EventIrcUserStatusRequest>(EventIrcUserStatusRequest::Status::Part,
+                                                                                clientData.userId,
+                                                                                serverId,
+                                                                                channel);
+                    appQueue->sendEvent(statusRequest);
                 } else if (cmd == "nick") {
                     size_t serverId;
                     istringstream(root.get("server", "0").asString()) >> serverId;
