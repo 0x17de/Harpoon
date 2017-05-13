@@ -13,7 +13,8 @@ public:
         Joined,
         Parted,
         Kicked,
-        Quit
+        Quit,
+        Mode
     };
 private:
     size_t userId;
@@ -21,7 +22,7 @@ private:
     std::string username;
     std::string channel;
     Status status;
-    std::string target;
+    std::string targetOrMode;
     std::string reason;
 public:
     static constexpr UUID uuid = 34;
@@ -32,7 +33,7 @@ public:
                               Status status,
                               const std::string& username,
                               const std::string& channel = "",
-                              const std::string& target = "",
+                              const std::string& targetOrMode = "",
                               const std::string& reason = "");
     virtual size_t getUserId() const override;
     size_t getServerId() const;
@@ -41,6 +42,7 @@ public:
     Status getStatus() const;
     std::string getReason() const;
     std::string getTarget() const;
+    std::string getMode() const;
 };
 
 #endif

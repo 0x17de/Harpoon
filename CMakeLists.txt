@@ -123,7 +123,6 @@ if(USE_IRC_PROTOCOL)
     src/event/irc/EventIrcServiceInit.cpp
     src/event/irc/EventIrcSettingsListing.cpp
     src/event/irc/EventIrcTopic.cpp
-    src/event/irc/EventIrcUserModeChanged.cpp
     src/event/irc/EventIrcUserStatusChanged.cpp
     src/event/irc/EventIrcUserStatusRequest.cpp
     src/event/irc/EventIrcUserlistReceived.cpp

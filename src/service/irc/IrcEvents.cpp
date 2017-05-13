@@ -2,7 +2,6 @@
 #include "queue/EventQueue.hpp"
 #include "event/irc/EventIrcConnected.hpp"
 #include "event/irc/EventIrcModeChanged.hpp"
-#include "event/irc/EventIrcUserModeChanged.hpp"
 #include "event/irc/EventIrcNickChanged.hpp"
 #include "event/irc/EventIrcUserStatusChanged.hpp"
 #include "event/irc/EventIrcTopic.hpp"
@@ -130,7 +129,9 @@ void IrcConnection::onUmode(irc_session_t* session,
     string who(origin);
     string channel(params.at(0));
     string mode(params.at(1));
-    resultEvent = make_shared<EventIrcUserModeChanged>(userId, configuration.getServerId(), who, channel, mode);
+    resultEvent = make_shared<EventIrcUserStatusChanged>(userId, configuration.getServerId(),
+                                                         EventIrcUserStatusChanged::Status::Mode,
+                                                         who, channel, mode);
     cout << "UMODE<" << who << ">: " << channel << " " << mode << endl;
 }
 
