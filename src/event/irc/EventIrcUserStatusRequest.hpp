@@ -7,6 +7,7 @@
 
 
 class IrcChannelLoginData;
+/// Requesting a status change for join/part
 class EventIrcUserStatusRequest : public IIrcCommand {
 public:
     enum class Status {
@@ -23,6 +24,13 @@ public:
     static constexpr UUID uuid = 24;
     virtual UUID getEventUuid() const override;
 
+    /// Constructor
+    ///
+    /// \param status The requestet status type
+    /// \param userId The requesting user's id
+    /// \param serverId Server id on which the request is created
+    /// \param target The target channel
+    /// \param password Non empty if the channel requires a password
     explicit EventIrcUserStatusRequest(Status status,
                                        size_t userId,
                                        size_t serverId,
