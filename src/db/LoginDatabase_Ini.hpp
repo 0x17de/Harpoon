@@ -6,6 +6,9 @@
 #include "utils/Ini.hpp"
 
 
+/// Used to validate users.
+/// Stores users as categories having salt and password.
+/// To add new users use the --genuser cmdline option together with --save.
 class LoginDatabase_Ini : public EventLoop {
     EventQueue* appQueue;
     Ini usersIni;
